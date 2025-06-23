@@ -24,6 +24,7 @@ class User extends Model
         return $this->hasMany(Menu::class);
     }
 
+    
     public function events()
     {
         return $this->hasMany(Event::class);
