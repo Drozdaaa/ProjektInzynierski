@@ -33,5 +33,5 @@ class Dish extends Model
     {
         return $this->hasMany(Diet::class);
     }
-    public $timestamps = false;
+
 }

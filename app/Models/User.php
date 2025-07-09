@@ -33,5 +33,5 @@ class User extends Model
     {
         return $this->belongsToMany(Allergy::class, 'user_allergy');
     }
-    public $timestamps = false;
+
 }

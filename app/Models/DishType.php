@@ -14,5 +14,5 @@ class DishType extends Model
     {
         return $this->hasMany(Dish::class);
     }
-    public $timestamps = false;
+
 }

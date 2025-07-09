@@ -18,7 +18,6 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->foreignId('dish_type_id')->constrained('dish_types');
             $table->foreignId('restaurant_id')->constrained('restaurants');
-            $table->timestamps();
         });
     }
 

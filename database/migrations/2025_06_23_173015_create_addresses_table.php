@@ -17,8 +17,6 @@ return new class extends Migration
             $table->string('street');
             $table->string('postal_code');
             $table->integer('building_number');
-            $table->timestamps();
-
         });
     }
 

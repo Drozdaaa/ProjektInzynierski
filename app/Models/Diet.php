@@ -22,5 +22,5 @@ class Diet extends Model
     {
         return $this->belongsTo(Dish::class);
     }
-    public $timestamps = false;
+
 }

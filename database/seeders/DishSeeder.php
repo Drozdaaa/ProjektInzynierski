@@ -10,7 +10,7 @@ class DishSeeder extends Seeder
 {
     public function run(): void
     {
-        Dish::create([
+        Dish::insert([
             [
                 'name' => 'Tatar',
                 'description' => 'Tatar z mięsa wołowego',

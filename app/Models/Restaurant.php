@@ -26,5 +26,5 @@ class Restaurant extends Model
     {
         return $this->hasMany(Event::class);
     }
-    public $timestamps = false;
+
 }

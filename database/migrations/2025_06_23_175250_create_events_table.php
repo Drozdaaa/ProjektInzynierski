@@ -20,7 +20,6 @@ return new class extends Migration
             $table->foreignId('event_type_id')->constrained('event_types');
             $table->foreignId('restaurant_id')->constrained('restaurants');
             $table->foreignId('user_id')->constrained('users');
-            $table->timestamps();
         });
     }
 

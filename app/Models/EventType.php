@@ -14,5 +14,5 @@ class EventType extends Model
     {
         return $this->hasMany(Event::class);
     }
-    public $timestamps = false;
+
 }

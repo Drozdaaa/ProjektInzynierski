@@ -17,5 +17,4 @@ class Address extends Model
     {
         return $this->hasMany(Restaurant::class);
     }
-    public $timestamps = false;
 }
