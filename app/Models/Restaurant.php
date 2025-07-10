@@ -12,6 +12,8 @@ class Restaurant extends Model
         'address_id'
     ];
 
+    public $timestamps = false;
+
     public function address()
     {
         return $this->belongsTo(Address::class);

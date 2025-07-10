@@ -13,6 +13,8 @@ class Diet extends Model
         'dish_id'
         ];
 
+    public $timestamps = false;
+    
     public function menu()
     {
         return $this->belongsTo(Menu::class);

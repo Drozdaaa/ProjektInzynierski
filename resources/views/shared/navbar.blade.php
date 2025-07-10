@@ -36,16 +36,16 @@
         <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
       </form>
       <ul id="navbar-user" class="navbar-nav mb-2 mb-lg-0">
-            <li class="pr-5">
-                <button class="nav-link" onclick="themeToggle()"> <i class="bi-moon-stars"></i></button>
-            </li>
             @if (Auth::check())
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('logout') }}">{{ Auth::user()->name }}, wyloguj się... </a>
+                    <a class="nav-link" href="{{ route('logout') }}">{{ Auth::user()->name }}wyloguj się </a>
                 </li>
             @else
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('login') }}">Zaloguj się...</a>
+                    <a class="nav-link" href="{{ route('login') }}">Zaloguj się</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('register') }}">Zarejestruj się</a>
                 </li>
             @endif
         </ul>

@@ -14,6 +14,8 @@ class Dish extends Model
         'restaurant_id'
     ];
 
+    public $timestamps = false;
+
     public function dishType()
     {
         return $this->belongsTo(DishType::class);

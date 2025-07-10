@@ -16,6 +16,8 @@ class Event extends Model
         'user_id'
     ];
 
+    public $timestamps = false;
+
     public function status()
     {
         return $this->belongsTo(Status::class);

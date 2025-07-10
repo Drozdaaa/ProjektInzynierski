@@ -10,6 +10,8 @@ class DishType extends Model
         'name'
     ];
 
+    public $timestamps = false;
+
     public function dishes()
     {
         return $this->hasMany(Dish::class);

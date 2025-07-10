@@ -26,9 +26,6 @@
                         <input id="email" name="email" type="email"
                             class="form-control @if ($errors->has('email')) is-invalid @endif"
                             value="{{ old('email') }}" required>
-                        <div class="invalid-feedback">
-                            {{ $errors->first('email') ?? 'Nieprawidłowy email!' }}
-                        </div>
                     </div>
 
 
@@ -36,9 +33,6 @@
                         <label for="password" class="form-label">Hasło</label>
                         <input id="password" name="password" type="password"
                             class="form-control @if ($errors->has('password')) is-invalid @endif" required>
-                        <div class="invalid-feedback">
-                            {{ $errors->first('password') ?? 'Nieprawidłowe hasło!' }}
-                        </div>
                     </div>
 
                     <div class="text-center mt-4 mb-4">

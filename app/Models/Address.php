@@ -13,6 +13,8 @@ class Address extends Model
         'building_number'
     ];
 
+    public $timestamps = false;
+
     public function restaurants()
     {
         return $this->hasMany(Restaurant::class);

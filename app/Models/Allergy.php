@@ -17,9 +17,11 @@ class Allergy extends Model
         return $this->belongsTo(Menu::class);
     }
 
+    public $timestamps = false;
+    
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_allergy');
     }
- 
+
 }
