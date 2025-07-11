@@ -26,6 +26,13 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
+            $user = Auth::user();
+
+            if($user->role->name==='Administrator'){
+                return redirect()->route('users.admin-dashboard');
+            }
+
             return redirect()->route('main.index');
         }
 
