@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Restaurant;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,8 @@ class AdminController extends Controller
     public function index()
     {
         return view('users.admin-dashboard', [
-            'users'=>User::with(['role'])->orderBy('role_id')->get()
+            'users'=>User::with(['role'])->orderBy('role_id')->get(),
+            'restaurants'=>Restaurant::with(['address', 'user'])->orderBy('id')->get()
         ]);
     }
 

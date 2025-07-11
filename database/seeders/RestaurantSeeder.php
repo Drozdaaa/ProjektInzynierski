@@ -12,8 +12,9 @@ class RestaurantSeeder extends Seeder
     {
         Restaurant::insert([
             [
-                'name'=>'Restauracja Polska',
+                'name' => 'Restauracja Polska',
                 'description' => 'Tradycyjna kuchnia polska',
+                'user_id' => 3,
                 'address_id' => 1,
             ],
         ]);
