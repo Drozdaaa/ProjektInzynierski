@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('description');
             $table->decimal('price', 10, 2);
             $table->foreignId('dish_type_id')->constrained('dish_types');
-            $table->foreignId('restaurant_id')->constrained('restaurants');
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
         });
     }
 

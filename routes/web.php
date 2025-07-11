@@ -29,4 +29,5 @@ Route::controller(AdminController::class)->group(function(){
 Route::controller(RestaurantController::class)->group(function(){
     Route::get('/restaurants/{id}/edit', 'edit')->name('restaurants.edit');
     Route::put('/restaurants/{id}','update')->name('restaurants.update');
+    Route::delete('/restaurants/{restaurant}', 'destroy')->name('restaurants.destroy');
 });

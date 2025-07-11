@@ -81,11 +81,7 @@ class RestaurantController extends Controller
                 'postal_code' => $request->postal_code,
             ]);
 
-            $route = match (Auth::user()->role->name) {
-                'Administrator' => 'users.admin-dashboard',
-                'Manager' => 'restaurants.index',
-                default => 'restaurants.index',
-            };
+            $route = $this->redirectRoute();
             return redirect()->route($route)->with('success', 'Zaktualizowano restaurację.');
         });
     }
@@ -93,8 +89,19 @@ class RestaurantController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Restaurant $restaurant)
     {
-        //
+        $restaurant->delete();
+        $route = $this->redirectRoute();
+        return redirect()->route($route)->with('success', 'Usunięto restaurację.');
+    }
+
+    protected function redirectRoute(): string
+    {
+        return match (Auth::user()->role->name) {
+            'Administrator' => 'users.admin-dashboard',
+            'Manager' => 'restaurants.index',
+            default => 'restaurants.index',
+        };
     }
 }

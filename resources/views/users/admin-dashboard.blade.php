@@ -82,12 +82,16 @@
                                 <td> <a href="{{ route('restaurants.edit', $restaurant->id) }}"
                                         class="btn btn-info">Edytuj</a></td>
                                 <td>
-                                    <button type="submit" class="btn btn-danger">Usuń</button>
+                                    <form method="POST" action="{{ route('restaurants.destroy', $restaurant->id) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger">Usuń</button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <th scope="row" colspan="5">Brak użytkowników.</th>
+                                <th scope="row" colspan="10">Brak lokali do wyświetlenia.</th>
                             </tr>
                         @endforelse
                     </tbody>
