@@ -33,4 +33,9 @@ class Menu extends Model
         return $this->hasMany(Diet::class);
     }
 
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
 }

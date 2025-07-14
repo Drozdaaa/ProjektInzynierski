@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('description');
             $table->foreignId('status_id')->constrained('statuses');
             $table->foreignId('event_type_id')->constrained('event_types');
-            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');;
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('menu_id')->constrained('menus')->onDelete('cascade');
         });
     }
 
