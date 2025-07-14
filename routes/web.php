@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RestaurantController;
 
 Route::controller(MainController::class)->group(function () {
@@ -24,6 +26,11 @@ Route::controller(RegisterController::class)->group(function(){
 
 Route::controller(AdminController::class)->group(function(){
     Route::get('/admin', 'index')->name('users.admin-dashboard');
+});
+
+Route::controller(ManagerController::class)->group(function(){
+    Route::get('/manager', 'index')->name('users.manager-dashboard');
+    Route::get('/menu/event/{event}', 'show')->name('menu.show');
 });
 
 Route::controller(RestaurantController::class)->group(function(){
