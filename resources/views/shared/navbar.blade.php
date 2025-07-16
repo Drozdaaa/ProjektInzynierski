@@ -35,7 +35,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->is('logout') ? 'active' : '' }}"
                        href="{{ route('logout') }}">
-                       {{ Auth::user()->name }} (wyloguj się)
+                       {{ Auth::user()->name }} Wyloguj się
                     </a>
                 </li>
             @else

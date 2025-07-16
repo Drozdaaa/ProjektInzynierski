@@ -100,6 +100,7 @@
                 </table>
             </div>
         </div>
+    </div>
         <script>
             function showTable(type) {
                 const usersTable = document.getElementById('table-users');

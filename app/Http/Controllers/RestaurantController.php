@@ -80,10 +80,9 @@ class RestaurantController extends Controller
                 'city' => $request->city,
                 'postal_code' => $request->postal_code,
             ]);
-
-            $route = $this->redirectRoute();
-            return redirect()->route($route)->with('success', 'Zaktualizowano restaurację.');
         });
+        $route = $this->redirectRoute();
+        return redirect()->route($route)->with('success', 'Zaktualizowano restaurację.');
     }
 
     /**

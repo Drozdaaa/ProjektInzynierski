@@ -39,6 +39,14 @@ class UserSeeder extends Seeder
                     'password' => Hash::make('haslo123'),
                     'role_id' => 3
                 ],
+                [
+                    'first_name' => 'Admin',
+                    'last_name' => 'Admin',
+                    'phone' => '123456789',
+                    'email' => 'Admin',
+                    'password' => Hash::make('admin'),
+                    'role_id' => 1
+                ],
             ]
         );
     }

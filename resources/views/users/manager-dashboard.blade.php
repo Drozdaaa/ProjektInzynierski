@@ -48,11 +48,13 @@
                                 <td>{{ $event->description }}</td>
                                 <td>{{ $event->status->name }}</td>
                                 <td>
-                                    <a href="{{ route('menu.show', $event->id) }}" class="btn btn-primary">Zobacz
+                                    <a href="{{ route('menus.show', $event->id) }}" class="btn btn-primary">Zobacz
                                         menu</a>
                                     @if ($event->status->name === 'Zaplanowane')
-                                        <button type="button" class="btn btn-info">Edytuj</button>
-                                        <form action="{{ route('event.archive', $event->id) }}" method="POST"
+
+                                    <a href="{{route('events.edit', $event->id)}}" class="btn btn-info">Edytuj</a>
+
+                                        <form action="{{ route('events.archive', $event->id) }}" method="POST"
                                             style="display:inline;">
                                             @csrf
                                             @method('PATCH')

@@ -1,5 +1,5 @@
 @include('shared.html')
-@include('shared.head', ['pageTitle' => 'Panel Administratora'])
+@include('shared.head', ['pageTitle' => 'Edytuj restaurację'])
 
 <body>
     @include('shared.navbar')
