@@ -12,9 +12,16 @@ class ManagerController extends Controller
      */
     public function index()
     {
+        $events = Event::with(['user', 'eventType', 'status'])->get();
+
         return view('users.manager-dashboard', [
-            'events' => Event::with(['user', 'eventType', 'status'])->get(),
+            'events'=>$events,
         ]);
+    }
+
+    public function archive(Event $event){
+        $event->update(['status_id'=>2]);
+        return redirect()->route('users.manager-dashboard')->with('success', 'Wydarzenie zarchiwizowane.');
     }
 
     /**
@@ -66,8 +73,9 @@ class ManagerController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Event $event)
     {
-        //
+        $event->delete();
+        return redirect()->route('users.manager-dashboard')->with('success', 'Wydarzenie usunięte.');
     }
 }

@@ -12,7 +12,6 @@ class StatusSeeder extends Seeder
     {
         Status::insert([
             ['name' => 'Zaplanowane'],
-            ['name' => 'W trakcie'],
             ['name' => 'Zakończone'],
         ]);
     }

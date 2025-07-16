@@ -47,7 +47,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <th scope="row" colspan="5">Brak użytkowników.</th>
+                                <th scope="row" colspan="5" class="text-center">Brak użytkowników.</th>
                             </tr>
                         @endforelse
 
@@ -85,13 +85,15 @@
                                     <form method="POST" action="{{ route('restaurants.destroy', $restaurant->id) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">Usuń</button>
+                                        <button type="submit" class="btn btn-danger"
+                                            onclick="return confirm('Na pewno usunąć ten lokal?')">
+                                            Usuń</button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <th scope="row" colspan="10">Brak lokali do wyświetlenia.</th>
+                                <th scope="row" colspan="10" class="text-center">Brak lokali do wyświetlenia.</th>
                             </tr>
                         @endforelse
                     </tbody>

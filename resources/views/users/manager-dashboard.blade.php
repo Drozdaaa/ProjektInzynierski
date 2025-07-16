@@ -6,9 +6,21 @@
 
     <h1>Panel Menadżera</h1>
     <div class = 'container-fluid px-5'>
-        <h3>Nadchodzące wydarzenia</h3>
+        <div class="btn-group mt-3" role="group" aria-label="Status filtr">
+            <input type="radio" class="btn-check" name="btnstatus" id="btn-all" autocomplete="off" checked
+                onclick="filterStatus('all')">
+            <label class="btn btn-outline-primary" for="btn-all">Wszystkie</label>
+
+            <input type="radio" class="btn-check" name="btnstatus" id="btn-zaplanowane" autocomplete="off"
+                onclick="filterStatus('Zaplanowane')">
+            <label class="btn btn-outline-primary" for="btn-zaplanowane">Zaplanowane</label>
+
+            <input type="radio" class="btn-check" name="btnstatus" id="btn-zakonczone" autocomplete="off"
+                onclick="filterStatus('Zakończone')">
+            <label class="btn btn-outline-primary" for="btn-zakonczone">Zakończone</label>
+        </div>
         <div class="table-responsive-sm">
-            <div id="table-events">
+            <div id="events">
                 <table class="table table-events table-striped">
                     <thead>
                         <tr>
@@ -25,7 +37,7 @@
                     </thead>
                     <tbody>
                         @forelse ($events as $event)
-                            <tr>
+                            <tr data-status="{{ $event->status->name }}">
                                 <th scope="row">{{ $loop->iteration }}</th>
                                 <td>{{ $event->user->first_name }} {{ $event->user->last_name }}</td>
                                 <td>{{ $event->user->phone }}</td>
@@ -36,22 +48,49 @@
                                 <td>{{ $event->description }}</td>
                                 <td>{{ $event->status->name }}</td>
                                 <td>
-                                       <a href="{{ route('menu.show', $event->id) }}" class="btn btn-primary">Zobacz menu</a>
-                                    <button type="button" class="btn btn-info">Edytuj</button>
-                                    <button type="submit" class="btn btn-danger">Usuń</button>
+                                    <a href="{{ route('menu.show', $event->id) }}" class="btn btn-primary">Zobacz
+                                        menu</a>
+                                    @if ($event->status->name === 'Zaplanowane')
+                                        <button type="button" class="btn btn-info">Edytuj</button>
+                                        <form action="{{ route('event.archive', $event->id) }}" method="POST"
+                                            style="display:inline;">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-danger"
+                                                onclick="return confirm('Na pewno archiwizować to wydarzenie?')">
+                                                Archiwizuj
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('event.destroy', $event->id) }}" method="POST"
+                                            style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger"
+                                                onclick="return confirm('Na pewno usunąć to wydarzenie?')">
+                                                Usuń
+                                            </button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <th scope="row" colspan="5">Brak wydarzeń.</th>
+                                <th scope="row" colspan="10" class="text-center">Brak wydarzeń.</th>
                             </tr>
                         @endforelse
-
                     </tbody>
                 </table>
             </div>
         </div>
-
-
-
+    </div>
+    <script>
+        function filterStatus(status) {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute('data-status');
+                row.style.display = (status === 'all' || rowStatus === status) ? '' : 'none';
+            });
+        }
+    </script>
 </body>

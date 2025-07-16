@@ -31,6 +31,8 @@ Route::controller(AdminController::class)->group(function(){
 Route::controller(ManagerController::class)->group(function(){
     Route::get('/manager', 'index')->name('users.manager-dashboard');
     Route::get('/menu/event/{event}', 'show')->name('menu.show');
+    Route::patch('/events/{event}/archive', 'archive')->name('event.archive');
+    Route::delete('/manager/{event}', 'destroy')->name('event.destroy');
 });
 
 Route::controller(RestaurantController::class)->group(function(){

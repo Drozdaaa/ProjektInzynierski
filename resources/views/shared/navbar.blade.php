@@ -7,28 +7,23 @@
     <div class="collapse navbar-collapse" id="navbarColor01">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link active" href="{{ route ('main.index')}}">Home
-            <span class="visually-hidden">(current)</span>
+          <a class="nav-link {{ request()->routeIs('main.index') ? 'active' : '' }}"
+             href="{{ route('main.index') }}">
+             Home
+             @if(request()->routeIs('main.index'))<span class="visually-hidden">(current)</span>@endif
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('users.manager-dashboard') }}">Menadżer</a>
+          <a class="nav-link {{ request()->routeIs('users.manager-dashboard') ? 'active' : '' }}"
+             href="{{ route('users.manager-dashboard') }}">
+             Menadżer
+          </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('users.admin-dashboard') }}">Administrator</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">About</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-          <div class="dropdown-menu">
-            <a class="dropdown-item" href="#">Action</a>
-            <a class="dropdown-item" href="#">Another action</a>
-            <a class="dropdown-item" href="#">Something else here</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Separated link</a>
-          </div>
+          <a class="nav-link {{ request()->routeIs('users.admin-dashboard') ? 'active' : '' }}"
+             href="{{ route('users.admin-dashboard') }}">
+             Administrator
+          </a>
         </li>
       </ul>
       <form class="d-flex">
@@ -38,14 +33,23 @@
       <ul id="navbar-user" class="navbar-nav mb-2 mb-lg-0">
             @if (Auth::check())
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('logout') }}">{{ Auth::user()->name }}wyloguj się </a>
+                    <a class="nav-link {{ request()->is('logout') ? 'active' : '' }}"
+                       href="{{ route('logout') }}">
+                       {{ Auth::user()->name }} (wyloguj się)
+                    </a>
                 </li>
             @else
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('login') }}">Zaloguj się</a>
+                    <a class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}"
+                       href="{{ route('login') }}">
+                       Zaloguj się
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('register') }}">Zarejestruj się</a>
+                    <a class="nav-link {{ request()->routeIs('register') ? 'active' : '' }}"
+                       href="{{ route('register') }}">
+                       Zarejestruj się
+                    </a>
                 </li>
             @endif
         </ul>
