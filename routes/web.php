@@ -37,6 +37,7 @@ Route::controller(RestaurantController::class)->group(function(){
     Route::get('/restaurants/{id}/edit', 'edit')->name('restaurants.edit');
     Route::put('/restaurants/{id}','update')->name('restaurants.update');
     Route::delete('/restaurants/{restaurant}', 'destroy')->name('restaurants.destroy');
+    Route::get('/restaurants/{id}', 'show')->name('restaurants.show');
 });
 
 Route::controller(EventController::class)->group(function(){
@@ -44,6 +45,8 @@ Route::controller(EventController::class)->group(function(){
     Route::patch('/events/{event}/archive', 'archive')->name('events.archive');
     Route::get('/events/{id}/edit', 'edit')->name('events.edit');
     Route::put('/events/{id}','update')->name('events.update');
+    Route::get('/events/create', 'create')->name('events.create');
+
 });
 
 Route::controller(MenuController::class)->group(function(){

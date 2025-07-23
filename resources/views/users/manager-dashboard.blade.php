@@ -5,19 +5,24 @@
     @include('shared.navbar')
 
     <h1>Panel Menadżera</h1>
-    <div class = 'container-fluid px-5'>
-        <div class="btn-group mt-3" role="group" aria-label="Status filtr">
-            <input type="radio" class="btn-check" name="btnstatus" id="btn-all" autocomplete="off" checked
-                onclick="filterStatus('all')">
-            <label class="btn btn-outline-primary" for="btn-all">Wszystkie</label>
+    <div class="container-fluid px-5">
+        <div class="d-flex justify-content-between align-items-center mt-3">
 
-            <input type="radio" class="btn-check" name="btnstatus" id="btn-zaplanowane" autocomplete="off"
-                onclick="filterStatus('Zaplanowane')">
-            <label class="btn btn-outline-primary" for="btn-zaplanowane">Zaplanowane</label>
+            <a href="{{events.create}}" button type="button" class="btn btn-primary">Dodaj wydarzenie</button>
 
-            <input type="radio" class="btn-check" name="btnstatus" id="btn-zakonczone" autocomplete="off"
-                onclick="filterStatus('Zakończone')">
-            <label class="btn btn-outline-primary" for="btn-zakonczone">Zakończone</label>
+            <div class="btn-group" role="group" aria-label="Status filtr">
+                <input type="radio" class="btn-check" name="btnstatus" id="btn-all" autocomplete="off" checked
+                    onclick="filterStatus('all')">
+                <label class="btn btn-outline-primary" for="btn-all">Wszystkie</label>
+
+                <input type="radio" class="btn-check" name="btnstatus" id="btn-zaplanowane" autocomplete="off"
+                    onclick="filterStatus('Zaplanowane')">
+                <label class="btn btn-outline-primary" for="btn-zaplanowane">Zaplanowane</label>
+
+                <input type="radio" class="btn-check" name="btnstatus" id="btn-zakonczone" autocomplete="off"
+                    onclick="filterStatus('Zakończone')">
+                <label class="btn btn-outline-primary" for="btn-zakonczone">Zakończone</label>
+            </div>
         </div>
         <div class="table-responsive-sm">
             <div id="events">
@@ -51,8 +56,8 @@
                                     <a href="{{ route('menus.show', $event->id) }}" class="btn btn-primary">Zobacz
                                         menu</a>
                                     @if ($event->status->name === 'Zaplanowane')
-
-                                    <a href="{{route('events.edit', $event->id)}}" class="btn btn-info">Edytuj</a>
+                                        <a href="{{ route('events.edit', $event->id) }}"
+                                            class="btn btn-info">Edytuj</a>
 
                                         <form action="{{ route('events.archive', $event->id) }}" method="POST"
                                             style="display:inline;">

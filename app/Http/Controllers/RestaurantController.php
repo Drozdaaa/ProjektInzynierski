@@ -38,9 +38,12 @@ class RestaurantController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $restaurant=Restaurant::findOrFail($id);
+        return view('restaurants.show',[
+            'restaurant'=>$restaurant
+        ]);
     }
 
     /**
