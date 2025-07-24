@@ -7,6 +7,7 @@ use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 
 class RestaurantController extends Controller
@@ -40,9 +41,9 @@ class RestaurantController extends Controller
      */
     public function show($id)
     {
-        $restaurant=Restaurant::findOrFail($id);
-        return view('restaurants.show',[
-            'restaurant'=>$restaurant
+        $restaurant = Restaurant::findOrFail($id);
+        return view('restaurants.show', [
+            'restaurant' => $restaurant
         ]);
     }
 
@@ -51,6 +52,9 @@ class RestaurantController extends Controller
      */
     public function edit($id)
     {
+        if (!Gate::allows('admin-or-manager')) {
+            abort(403);
+        }
         $restaurant = Restaurant::with('address')->findOrFail($id);
         $users = User::all();
 
@@ -62,6 +66,9 @@ class RestaurantController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!Gate::allows('admin-or-manager')) {
+            abort(403);
+        }
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',

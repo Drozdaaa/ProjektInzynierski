@@ -16,28 +16,33 @@
                         @endif
                     </a>
                 </li>
+                @can('admin-or-manager')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Menadżer
+                        </a>
+                        <ul class="dropdown-menu" {{ request()->routeIs('users.manager-dashboard') ? 'active' : '' }}>
+                            <li><a class="dropdown-item" href="{{ route('users.manager-dashboard') }}">Wydarzenia</a></li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Menadżer
-                    </a>
-                    <ul class="dropdown-menu" {{ request()->routeIs('users.manager-dashboard') ? 'active' : '' }}>
-                        <li><a class="dropdown-item" href="{{ route('users.manager-dashboard') }}">Wydarzenia</a></li>
+                            <li><a class="dropdown-item" href="#">Informacje o lokalu</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">Utwórz lokal</a></li>
+                        </ul>
+                    </li>
+                @endcan
 
-                        <li><a class="dropdown-item" href="#">Informacje o lokalu</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#">Utwórz lokal</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('users.admin-dashboard') ? 'active' : '' }}"
-                        href="{{ route('users.admin-dashboard') }}">
-                        Administrator
-                    </a>
-                </li>
+                @can('is-admin')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('users.admin-dashboard') ? 'active' : '' }}"
+                            href="{{ route('users.admin-dashboard') }}">
+                            Administrator
+                        </a>
+                    </li>
+                @endcan
+
             </ul>
             <form class="d-flex">
                 <input class="form-control me-sm-2" type="search" placeholder="Search">

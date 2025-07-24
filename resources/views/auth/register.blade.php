@@ -64,8 +64,8 @@
                         <select id="role_id" name="role_id"
                             class="form-control @error('role_id') is-invalid @enderror" required>
                             <option value="">-- Wybierz --</option>
-                            <option value="1" {{ old('role_id') == 2 ? 'selected' : '' }}>Klient</option>
-                            <option value="2" {{ old('role_id') == 3 ? 'selected' : '' }}>Menadżer</option>
+                            <option value="2" {{ old('role_id') == 2 ? 'selected' : '' }}>Klient</option>
+                            <option value="3" {{ old('role_id') == 3 ? 'selected' : '' }}>Menadżer</option>
                         </select>
                     </div>
 

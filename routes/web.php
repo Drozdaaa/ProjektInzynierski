@@ -25,18 +25,20 @@ Route::controller(RegisterController::class)->group(function(){
     Route::post('/auth/register', 'register')->name('register');
 });
 
-Route::controller(AdminController::class)->group(function(){
+Route::middleware(['auth', 'can:is-admin'])->controller(AdminController::class)->group(function(){
     Route::get('/admin', 'index')->name('users.admin-dashboard');
 });
 
-Route::controller(ManagerController::class)->group(function(){
+Route::middleware(['auth', 'can:admin-or-manager'])->controller(ManagerController::class)->group(function(){
     Route::get('/manager', 'index')->name('users.manager-dashboard');
 });
 
 Route::controller(RestaurantController::class)->group(function(){
-    Route::get('/restaurants/{id}/edit', 'edit')->name('restaurants.edit');
-    Route::put('/restaurants/{id}','update')->name('restaurants.update');
-    Route::delete('/restaurants/{restaurant}', 'destroy')->name('restaurants.destroy');
+    Route::middleware(['can:admin-or-manager'])->group(function() {
+        Route::get('/restaurants/{id}/edit', 'edit')->name('restaurants.edit');
+        Route::put('/restaurants/{id}', 'update')->name('restaurants.update');
+        Route::delete('/restaurants/{restaurant}', 'destroy')->name('restaurants.destroy');
+    });
     Route::get('/restaurants/{id}', 'show')->name('restaurants.show');
 });
 
