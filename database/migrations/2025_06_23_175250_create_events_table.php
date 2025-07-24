@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('menu_id')->constrained('menus')->onDelete('cascade');
+            $table->foreignId('manager_id')->constrained('users')->onDelete('cascade');
         });
     }
 

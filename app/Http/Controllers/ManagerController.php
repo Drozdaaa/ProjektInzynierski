@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ManagerController extends Controller
 {
@@ -12,8 +13,11 @@ class ManagerController extends Controller
      */
     public function index()
     {
-        $events = Event::with(['user', 'eventType', 'status'])->get();
-
+        $managerId = Auth::id();
+        $events = Event::with(['user', 'eventType', 'status'])
+        ->where('manager_id', $managerId)
+        ->get();
+        
         return view('users.manager-dashboard', [
             'events'=>$events,
         ]);

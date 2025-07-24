@@ -20,6 +20,7 @@ class EventSeeder extends Seeder
                 'restaurant_id' => 1,
                 'user_id' => 3,
                 'menu_id' => 1,
+                'manager_id' => 3,
             ],
         ]);
     }

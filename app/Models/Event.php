@@ -42,6 +42,8 @@ class Event extends Model
     {
         return $this->belongsTo(Menu::class);
     }
-
-    
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
 }
