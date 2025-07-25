@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Address;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,9 @@ class RestaurantController extends Controller
      */
     public function create()
     {
-        //
+        return view('restaurants.create', [
+            'address' => Address::all(),
+        ]);
     }
 
     /**
@@ -33,7 +36,36 @@ class RestaurantController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if (!Gate::allows('admin-or-manager')) {
+            abort(403);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'street' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:6',
+            'building_number' => 'required|integer|min:1',
+        ]);
+
+        DB::transaction(function () use ($request) {
+            $address = Address::create([
+                'city' => $request->city,
+                'street' => $request->street,
+                'postal_code' => $request->postal_code,
+                'building_number' => $request->building_number,
+            ]);
+
+            Restaurant::create([
+                'name' => $request->name,
+                'description' => $request->description,
+                'address_id' => $address->id,
+                'user_id' => Auth::id(),
+            ]);
+        });
+
+        return redirect()->route('users.manager-dashboard')->with('success', 'Lokal został dodany.');
     }
 
     /**
@@ -52,10 +84,12 @@ class RestaurantController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('admin-or-manager')) {
+        $restaurant = Restaurant::with('address')->findOrFail($id);
+
+        if (!Gate::allows('restaurant-owner', $restaurant)) {
             abort(403);
         }
-        $restaurant = Restaurant::with('address')->findOrFail($id);
+
         $users = User::all();
 
         return view('restaurants.edit', compact('restaurant', 'users'));
@@ -66,24 +100,36 @@ class RestaurantController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('admin-or-manager')) {
+        $restaurant = Restaurant::findOrFail($id);
+
+        if (!Gate::allows('restaurant-owner', $restaurant)) {
             abort(403);
         }
+
+        $user = User::where('email', $request->input('user_email'))->first();
+
+        if (!$user) {
+            return back()->withErrors(['user_email' => 'Nie znaleziono użytkownika o podanym adresie e-mail.'])->withInput();
+        }
+        if ($user->role_id !== 3) {
+            return back()->withErrors(['user_email' => 'Użytkownik musi mieć przypisaną rolę Menadżera.'])->withInput();
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'user_id' => 'required|exists:users,id',
+            'user_email' => 'required|email|exists:users,email',
             'street' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'postal_code' => 'required|string|max:10',
         ]);
 
-        DB::transaction(function () use ($request, $id) {
+        DB::transaction(function () use ($request, $id, $user) {
             $restaurant = Restaurant::findOrFail($id);
             $restaurant->update([
                 'name' => $request->name,
                 'description' => $request->description,
-                'user_id' => $request->user_id,
+                'user_id' => $user->id,
             ]);
             $restaurant->address->update([
                 'street' => $request->street,
@@ -91,8 +137,7 @@ class RestaurantController extends Controller
                 'postal_code' => $request->postal_code,
             ]);
         });
-        $route = $this->redirectRoute();
-        return redirect()->route($route)->with('success', 'Zaktualizowano restaurację.');
+        return redirect()->route('users.manager-dashboard')->with('success', 'Dane lokalu zostały zmienione.');
     }
 
     /**

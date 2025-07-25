@@ -8,8 +8,9 @@
     <div class="container-fluid px-5">
         <div class="d-flex justify-content-between align-items-center mt-3">
 
-            <a href="{{route ('events.create')}}" class="btn btn-primary">Dodaj wydarzenie</a>
-
+            <div class="btn-group" role="group">
+                <a href="{{ route('events.create') }}" class="btn btn-primary">Dodaj wydarzenie</a>
+            </div>
             <div class="btn-group" role="group" aria-label="Status filtr">
                 <input type="radio" class="btn-check" name="btnstatus" id="btn-all" autocomplete="off" checked
                     onclick="filterStatus('all')">

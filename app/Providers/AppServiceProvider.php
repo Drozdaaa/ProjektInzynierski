@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Restaurant;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -34,5 +35,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('admin-or-manager', function (User $user) {
             return $user->isAdmin() || $user->isManager();
         });
+
+        Gate::define('restaurant-owner', function (User $user, Restaurant $restaurant) {
+        return $user->isAdmin() || ($user->isManager() && $restaurant->user_id === $user->id);
+    });
     }
 }

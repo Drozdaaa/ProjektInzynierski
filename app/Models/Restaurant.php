@@ -9,7 +9,8 @@ class Restaurant extends Model
      protected $fillable = [
         'name',
         'description',
-        'address_id'
+        'address_id',
+        'user_id'
     ];
 
     public $timestamps = false;

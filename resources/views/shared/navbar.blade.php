@@ -24,12 +24,8 @@
                         </a>
                         <ul class="dropdown-menu" {{ request()->routeIs('users.manager-dashboard') ? 'active' : '' }}>
                             <li><a class="dropdown-item" href="{{ route('users.manager-dashboard') }}">Wydarzenia</a></li>
-
                             <li><a class="dropdown-item" href="#">Informacje o lokalu</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">Utwórz lokal</a></li>
+                            <li><a class="dropdown-item" href="{{ route('restaurants.create') }}">Utwórz lokal</a></li>
                         </ul>
                     </li>
                 @endcan
