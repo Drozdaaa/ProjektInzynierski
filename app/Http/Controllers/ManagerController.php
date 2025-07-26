@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,9 +18,11 @@ class ManagerController extends Controller
         $events = Event::with(['user', 'eventType', 'status'])
         ->where('manager_id', $managerId)
         ->get();
-        
+        $restaurant = Restaurant::where('user_id', $managerId)->first();
+
         return view('users.manager-dashboard', [
             'events'=>$events,
+            'restaurant'=>$restaurant
         ]);
     }
 

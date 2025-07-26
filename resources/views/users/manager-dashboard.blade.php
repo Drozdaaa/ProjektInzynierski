@@ -8,9 +8,16 @@
     <div class="container-fluid px-5">
         <div class="d-flex justify-content-between align-items-center mt-3">
 
-            <div class="btn-group" role="group">
-                <a href="{{ route('events.create') }}" class="btn btn-primary">Dodaj wydarzenie</a>
-            </div>
+            @if ($restaurant)
+                <a href="{{ route('events.create', ['id' => $restaurant->id]) }}" class="btn btn-primary">
+                    Dodaj wydarzenie
+                </a>
+            @else
+                <div class="alert alert-warning">
+                    Najpierw utwórz swoją restaurację, aby móc dodawać wydarzenia.
+                    <a href="{{ route('restaurants.create') }}" class="alert-link">Utwórz restaurację</a>
+                </div>
+            @endif
             <div class="btn-group" role="group" aria-label="Status filtr">
                 <input type="radio" class="btn-check" name="btnstatus" id="btn-all" autocomplete="off" checked
                     onclick="filterStatus('all')">
@@ -69,8 +76,9 @@
                                                 Archiwizuj
                                             </button>
                                         </form>
+
                                     @else
-                                        <form action="{{ route('event.destroy', $event->id) }}" method="POST"
+                                        <form action="{{ route('events.destroy', $event->id) }}" method="POST"
                                             style="display:inline;">
                                             @csrf
                                             @method('DELETE')

@@ -13,6 +13,7 @@ class MenuSeeder extends Seeder
         Menu::insert([
             'price' => 73.00,
             'user_id' => 3,
+            'restaurant_id' => 1,
         ]);
     }
 }

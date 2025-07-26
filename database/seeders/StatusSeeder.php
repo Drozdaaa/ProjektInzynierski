@@ -11,6 +11,7 @@ class StatusSeeder extends Seeder
     public function run(): void
     {
         Status::insert([
+            ['name' => 'Oczekujące'],
             ['name' => 'Zaplanowane'],
             ['name' => 'Zakończone'],
         ]);

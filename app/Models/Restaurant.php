@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Restaurant extends Model
 {
-     protected $fillable = [
+    protected $fillable = [
         'name',
         'description',
         'address_id',
@@ -34,5 +34,8 @@ class Restaurant extends Model
     {
         return $this->hasMany(Event::class);
     }
-
+    public function menus()
+    {
+        return $this->hasMany(Menu::class);
+    }
 }

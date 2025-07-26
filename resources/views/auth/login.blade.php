@@ -36,7 +36,10 @@
                     </div>
 
                     <div class="text-center mt-4 mb-4">
-                        <input class="btn btn-primary" type="submit" value="Wyślij">
+                        <input class="btn btn-primary" type="submit" value="Zaloguj się">
+                    </div>
+                    <div class="text-center mt-4 mb-4">
+                        <a href="{{ route('register.form') }}" class="btn btn-primary">Zarejstruj się </a>
                     </div>
                 </form>
             </div>

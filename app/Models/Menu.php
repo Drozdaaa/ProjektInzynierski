@@ -37,5 +37,8 @@ class Menu extends Model
     {
         return $this->hasMany(Event::class);
     }
-
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurant::class);
+    }
 }

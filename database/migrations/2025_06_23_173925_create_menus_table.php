@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->decimal('price', 10, 2);
             $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('restaurant_id')->nullable()->constrained('restaurants')->onDelete('cascade');
         });
     }
 

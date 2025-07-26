@@ -13,7 +13,9 @@ class Event extends Model
         'status_id',
         'event_type_id',
         'restaurant_id',
-        'user_id'
+        'user_id',
+        'menu_id',
+        'manager_id',
     ];
 
     public $timestamps = false;
