@@ -37,7 +37,7 @@
             <label for="menu_id" class="form-label">Menu</label>
             <select name="menu_id" id="menu_id" class="form-select" required>
                 @foreach ($menus as $menu)
-                    <option value="{{ $menu->id }}">Menu ID: {{ $menu->id }} (Cena: {{ $menu->price }} zł)</option>
+                    <option value="{{ $menu->id }}">Menu {{ $menu->id }} (Cena: {{ $menu->price }} zł)</option>
                 @endforeach
             </select>
         </div>

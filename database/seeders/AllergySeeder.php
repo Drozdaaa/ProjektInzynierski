@@ -12,10 +12,18 @@ class AllergySeeder extends Seeder
     {
         Allergy::insert([
             [
+                'name' => 'Gluten',
+                'description' => 'Uczulenie na zboża: pszenica, żyto, jęczmień'
+            ],
+            [
                 'name' => 'Orzechy',
-                'description' => 'Alergia na orzechy laskowe i włoskie',
-                'menu_id' => 1,
-            ]
+                'description' => 'Uczulenie na: orzechy laskowe, włoskie, migdały'
+            ],
+            [
+                'name' => 'Laktoza',
+                'description' => 'Uczulenie na cukier mleczny'
+            ],
+
         ]);
     }
 }

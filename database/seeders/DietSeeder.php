@@ -11,10 +11,22 @@ class DietSeeder extends Seeder
     public function run(): void
     {
         Diet::insert([
-            'name' => 'Wegetariańska',
-            'description' => 'Dieta bez mięsa',
-            'menu_id' => 1,
-            'dish_id' => 4,
+            [
+                'name' => 'Keto',
+                'description' => 'Dieta niskowęglowodanowa'
+            ],
+            [
+                'name' => 'Wegetariańska',
+                'description' => 'Bez mięsa'
+            ],
+            [
+                'name' => 'Wegańska',
+                'description' => 'Bez produktów odzwierzęcych'
+            ],
+            [
+                'name' => 'Bezglutenowa',
+                'description' => 'Bez glutenu'
+            ],
         ]);
     }
 }
