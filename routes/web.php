@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DishController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ManagerController;
@@ -56,4 +57,10 @@ Route::middleware(['auth'])->controller(EventController::class)->group(function 
 
 Route::controller(MenuController::class)->group(function () {
     Route::get('/menu/event/{event}', 'show')->name('menus.show');
+    Route::get('/menu', 'index')->name('menus.index');
+    Route::get('/menu/create','create')->name('menus.create');
+});
+
+Route::controller(DishController::class)->group(function (){
+    Route::get('/dish/create', 'create')->name('dishes.create');
 });

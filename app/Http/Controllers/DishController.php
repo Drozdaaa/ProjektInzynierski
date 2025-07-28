@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
-use App\Models\User;
 use Illuminate\Http\Request;
 
-class MenuController extends Controller
+class DishController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('menus.index');
+        //
     }
 
     /**
@@ -21,7 +19,7 @@ class MenuController extends Controller
      */
     public function create()
     {
-        return view('menus.create');
+        return view('dishes.create');
     }
 
     /**
@@ -35,21 +33,18 @@ class MenuController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(string $id)
     {
-        $event = Event::with('menu.dishes.dishType')->findOrFail($id);
-
-        return view('menus.show', [
-            'event' => $event,
-            'menu' => $event->menu,
-            'dishes' => $event->menu->dishes,
-        ]);
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-
+    public function edit(string $id)
+    {
+        //
+    }
 
     /**
      * Update the specified resource in storage.

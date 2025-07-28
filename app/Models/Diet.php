@@ -9,20 +9,13 @@ class Diet extends Model
     protected $fillable = [
         'name',
         'description',
-        'menu_id',
-        'dish_id'
         ];
 
     public $timestamps = false;
-    
-    public function menu()
-    {
-        return $this->belongsTo(Menu::class);
-    }
 
-    public function dish()
+    public function dishes()
     {
-        return $this->belongsTo(Dish::class);
+        return $this->belongsToMany(Dish::class);
     }
 
 }

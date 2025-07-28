@@ -23,16 +23,6 @@ class Menu extends Model
         return $this->belongsToMany(Dish::class, 'menu_dish');
     }
 
-    public function allergies()
-    {
-        return $this->hasMany(Allergy::class);
-    }
-
-    public function diets()
-    {
-        return $this->hasMany(Diet::class);
-    }
-
     public function events()
     {
         return $this->hasMany(Event::class);

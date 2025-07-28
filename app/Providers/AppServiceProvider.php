@@ -48,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
             return $user->isAdmin() || ($user->isManager() && $restaurant->user_id === $user->id);
         });
 
+        //do wyrzucenia 
         Gate::define('can-create-event-in-restaurant', function (User $user, Restaurant $restaurant) {
             if ($user->isUser()) {
                 return true;

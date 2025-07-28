@@ -9,19 +9,18 @@ class Allergy extends Model
     protected $fillable = [
         'name',
         'description',
-        'menu_id'
     ];
 
-    public function menu()
-    {
-        return $this->belongsTo(Menu::class);
-    }
-
     public $timestamps = false;
-    
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_allergy');
+    }
+
+    public function dishes()
+    {
+        return $this->belongsToMany(Dish::class);
     }
 
 }

@@ -26,7 +26,7 @@ class EventController extends Controller
         $event->update(['status_id' => 2]);
         return redirect()->route('users.manager-dashboard')->with('success', 'Wydarzenie zarchiwizowane.');
     }
-    
+
     /**
      * Show the form for creating a new resource.
      */
@@ -35,10 +35,6 @@ class EventController extends Controller
         $restaurant = Restaurant::findOrFail($id);
         $eventTypes = EventType::all();
         $menus = $restaurant->menus;
-
-        if (!Gate::allows('can-create-event-in-restaurant',$restaurant)) {
-            abort(403, 'Nie masz dostępu do tworzenia wydarzeń w tym lokalu.');
-        }
 
         return view('events.create', compact('restaurant', 'eventTypes', 'menus'));
     }

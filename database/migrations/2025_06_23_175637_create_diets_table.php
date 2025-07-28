@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('diets', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('description');
-            $table->foreignId('menu_id')->constrained('menus');
-            $table->foreignId('dish_id')->constrained('dishes')->onDelete('cascade');
+            $table->string('description')->nullable();
+            $table->timestamps();
         });
     }
 
