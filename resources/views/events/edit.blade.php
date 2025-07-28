@@ -5,6 +5,17 @@
     @include('shared.navbar')
     <div class="container mt-5">
         <h2>Edytuj dane wydarzenia</h2>
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form action="{{ route('events.update', $event->id) }}" method="POST">
             @csrf
             @method('PUT')
@@ -36,6 +47,18 @@
                     @endforeach
                 </select>
             </div>
+
+            <div class="mb-3">
+                <label for="menu_id" class="form-label">Menu</label>
+                <select class="form-select" id="menu_id" name="menu_id" required>
+                    @foreach ($menus as $menu)
+                        <option value="{{ $menu->id }}" {{ $event->menu_id == $menu->id ? 'selected' : '' }}>
+                            Menu {{ $menu->id }} (Cena: {{ $menu->price }} zł)
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            
             <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
             <a href="{{ route('users.manager-dashboard') }}" class="btn btn-secondary">Anuluj</a>
         </form>

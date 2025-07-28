@@ -9,8 +9,10 @@ use App\Models\Status;
 use App\Models\EventType;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
+use App\Http\Requests\EventRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Auth\Events\Validated;
 
 class EventController extends Controller
 {
@@ -21,11 +23,21 @@ class EventController extends Controller
     {
         //
     }
-    public function archive(Event $event)
+    public function updateStatus(Event $event, Request $request)
     {
-        $event->update(['status_id' => 2]);
-        return redirect()->route('users.manager-dashboard')->with('success', 'Wydarzenie zarchiwizowane.');
+        $validated = $request->validate([
+            'status_id' => 'required|integer|in:2,3'
+        ]);
+
+        $event->update(['status_id' => $validated['status_id']]);
+
+        $statusName = $validated['status_id'] === 2 ? 'zaplanowane' : 'zarchiwizowane';
+
+
+        return redirect()->route('users.manager-dashboard')->with('success', "Wydarzenie zostało $statusName.");
     }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -43,18 +55,9 @@ class EventController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, $id)
+    public function store(EventRequest $request, $id)
     {
         $restaurant = Restaurant::findOrFail($id);
-
-
-        $request->validate([
-            'date' => 'required|after:yesterday',
-            'number_of_people' => 'integer|min:1',
-            'description' => 'required|string|max:255',
-            'event_type_id' => 'required|exists:event_types,id',
-            'menu_id' => 'required|exists:menus,id',
-        ]);
 
         Event::create([
             'date' => $request->date,
@@ -91,24 +94,18 @@ class EventController extends Controller
             'users' => User::all(),
             'statuses' => Status::all(),
             'eventTypes' => EventType::all(),
+            'menus'=>Menu::all(),
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(EventRequest $request, $id)
     {
         $event = Event::findOrFail($id);
+        $event->update($request->validated());
 
-        $validatedData = $request->validate([
-            'date' => 'required|date',
-            'number_of_people' => 'required|integer|min:1',
-            'description' => 'nullable|string|max:255',
-            'event_type_id' => 'required|exists:event_types,id',
-        ]);
-
-        $event->update($validatedData);
         return redirect()->route('users.manager-dashboard')->with('success', 'Wydarzenie zostało zaktualizowane.');
     }
 

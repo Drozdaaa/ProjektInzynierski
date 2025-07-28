@@ -23,6 +23,10 @@
                     onclick="filterStatus('all')">
                 <label class="btn btn-outline-primary" for="btn-all">Wszystkie</label>
 
+                <input type="radio" class="btn-check" name="btnstatus" id="btn-oczekujące" autocomplete="off"
+                    onclick="filterStatus('Oczekujące')">
+                <label class="btn btn-outline-primary" for="btn-oczekujące">Oczekujące</label>
+
                 <input type="radio" class="btn-check" name="btnstatus" id="btn-zaplanowane" autocomplete="off"
                     onclick="filterStatus('Zaplanowane')">
                 <label class="btn btn-outline-primary" for="btn-zaplanowane">Zaplanowane</label>
@@ -67,16 +71,26 @@
                                         <a href="{{ route('events.edit', $event->id) }}"
                                             class="btn btn-info">Edytuj</a>
 
-                                        <form action="{{ route('events.archive', $event->id) }}" method="POST"
+                                        <form action="{{ route('events.update-status', $event->id) }}" method="POST"
                                             style="display:inline;">
                                             @csrf
                                             @method('PATCH')
+                                            <input type="hidden" name="status_id" value="3">
                                             <button type="submit" class="btn btn-danger"
                                                 onclick="return confirm('Na pewno archiwizować to wydarzenie?')">
                                                 Archiwizuj
                                             </button>
                                         </form>
-
+                                    @elseif ($event->status->name === 'Oczekujące')
+                                    <form action="{{ route('events.update-status', $event->id)}}" method="POST"
+                                        style="display:inline;">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status_id" value="2">
+                                        <button type="submit" class="btn btn-primary"
+                                                onclick="return confirm('Na pewno zaplanować to wydarzenie?')">
+                                                Zaplanuj
+                                            </button>
                                     @else
                                         <form action="{{ route('events.destroy', $event->id) }}" method="POST"
                                             style="display:inline;">
