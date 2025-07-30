@@ -37,8 +37,6 @@ class EventController extends Controller
         return redirect()->route('users.manager-dashboard')->with('success', "Wydarzenie zostało $statusName.");
     }
 
-
-
     /**
      * Show the form for creating a new resource.
      */
@@ -94,7 +92,7 @@ class EventController extends Controller
             'users' => User::all(),
             'statuses' => Status::all(),
             'eventTypes' => EventType::all(),
-            'menus'=>Menu::all(),
+            'menus' => Menu::all(),
         ]);
     }
 

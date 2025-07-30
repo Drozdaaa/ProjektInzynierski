@@ -62,5 +62,6 @@ Route::controller(MenuController::class)->group(function () {
 });
 
 Route::controller(DishController::class)->group(function (){
-    Route::get('/dish/create', 'create')->name('dishes.create');
+    Route::get('/restaurants/{id}/dish/create', 'create')->name('dishes.create');
+    Route::post('/restaurants/{id}/dish', 'store')->name('dishes.store');
 });

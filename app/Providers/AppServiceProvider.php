@@ -2,8 +2,9 @@
 
 namespace App\Providers;
 
-use App\Models\Restaurant;
 use App\Models\User;
+use App\Models\Restaurant;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -46,19 +47,6 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('restaurant-owner', function (User $user, Restaurant $restaurant) {
             return $user->isAdmin() || ($user->isManager() && $restaurant->user_id === $user->id);
-        });
-
-        //do wyrzucenia 
-        Gate::define('can-create-event-in-restaurant', function (User $user, Restaurant $restaurant) {
-            if ($user->isUser()) {
-                return true;
-            }
-
-            if ($user->isManager()) {
-                return $restaurant->user_id === $user->id;
-            }
-
-            return $user->isAdmin();
         });
     }
 }

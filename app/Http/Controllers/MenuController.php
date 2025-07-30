@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
 use App\Models\User;
+use App\Models\Event;
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class MenuController extends Controller
 {
@@ -13,7 +16,11 @@ class MenuController extends Controller
      */
     public function index()
     {
-        return view('menus.index');
+        $user = Auth::user();
+
+        $restaurant = Restaurant::where('user_id', $user->id)->firstOrFail();
+
+        return view('menus.index', compact('restaurant'));
     }
 
     /**

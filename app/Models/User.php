@@ -38,6 +38,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Allergy::class, 'user_allergy');
     }
 
+    public function restaurants()
+    {
+        return $this->hasOne(Restaurant::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role_id == 1;
