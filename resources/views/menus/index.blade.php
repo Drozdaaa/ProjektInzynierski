@@ -6,9 +6,10 @@
     <h1>Twoje aktualne menu</h1>
     <div class='container-fluid px-5'>
         <div class="btn-group" role="group" aria-label="Basic example">
-            <a href="{{ route('dishes.create', ['id' => $restaurant->id])}}" class="btn btn-primary">Dodaj danie</a>
-            
-            <a href="{{ route('menus.create') }}" class="btn btn-primary">Utwórz nowe menu</a>
+            <a href="{{ route('dishes.create', ['restaurant' => $restaurant->id]) }}" class="btn btn-primary">Dodaj danie</a>
+
+            <a href="{{ route('menus.create', ['restaurant' => $restaurant->id]) }}" class="btn btn-primary">Utwórz nowe
+                menu</a>
         </div>
     </div>
 </body>

@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 
 class MenuController extends Controller
@@ -26,18 +27,45 @@ class MenuController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Restaurant $restaurant)
     {
-        return view('menus.create');
+        if (Gate::denies('restaurant-owner', $restaurant)) {
+            abort(403);
+        }
+
+        $dishes = $restaurant->dishes()->with(['dishType', 'diets', 'allergies'])->get();
+
+        return view('menus.create', compact('restaurant', 'dishes'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Restaurant $restaurant)
     {
-        //
+        if (Gate::denies('restaurant-owner', $restaurant)) {
+            abort(403);
+        }
+
+        $request->validate([
+            'price' => 'required|numeric|min:0',
+            'dishes' => 'required|array|min:1',
+            'dishes.*' => 'exists:dishes,id',
+        ], [
+            'dishes.required' => 'Musisz wybrać przynajmniej jedno danie do menu.',
+        ]);
+
+        $menu = $restaurant->menus()->create([
+            'price' => $request->price,
+            'user_id' => Auth::id(),
+        ]);
+
+        $menu->dishes()->sync($request->input('dishes'));
+
+        return redirect()->route('menus.create', ['restaurant' => $restaurant->id])
+            ->with('success', 'Menu zostało utworzone.');
     }
+
 
     /**
      * Display the specified resource.

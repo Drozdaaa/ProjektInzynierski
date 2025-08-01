@@ -33,10 +33,10 @@ class Dish extends Model
 
     public function diets()
     {
-        return $this->belongsToMany(Diet::class);
+        return $this->belongsToMany(Diet::class, 'dish_diet');
     }
     public function allergies()
     {
-        return $this->belongsToMany(Allergy::class);
+        return $this->belongsToMany(Allergy::class, 'dish_allergy');
     }
 }

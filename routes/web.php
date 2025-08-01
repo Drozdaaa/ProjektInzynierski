@@ -58,10 +58,13 @@ Route::middleware(['auth'])->controller(EventController::class)->group(function 
 Route::controller(MenuController::class)->group(function () {
     Route::get('/menu/event/{event}', 'show')->name('menus.show');
     Route::get('/menu', 'index')->name('menus.index');
-    Route::get('/menu/create','create')->name('menus.create');
+    Route::get('/restaurants/{restaurant}/menus/create',  'create')->name('menus.create');
+    Route::post('/restaurants/{restaurant}/menus', 'store')->name('menus.store');
 });
 
 Route::controller(DishController::class)->group(function (){
-    Route::get('/restaurants/{id}/dish/create', 'create')->name('dishes.create');
-    Route::post('/restaurants/{id}/dish', 'store')->name('dishes.store');
+    Route::get('/restaurants/{restaurant}/dish/create', 'create')->name('dishes.create');
+    Route::post('/restaurants/{restaurant}/dish', 'store')->name('dishes.store');
 });
+
+
