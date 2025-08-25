@@ -1,6 +1,7 @@
 @include('shared.html')
 @include('shared.head', ['pageTitle' => 'Stwórz nowe menu'])
 @include('shared.menu-scripts')
+
 <body>
     @include('shared.navbar')
     <div class="container mt-5">
@@ -88,4 +89,3 @@
         </form>
     </div>
 </body>
-

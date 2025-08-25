@@ -7,6 +7,7 @@
         document.querySelectorAll('.dish-checkbox:checked').forEach(checkbox => {
             const card = checkbox.closest('.dish-card');
             selectedDishes.add(card.dataset.dishId);
+            card.classList.add('selected');
         });
         updateTotalPrice();
 

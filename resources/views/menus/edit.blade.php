@@ -5,7 +5,7 @@
 <body>
     @include('shared.navbar')
     <div class="container mt-5">
-        <h1>Edytuj menu: {{ $menu->name }}</h1>
+        <h1>Edytuj menu: {{ $menu->id }}</h1>
 
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -34,61 +34,25 @@
             <h3>Wybierz dania:</h3>
 
             <table class="table table-borderless" id="dishes-container">
-                <tr>
-                    <td>
-                        <h4>Przystawki</h4>
-                        <div class="row g-3">
-                            @foreach ($dishes->where('dishType.name', 'Przystawka') as $dish)
-                                @include('shared.dish-card', [
-                                    'dish' => $dish,
-                                    'selected' => in_array($dish->id, $selectedDishes),
-                                ])
-                            @endforeach
-                        </div>
-                    </td>
-                </tr>
+                @foreach (['Przystawka', 'Zupa', 'Danie główne', 'Deser'] as $type)
+                    <tr>
+                        <td>
+                            <h4>{{ $type }}@if ($type == 'Danie główne')
+                                    główne
+                                @endif
+                            </h4>
+                            <div class="row g-3">
+                                @foreach ($dishes->where('dishType.name', $type) as $dish)
+                                    @include('shared.dish-card', [
+                                        'dish' => $dish,
+                                        'selected' => in_array($dish->id, $menu->dishes->pluck('id')->toArray()),
+                                    ])
+                                @endforeach
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
 
-                <tr>
-                    <td>
-                        <h4>Zupy</h4>
-                        <div class="row g-3">
-                            @foreach ($dishes->where('dishType.name', 'Zupa') as $dish)
-                                @include('shared.dish-card', [
-                                    'dish' => $dish,
-                                    'selected' => in_array($dish->id, $selectedDishes),
-                                ])
-                            @endforeach
-                        </div>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        <h4>Dania główne</h4>
-                        <div class="row g-3">
-                            @foreach ($dishes->where('dishType.name', 'Danie główne') as $dish)
-                                @include('shared.dish-card', [
-                                    'dish' => $dish,
-                                    'selected' => in_array($dish->id, $selectedDishes),
-                                ])
-                            @endforeach
-                        </div>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        <h4>Desery</h4>
-                        <div class="row g-3">
-                            @foreach ($dishes->where('dishType.name', 'Deser') as $dish)
-                                @include('shared.dish-card', [
-                                    'dish' => $dish,
-                                    'selected' => in_array($dish->id, $selectedDishes),
-                                ])
-                            @endforeach
-                        </div>
-                    </td>
-                </tr>
                 <tr>
                     <td>
                         <div class="mt-4">

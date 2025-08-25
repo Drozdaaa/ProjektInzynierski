@@ -97,7 +97,11 @@ class MenuController extends Controller
 
         $restaurant = $menu->restaurant()->with('dishes')->first();
 
-        return view('menus.edit', compact('menu', 'restaurant'));
+        $selectedDishes = $menu->dishes->pluck('id')->toArray();
+
+        $dishes = $restaurant->dishes()->with('dishType')->get();
+
+        return view('menus.edit', compact('menu', 'restaurant', 'dishes', 'selectedDishes'));
     }
 
     public function update(Request $request, $id)
