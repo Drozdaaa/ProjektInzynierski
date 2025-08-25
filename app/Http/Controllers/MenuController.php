@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Menu;
 use App\Models\User;
 use App\Models\Event;
 use App\Models\Restaurant;
@@ -19,7 +20,9 @@ class MenuController extends Controller
     {
         $user = Auth::user();
 
-        $restaurant = Restaurant::where('user_id', $user->id)->firstOrFail();
+        $restaurant = Restaurant::where('user_id', Auth::id())
+            ->with('menus.dishes.diets', 'menus.dishes.allergies')
+            ->firstOrFail();
 
         return view('menus.index', compact('restaurant'));
     }
@@ -84,21 +87,54 @@ class MenuController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function edit($id)
     {
-        //
+        $menu = Menu::findOrFail($id);
+
+        if (Gate::denies('restaurant-owner', $menu->restaurant)) {
+            abort(403);
+        }
+
+        $restaurant = $menu->restaurant()->with('dishes')->first();
+
+        return view('menus.edit', compact('menu', 'restaurant'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $menu = Menu::findOrFail($id);
+
+        if (Gate::denies('restaurant-owner', $menu->restaurant)) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'price' => 'required|numeric|min:0',
+            'dishes' => 'array',
+            'dishes.*' => 'exists:dishes,id',
+        ]);
+
+        $menu->price = $validated['price'];
+        $menu->save();
+
+        $menu->dishes()->sync($validated['dishes'] ?? []);
+
+        return redirect()->route('menus.index')
+            ->with('success', 'Menu zostało zaktualizowane.');
+    }
+
+    public function destroy($id)
+    {
+        $menu = Menu::findOrFail($id);
+
+        if (Gate::denies('restaurant-owner', $menu->restaurant)) {
+            abort(403);
+        }
+
+        $menu->delete();
+
+        return redirect()
+            ->route('menus.index', ['id' => $menu->restaurant_id])
+            ->with('success', 'Menu zostało usunięte.');
     }
 }

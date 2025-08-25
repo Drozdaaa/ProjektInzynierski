@@ -59,7 +59,10 @@ Route::controller(MenuController::class)->group(function () {
     Route::get('/menu/event/{event}', 'show')->name('menus.show');
     Route::get('/menu', 'index')->name('menus.index');
     Route::get('/restaurants/{restaurant}/menus/create',  'create')->name('menus.create');
+    Route::get('/menus/{menu}/edit', 'edit')->name('menus.edit');
     Route::post('/restaurants/{restaurant}/menus', 'store')->name('menus.store');
+    Route::put('/menus/{menu}', 'update')->name('menus.update');
+    Route::delete('/menus/{menu}', 'destroy')->name('menus.destroy');
 });
 
 Route::controller(DishController::class)->group(function (){
