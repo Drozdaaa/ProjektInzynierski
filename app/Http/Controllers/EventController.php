@@ -45,7 +45,10 @@ class EventController extends Controller
         $restaurant = Restaurant::findOrFail($id);
         $eventTypes = EventType::all();
         $menus = $restaurant->menus;
-
+        $restaurant->menus->transform(function ($menu) {
+            $menu->dishesByType = $menu->dishes->groupBy(fn($dish) => $dish->dishType->name);
+            return $menu;
+        });
         return view('events.create', compact('restaurant', 'eventTypes', 'menus'));
     }
 
@@ -85,15 +88,22 @@ class EventController extends Controller
      */
     public function edit($id)
     {
-        $event = Event::with('user')->findOrFail($id);
+        $event = Event::with('user', 'restaurant.menus.dishes.dishType', 'restaurant.menus.dishes.diets', 'restaurant.menus.dishes.allergies')
+            ->findOrFail($id);
 
-        return view('events.edit', [
-            'event' => $event,
-            'users' => User::all(),
-            'statuses' => Status::all(),
-            'eventTypes' => EventType::all(),
-            'menus' => Menu::all(),
-        ]);
+        $restaurant = $event->restaurant;
+
+        $restaurant->menus->transform(function ($menu) {
+            $menu->dishesByType = $menu->dishes->groupBy(fn($dish) => $dish->dishType?->name ?? 'Inne');
+            return $menu;
+        });
+
+        $menus = $restaurant->menus;
+        $eventTypes = EventType::all();
+        $users = User::all();
+        $statuses = Status::all();
+
+        return view('events.edit', compact('event', 'restaurant', 'menus', 'eventTypes', 'users', 'statuses'));
     }
 
     /**

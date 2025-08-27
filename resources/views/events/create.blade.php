@@ -47,18 +47,7 @@
                     @endforeach
                 </select>
             </div>
-
-            <div class="mb-3">
-                <label for="menu_id" class="form-label">Menu</label>
-                <select name="menu_id" id="menu_id" class="form-select" required>
-                    <option value="">-- Wybierz menu --</option>
-                    @foreach ($menus as $menu)
-                        <option value="{{ $menu->id }}" @selected(old('menu_id') == $menu->id)>
-                            Menu {{ $menu->id }} (Cena: {{ $menu->price }} zł)
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+            @include('shared.menu-card')
 
             <button type="submit" class="btn btn-primary">Utwórz wydarzenie</button>
         </form>

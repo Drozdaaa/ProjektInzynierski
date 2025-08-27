@@ -21,8 +21,12 @@ class MenuController extends Controller
         $user = Auth::user();
 
         $restaurant = Restaurant::where('user_id', Auth::id())
-            ->with('menus.dishes.diets', 'menus.dishes.allergies')
+            ->with('menus.dishes.dishType', 'menus.dishes.diets', 'menus.dishes.allergies')
             ->firstOrFail();
+        $restaurant->menus->transform(function ($menu) {
+            $menu->dishesByType = $menu->dishes->groupBy(fn($dish) => $dish->dishType->name);
+            return $menu;
+        });
 
         return view('menus.index', compact('restaurant'));
     }
