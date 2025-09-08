@@ -1,10 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DishController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\DishController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ManagerController;
@@ -32,6 +33,10 @@ Route::middleware(['auth', 'can:is-admin'])->controller(AdminController::class)-
 
 Route::middleware(['auth', 'can:admin-or-manager'])->controller(ManagerController::class)->group(function () {
     Route::get('/manager', 'index')->name('users.manager-dashboard');
+});
+
+Route::middleware(['auth', 'can:is-user'])->controller(UserController::class)->group(function () {
+    Route::get('/user', 'index')->name('users.user-dashboard');
 });
 
 Route::controller(RestaurantController::class)->group(function () {

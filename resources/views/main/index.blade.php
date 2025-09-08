@@ -1,5 +1,5 @@
 @include('shared.html')
-@include('shared.head', ['pageTitle' => 'Main'])
+@include('shared.head', ['pageTitle' => 'Strona główna'])
 
 <body>
 

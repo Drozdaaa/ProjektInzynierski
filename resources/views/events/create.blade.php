@@ -48,7 +48,7 @@
                 </select>
             </div>
             @include('shared.menu-card')
-
+            <button type="submit" class="btn btn-primary">Utwórz własne menu</button>
             <button type="submit" class="btn btn-primary">Utwórz wydarzenie</button>
         </form>
     </div>

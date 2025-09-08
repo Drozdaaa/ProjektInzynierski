@@ -40,6 +40,15 @@
                     </li>
                 @endcan
 
+                @can('is-user')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('users.user-dashboard') ? 'active' : '' }}"
+                            href="{{ route('users.user-dashboard') }}">
+                            Twoje wydarzenia
+                        </a>
+                    </li>
+                @endcan
+
             </ul>
             <form class="d-flex">
                 <input class="form-control me-sm-2" type="search" placeholder="Search">

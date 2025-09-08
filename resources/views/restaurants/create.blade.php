@@ -1,5 +1,5 @@
 @include('shared.html')
-@include('shared.head', ['pageTitle' => 'Dodaj restaurację'])
+@include('shared.head', ['pageTitle' => 'Dodaj lokal'])
 
 <body>
     @include('shared.navbar')
