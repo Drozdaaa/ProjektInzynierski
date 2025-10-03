@@ -48,5 +48,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('restaurant-owner', function (User $user, Restaurant $restaurant) {
             return $user->isAdmin() || ($user->isManager() && $restaurant->user_id === $user->id);
         });
+
+        Gate::define('create-custom-menu', function (User $user) {
+            return $user->isUser() || $user->isAdmin() || $user->isManager();
+        });
     }
 }

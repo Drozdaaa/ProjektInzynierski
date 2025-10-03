@@ -53,28 +53,27 @@
                                         data-bs-target="#menuDetailsModal{{ $menu->id }}">
                                         Szczegóły
                                     </button>
-                                        <a href="{{ route('menus.edit', ['menu' => $menu->id]) }}"
-                                            class="btn btn-info btn-sm">
-                                            Edytuj
-                                        </a>
-                                        <form action="{{ route('menus.destroy', $menu->id) }}" method="POST"
-                                            class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Na pewno chcesz usunąć to menu?')">
-                                                Usuń
-                                            </button>
-                                        </form>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="menu_id"
-                                                id="menu_{{ $menu->id }}" value="{{ $menu->id }}"
-                                                @checked(old('menu_id') == $menu->id)>
-                                            <label class="form-check-label" for="menu_{{ $menu->id }}">
-                                                Wybierz
-                                            </label>
-                                        </div>
-                                    @endif
+                                    <a href="{{ route('menus.edit', ['menu' => $menu->id]) }}"
+                                        class="btn btn-info btn-sm">
+                                        Edytuj
+                                    </a>
+                                    <form action="{{ route('menus.destroy', $menu->id) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Na pewno chcesz usunąć to menu?')">
+                                            Usuń
+                                        </button>
+                                    </form>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="menu_id"
+                                            id="menu_{{ $menu->id }}" value="{{ $menu->id }}"
+                                            @checked(old('menu_id') == $menu->id)>
+                                        <label class="form-check-label" for="menu_{{ $menu->id }}">
+                                            Wybierz
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -26,7 +26,8 @@ class EventRequest extends FormRequest
             'number_of_people' => 'required|integer|min:1',
             'description' => 'required|string|max:255',
             'event_type_id' => 'required|exists:event_types,id',
-            'menu_id' => 'required|exists:menus,id',
+            'menu_id' => 'required_if:action,event|nullable|exists:menus,id',
+            'action' => 'required|in:event,custom',
         ];
     }
      public function messages(): array

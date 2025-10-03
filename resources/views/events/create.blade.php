@@ -47,9 +47,18 @@
                     @endforeach
                 </select>
             </div>
+
             @include('shared.menu-card')
-            <button type="submit" class="btn btn-primary">Utwórz własne menu</button>
-            <button type="submit" class="btn btn-primary">Utwórz wydarzenie</button>
+
+            <div class="mt-3">
+                <button type="submit" name="action" value="custom" class="btn btn-primary">
+                    Utwórz własne menu
+                </button>
+
+                <button type="submit" name="action" value="event" class="btn btn-success">
+                    Utwórz wydarzenie
+                </button>
+            </div>
         </form>
     </div>
 </body>

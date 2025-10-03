@@ -48,7 +48,6 @@ Route::controller(RestaurantController::class)->group(function () {
         Route::delete('/restaurants/{restaurant}', 'destroy')->name('restaurants.destroy');
     });
     Route::get('/restaurants/{id}', 'show')->name('restaurants.show');
-
 });
 
 Route::middleware(['auth'])->controller(EventController::class)->group(function () {
@@ -58,6 +57,7 @@ Route::middleware(['auth'])->controller(EventController::class)->group(function 
     Route::put('/events/{id}', 'update')->name('events.update');
     Route::get('/restaurants/{id}/events/create', 'create')->name('events.create');
     Route::post('/restaurants/{id}/events', 'store')->name('events.store');
+    Route::get('/restaurants/{restaurant}/events/{event}', 'show')->name('events.show');
 });
 
 Route::controller(MenuController::class)->group(function () {
@@ -68,11 +68,25 @@ Route::controller(MenuController::class)->group(function () {
     Route::post('/restaurants/{restaurant}/menus', 'store')->name('menus.store');
     Route::put('/menus/{menu}', 'update')->name('menus.update');
     Route::delete('/menus/{menu}', 'destroy')->name('menus.destroy');
+    Route::get('/restaurants/{restaurant}/events/{event}/menus/create', 'createForUser')
+        ->name('menus.user-create');
+    Route::post('/restaurants/{restaurant}/events/{event}/menus', 'storeForUser')
+        ->name('menus.user-store');
 });
 
-Route::controller(DishController::class)->group(function (){
+Route::controller(DishController::class)->group(function () {
     Route::get('/restaurants/{restaurant}/dish/create', 'create')->name('dishes.create');
     Route::post('/restaurants/{restaurant}/dish', 'store')->name('dishes.store');
 });
 
+Route::middleware(['auth', 'can:create-custom-menu'])->group(function () {
+    Route::get(
+        '/restaurants/{restaurant}/menus/create-for-event/{event}',
+        [MenuController::class, 'createForEvent']
+    )->name('menus.create-for-event');
 
+    Route::post(
+        '/restaurants/{restaurant}/menus/store-for-event/{event}',
+        [MenuController::class, 'storeForEvent']
+    )->name('menus.store-for-event');
+});

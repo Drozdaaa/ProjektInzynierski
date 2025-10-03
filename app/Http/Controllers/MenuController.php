@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
-
 class MenuController extends Controller
 {
     /**
@@ -18,11 +17,10 @@ class MenuController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-
         $restaurant = Restaurant::where('user_id', Auth::id())
             ->with('menus.dishes.dishType', 'menus.dishes.diets', 'menus.dishes.allergies')
             ->firstOrFail();
+
         $restaurant->menus->transform(function ($menu) {
             $menu->dishesByType = $menu->dishes->groupBy(fn($dish) => $dish->dishType->name);
             return $menu;
@@ -32,34 +30,28 @@ class MenuController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new menu.
      */
-    public function create(Restaurant $restaurant)
+    public function create(Restaurant $restaurant, Request $request)
     {
-        if (Gate::denies('restaurant-owner', $restaurant)) {
+        if (Gate::denies('create-custom-menu')) {
             abort(403);
         }
 
         $dishes = $restaurant->dishes()->with(['dishType', 'diets', 'allergies'])->get();
 
-        return view('menus.create', compact('restaurant', 'dishes'));
+        $fromEvent = $request->input('from_event', false);
+        $eventId = $request->input('event_id');
+
+        return view('menus.create', compact('restaurant', 'dishes', 'fromEvent', 'eventId'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request, Restaurant $restaurant)
     {
-        if (Gate::denies('restaurant-owner', $restaurant)) {
-            abort(403);
-        }
-
         $request->validate([
             'price' => 'required|numeric|min:0',
             'dishes' => 'required|array|min:1',
             'dishes.*' => 'exists:dishes,id',
-        ], [
-            'dishes.required' => 'Musisz wybrać przynajmniej jedno danie do menu.',
         ]);
 
         $menu = $restaurant->menus()->create([
@@ -69,13 +61,19 @@ class MenuController extends Controller
 
         $menu->dishes()->sync($request->input('dishes'));
 
-        return redirect()->route('menus.create', ['restaurant' => $restaurant->id])
+        if ($request->input('from_event')) {
+            return redirect()->route('events.edit', [
+                'id' => $request->input('event_id')
+            ])->with('success', 'Menu zostało utworzone. Możesz teraz dokończyć rezerwację wydarzenia.');
+        }
+
+        return redirect()->route('menus.index', ['restaurant' => $restaurant->id])
             ->with('success', 'Menu zostało utworzone.');
     }
 
 
     /**
-     * Display the specified resource.
+     * Display a menu assigned to event.
      */
     public function show($id)
     {
@@ -89,7 +87,7 @@ class MenuController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified menu.
      */
     public function edit($id)
     {
@@ -100,14 +98,15 @@ class MenuController extends Controller
         }
 
         $restaurant = $menu->restaurant()->with('dishes')->first();
-
         $selectedDishes = $menu->dishes->pluck('id')->toArray();
-
         $dishes = $restaurant->dishes()->with('dishType')->get();
 
         return view('menus.edit', compact('menu', 'restaurant', 'dishes', 'selectedDishes'));
     }
 
+    /**
+     * Update the specified menu in storage.
+     */
     public function update(Request $request, $id)
     {
         $menu = Menu::findOrFail($id);
@@ -124,13 +123,15 @@ class MenuController extends Controller
 
         $menu->price = $validated['price'];
         $menu->save();
-
         $menu->dishes()->sync($validated['dishes'] ?? []);
 
         return redirect()->route('menus.index')
             ->with('success', 'Menu zostało zaktualizowane.');
     }
 
+    /**
+     * Remove the specified menu from storage.
+     */
     public function destroy($id)
     {
         $menu = Menu::findOrFail($id);
@@ -144,5 +145,39 @@ class MenuController extends Controller
         return redirect()
             ->route('menus.index', ['id' => $menu->restaurant_id])
             ->with('success', 'Menu zostało usunięte.');
+    }
+
+    public function createForUser(Restaurant $restaurant, Event $event)
+    {
+        $dishes = $restaurant->dishes()
+            ->with(['dishType', 'diets', 'allergies'])
+            ->get();
+
+        return view('menus.user-create', compact('restaurant', 'event', 'dishes'));
+    }
+
+    public function storeForUser(Request $request, Restaurant $restaurant, Event $event)
+    {
+        $validated = $request->validate([
+            'price' => 'required|numeric|min:0',
+            'dishes' => 'required|array|min:1',
+        ]);
+
+        $menu = Menu::create([
+            'price' => $validated['price'],
+            'user_id' => Auth::id(),
+            'restaurant_id' => $restaurant->id,
+        ]);
+
+        $menu->dishes()->attach($validated['dishes']);
+
+        $event->update([
+            'menu_id' => $menu->id,
+        ]);
+
+        return redirect()->route('events.show', [
+            'restaurant' => $event->restaurant_id,
+            'event' => $event->id,
+        ])->with('success', 'Menu zostało utworzone i przypisane do wydarzenia.');
     }
 }
