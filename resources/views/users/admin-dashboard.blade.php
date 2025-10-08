@@ -5,8 +5,9 @@
 
     @include('shared.navbar')
 
-    <h1>Panel Admina</h1>
-    <div class="container">
+
+    <div class="container-fluid mt-5 px-5">
+        <h1>Panel Admina</h1>
         <div class="btn-group mt-3" role="group" aria-label="tabela przełączająca">
             <input type="radio" class="btn-check" name="btnradio" id="btn-users" autocomplete="off" checked
                 onclick="showTable('users')">

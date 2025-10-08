@@ -16,9 +16,13 @@ class DishController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Restaurant $restaurant)
     {
-        //
+        $dishes = Dish::where('restaurant_id', $restaurant->id)
+        ->with('dishType')
+        ->get();
+
+        return view('dishes.index', compact('dishes', 'restaurant'));
     }
 
     /**

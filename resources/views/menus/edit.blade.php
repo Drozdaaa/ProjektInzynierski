@@ -4,7 +4,7 @@
 
 <body>
     @include('shared.navbar')
-    <div class="container mt-5">
+    <div class="container-fluid mt-5 px-5">
         <h1>Edytuj menu: {{ $menu->id }}</h1>
 
         @if (session('success'))

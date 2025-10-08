@@ -3,8 +3,8 @@
 
 <body>
     @include('shared.navbar')
-    <div class="container mt-5">
-        <h2>Dodaj nowe danie</h2>
+    <div class="container-fluid mt-5 px-5">
+        <h1>Dodaj nowe danie</h1>
 
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>

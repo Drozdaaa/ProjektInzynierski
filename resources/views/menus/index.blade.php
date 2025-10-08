@@ -4,10 +4,14 @@
 <body>
     @include('shared.navbar')
 
-    <div class="container mt-5">
+    <div class="container-fluid mt-5 px-5">
         <h1 class="mb-4">Twoje aktualne menu</h1>
 
         <div class="mb-3">
+            <a href="{{ route('dishes.index', ['restaurant' => $restaurant->id]) }}" class="btn btn-primary">
+                Pokaż dania
+            </a>
+
             <a href="{{ route('dishes.create', ['restaurant' => $restaurant->id]) }}" class="btn btn-primary">
                 Dodaj danie
             </a>

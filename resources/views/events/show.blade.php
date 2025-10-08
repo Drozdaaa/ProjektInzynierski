@@ -13,7 +13,7 @@
                 <h5 class="card-title">{{ $event->eventType->name ?? 'Brak typu' }}</h5>
                 <p class="card-text mb-2">
                     <strong>Opis:</strong> {{ $event->description }} <br>
-                    <strong>Data:</strong> {{ \Carbon\Carbon::parse($event->date)->format('d.m.Y H:i') }} <br>
+                    <strong>Data:</strong> {{ $event->date }} <br>
                     <strong>Liczba osób:</strong> {{ $event->number_of_people }} <br>
                     <strong>Status:</strong> {{ $event->status->name ?? 'Nieznany' }}
                 </p>

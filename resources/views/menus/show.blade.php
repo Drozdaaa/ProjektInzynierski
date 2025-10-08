@@ -4,7 +4,7 @@
 <body>
     @include('shared.navbar')
 
-    <div id="menu" class="container mt-5 mb-5">
+    <div id="menu" class="container mt-5 px-5"> 
         <div class="row m-2 text-center">
             <h1>Menu</h1>
         </div>

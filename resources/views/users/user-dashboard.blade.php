@@ -4,8 +4,8 @@
 <body>
     @include('shared.navbar')
 
-    <h1>Moje wydarzenia</h1>
-    <div class="container-fluid px-5 mt-3">
+    <div class="container-fluid mt-5 px-5">
+        <h1>Moje wydarzenia</h1>
         <div class="btn-group" role="group" aria-label="Status filtr">
             <input type="radio" class="btn-check" name="btnstatus" id="btn-all" autocomplete="off" checked
                 onclick="filterStatus('all')">
@@ -33,6 +33,7 @@
                         <th scope="col">Opis</th>
                         <th scope="col">Koszt</th>
                         <th scope="col">Status</th>
+                        <th scope="col">Akcje</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,12 +43,34 @@
                             <td>{{ $event->date }}</td>
                             <td>{{ $event->number_of_people }}</td>
                             <td>{{ $event->description }}</td>
-                            <td>{{ number_format($event->number_of_people * $event->menu->price, 2, ',', ' ') }} zł</td>
+
+                            <td>
+                                @if ($event->menu)
+                                    {{ $event->number_of_people * $event->menu->price }} zł
+                                @else
+                                    <span class="text-muted">Brak menu</span>
+                                @endif
+                            </td>
+
                             <td>{{ $event->status->name }}</td>
+
+                            <td>
+                                @if (!$event->menu)
+                                    <a href="{{ route('menus.user-create', ['restaurant' => $event->restaurant->id, 'event' => $event->id]) }}"
+                                        class="btn btn-sm btn-outline-primary">
+                                        Dodaj menu
+                                    </a>
+                                @else
+                                    <a href="{{ route('events.show', ['restaurant' => $event->restaurant->id, 'event' => $event->id]) }}"
+                                        class="btn btn-sm btn-outline-success">
+                                        Zobacz
+                                    </a>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center">Brak wydarzeń.</td>
+                            <td colspan="7" class="text-center">Brak wydarzeń.</td>
                         </tr>
                     @endforelse
                 </tbody>

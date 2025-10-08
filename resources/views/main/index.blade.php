@@ -4,7 +4,7 @@
 <body>
     @include('shared.navbar')
 
-    <div class="container mt-4">
+    <div class="container-fluid mt-5 px-5">
         <div class="row">
             <div class="col-12 mb-4">
                 <h1>Lokale</h1>

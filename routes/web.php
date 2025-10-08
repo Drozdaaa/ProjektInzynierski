@@ -75,8 +75,12 @@ Route::controller(MenuController::class)->group(function () {
 });
 
 Route::controller(DishController::class)->group(function () {
-    Route::get('/restaurants/{restaurant}/dish/create', 'create')->name('dishes.create');
-    Route::post('/restaurants/{restaurant}/dish', 'store')->name('dishes.store');
+    Route::get('/restaurants/{restaurant}/dishes', 'index')->name('dishes.index');
+    Route::get('/restaurants/{restaurant}/dishes/create', 'create')->name('dishes.create');
+    Route::post('/restaurants/{restaurant}/dishes', 'store')->name('dishes.store');
+    Route::get('/dishes/{dish}/edit', 'edit')->name('dishes.edit');
+    Route::put('/dishes/{dish}', 'update')->name('dishes.update');
+    Route::delete('/dishes/{dish}', 'destroy')->name('dishes.destroy');
 });
 
 Route::middleware(['auth', 'can:create-custom-menu'])->group(function () {

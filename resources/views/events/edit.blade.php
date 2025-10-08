@@ -3,8 +3,8 @@
 
 <body>
     @include('shared.navbar')
-    <div class="container mt-5">
-        <h2>Edytuj dane wydarzenia</h2>
+    <div class="container-fluid mt-5 px-5">
+        <h1>Edytuj dane wydarzenia</h1>
 
         @if ($errors->any())
             <div class="alert alert-danger">
