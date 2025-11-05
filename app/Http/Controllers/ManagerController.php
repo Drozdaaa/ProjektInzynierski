@@ -15,16 +15,33 @@ class ManagerController extends Controller
     public function index()
     {
         $managerId = Auth::id();
-        $events = Event::with(['user', 'eventType', 'status', 'rooms'])
-        ->where('manager_id', $managerId)
-        ->get();
-        $restaurant = Restaurant::where('user_id', $managerId)->first();
 
-        return view('users.manager-dashboard', [
-            'events'=>$events,
-            'restaurant'=>$restaurant
-        ]);
+        $events = Event::with([
+            'user',
+            'eventType',
+            'status',
+            'rooms',
+            'menus.dishes.dishType',
+            'menus.dishes.diets',
+            'menus.dishes.allergies'
+        ])
+            ->where('manager_id', $managerId)
+            ->get();
+
+        $restaurant = Restaurant::where('user_id', $managerId)
+            ->with('menus.dishes.dishType')
+            ->first();
+
+        $events->each(function ($event) {
+            $event->menus->each(function ($menu) {
+                $menu->dishesByType = $menu->dishes
+                    ->groupBy(fn($dish) => $dish->dishType->name);
+            });
+        });
+
+        return view('users.manager-dashboard', compact('events', 'restaurant'));
     }
+
 
     /**
      * Show the form for creating a new resource.
