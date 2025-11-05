@@ -17,6 +17,7 @@ class EventTypeSeeder extends Seeder
            ['name'=>'Chrzciny'],
            ['name'=>'Spotkanie firmowe'],
            ['name'=>'Stypa'],
+           ['name'=>'Inne'],
         ]);
     }
 }

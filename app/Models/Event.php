@@ -8,13 +8,14 @@ class Event extends Model
 {
     protected $fillable = [
         'date',
+        'start_time',
+        'end_time',
         'number_of_people',
         'description',
         'status_id',
         'event_type_id',
         'restaurant_id',
         'user_id',
-        'menu_id',
         'manager_id',
     ];
 
@@ -40,12 +41,19 @@ class Event extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function menu()
-    {
-        return $this->belongsTo(Menu::class);
-    }
     public function manager()
     {
         return $this->belongsTo(User::class, 'manager_id');
+    }
+
+    public function menus()
+    {
+        return $this->belongsToMany(Menu::class, 'event_menu');
+    }
+
+
+    public function rooms()
+    {
+        return $this->belongsToMany(Room::class, 'event_room');
     }
 }

@@ -8,7 +8,8 @@ class Menu extends Model
 {
     protected $fillable = [
         'price',
-        'user_id'
+        'user_id',
+        'event_id',
     ];
 
     public $timestamps = false;
@@ -25,8 +26,9 @@ class Menu extends Model
 
     public function events()
     {
-        return $this->hasMany(Event::class);
+        return $this->belongsToMany(Event::class, 'event_menu');
     }
+
     public function restaurant()
     {
         return $this->belongsTo(Restaurant::class);

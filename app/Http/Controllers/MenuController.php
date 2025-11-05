@@ -77,12 +77,9 @@ class MenuController extends Controller
      */
     public function show($id)
     {
-        $event = Event::with('menu.dishes.dishType')->findOrFail($id);
-
+        $event = Event::with('menus.dishes.dishType')->findOrFail($id);
         return view('menus.show', [
             'event' => $event,
-            'menu' => $event->menu,
-            'dishes' => $event->menu->dishes,
         ]);
     }
 

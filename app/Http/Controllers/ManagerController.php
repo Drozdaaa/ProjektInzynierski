@@ -15,7 +15,7 @@ class ManagerController extends Controller
     public function index()
     {
         $managerId = Auth::id();
-        $events = Event::with(['user', 'eventType', 'status'])
+        $events = Event::with(['user', 'eventType', 'status', 'rooms'])
         ->where('manager_id', $managerId)
         ->get();
         $restaurant = Restaurant::where('user_id', $managerId)->first();

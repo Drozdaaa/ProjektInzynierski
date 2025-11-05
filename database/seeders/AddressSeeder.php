@@ -10,11 +10,19 @@ class AddressSeeder extends Seeder
 {
     public function run(): void
     {
-         Address::insert([
-            'city' => 'Warszawa',
-            'street' => 'Marszałkowska',
-            'postal_code' => '00-001',
-            'building_number' => 10,
+        Address::insert([
+            [
+                'city' => 'Warszawa',
+                'street' => 'Marszałkowska',
+                'postal_code' => '00-001',
+                'building_number' => 10,
+            ],
+            [
+                'city' => 'Warszawa',
+                'street' => 'Krakowska',
+                'postal_code' => '00-001',
+                'building_number' => 37,
+            ],
         ]);
     }
 }

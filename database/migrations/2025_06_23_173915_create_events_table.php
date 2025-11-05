@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->date('date');
-            $table->integer('number_of_people');
-            $table->string('description');
-            $table->foreignId('status_id')->constrained('statuses');
-            $table->foreignId('event_type_id')->constrained('event_types');
+            $table->date('date')->nullable();
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
+            $table->integer('number_of_people')->nullable();
+            $table->string('description')->nullable();
+            $table->foreignId('status_id')->constrained('statuses')->onDelete('cascade');
+            $table->foreignId('event_type_id')->constrained('event_types')->onDelete('cascade');
+            $table->foreignId('room_id')->constrained('statuses')->onDelete('cascade');
             $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('menu_id')->constrained('menus')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('manager_id')->constrained('users')->onDelete('cascade');
         });
     }

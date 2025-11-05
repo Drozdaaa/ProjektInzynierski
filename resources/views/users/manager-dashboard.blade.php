@@ -47,6 +47,7 @@
                         <th>Email</th>
                         <th>Rodzaj wydarzenia</th>
                         <th>Data</th>
+                        <th>Godziny wydarzenia</th>
                         <th>Liczba osób</th>
                         <th>Opis</th>
                         <th>Status</th>
@@ -61,7 +62,9 @@
                             <td>{{ $event->user->phone }}</td>
                             <td>{{ $event->user->email }}</td>
                             <td>{{ $event->eventType->name }}</td>
+                            <td>{{ $event->rooms->pluck('name')->join(', ') }}</td>
                             <td>{{ $event->date }}</td>
+                            <td>{{ $event->start_time }} - {{ $event->end_time }}</td>
                             <td>{{ $event->number_of_people }}</td>
                             <td>{{ $event->description }}</td>
                             <td>
@@ -119,7 +122,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="text-center text-muted py-4">
+                            <td colspan="11" class="text-center text-muted py-4">
                                 Brak wydarzeń.
                             </td>
                         </tr>
