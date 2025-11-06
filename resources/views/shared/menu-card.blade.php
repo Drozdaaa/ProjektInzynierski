@@ -31,9 +31,9 @@
                                 Szczegóły
                             </button>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="menu_id"
+                                <input class="form-check-input" type="checkbox" name="menus_id[]"
                                     id="menu_{{ $menu->id }}" value="{{ $menu->id }}"
-                                    @checked(old('menu_id') == $menu->id)>
+                                    @checked(in_array($menu->id, old('menus_id', [])))>
                                 <label class="form-check-label" for="menu_{{ $menu->id }}">
                                     Wybierz
                                 </label>

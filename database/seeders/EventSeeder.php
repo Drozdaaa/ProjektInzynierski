@@ -19,7 +19,6 @@ class EventSeeder extends Seeder
                 'description' => 'Urodziny Pawła',
                 'status_id' => 1,
                 'event_type_id' => 2,
-                'room_id'=>1,
                 'restaurant_id' => 1,
                 'user_id' => 3,
                 'manager_id' => 3,

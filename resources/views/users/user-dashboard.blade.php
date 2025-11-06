@@ -5,78 +5,106 @@
     @include('shared.navbar')
 
     <div class="container-fluid mt-5 px-5">
-        <h1>Moje wydarzenia</h1>
-        <div class="btn-group" role="group" aria-label="Status filtr">
-            <input type="radio" class="btn-check" name="btnstatus" id="btn-all" autocomplete="off" checked
-                onclick="filterStatus('all')">
-            <label class="btn btn-outline-primary" for="btn-all">Wszystkie</label>
+        <h1 class="mb-4">Moje wydarzenia</h1>
 
-            <input type="radio" class="btn-check" name="btnstatus" id="btn-oczekujące" autocomplete="off"
-                onclick="filterStatus('Oczekujące')">
-            <label class="btn btn-outline-primary" for="btn-oczekujące">Oczekujące</label>
+        <div class="d-grid d-sm-flex gap-2 justify-content flex-sm-wrap mb-4" role="group" aria-label="Status filtr">
+            <div class="flex">
+                <input type="radio" class="btn-check" name="btnstatus" id="btn-all" autocomplete="off" checked
+                    onclick="filterStatus('all')">
+                <label class="btn btn-outline-primary w-100 text-center" for="btn-all">Wszystkie</label>
+            </div>
 
-            <input type="radio" class="btn-check" name="btnstatus" id="btn-zaplanowane" autocomplete="off"
-                onclick="filterStatus('Zaplanowane')">
-            <label class="btn btn-outline-primary" for="btn-zaplanowane">Zaplanowane</label>
+            <div class="flex">
+                <input type="radio" class="btn-check" name="btnstatus" id="btn-oczekujące" autocomplete="off"
+                    onclick="filterStatus('Oczekujące')">
+                <label class="btn btn-outline-primary w-100 text-center" for="btn-oczekujące">Oczekujące</label>
+            </div>
 
-            <input type="radio" class="btn-check" name="btnstatus" id="btn-zakonczone" autocomplete="off"
-                onclick="filterStatus('Zakończone')">
-            <label class="btn btn-outline-primary" for="btn-zakonczone">Zakończone</label>
+            <div class="flex">
+                <input type="radio" class="btn-check" name="btnstatus" id="btn-zaplanowane" autocomplete="off"
+                    onclick="filterStatus('Zaplanowane')">
+                <label class="btn btn-outline-primary w-100 text-center" for="btn-zaplanowane">Zaplanowane</label>
+            </div>
+
+            <div class="flex">
+                <input type="radio" class="btn-check" name="btnstatus" id="btn-zakonczone" autocomplete="off"
+                    onclick="filterStatus('Zakończone')">
+                <label class="btn btn-outline-primary w-100 text-center" for="btn-zakonczone">Zakończone</label>
+            </div>
         </div>
-        <div class="table-responsive-sm">
-            <table class="table table-striped">
-                <thead>
+
+        <div class="table-responsive">
+            <table class="table table-striped align-middle text-center">
+                <thead class="table-primary">
                     <tr>
-                        <th scope="col">Rodzaj wydarzenia</th>
-                        <th scope="col">Data</th>
-                        <th scope="col">Liczba osób</th>
-                        <th scope="col">Opis</th>
-                        <th scope="col">Koszt</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Akcje</th>
+                        <th>#</th>
+                        <th>Lokal</th>
+                        <th>Rodzaj wydarzenia</th>
+                        <th>Data</th>
+                        <th>Sala</th>
+                        <th>Liczba osób</th>
+                        <th>Opis</th>
+                        <th>Menu</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($events as $event)
                         <tr data-status="{{ $event->status->name }}">
+                            <td>{{ $loop->iteration }}</td>
+                            <td>
+                                {{ $event->restaurant->name }}<br>
+                                <small class="text-muted">
+                                    {{ $event->restaurant->address->city }},
+                                    {{ $event->restaurant->address->street }}
+                                    {{ $event->restaurant->address->building_number }},
+                                    {{ $event->restaurant->address->postal_code }}
+                                </small>
+                            </td>
                             <td>{{ $event->eventType->name }}</td>
-                            <td>{{ $event->date }}</td>
+                            <td>
+                                {{ $event->date }}<br>
+                                <small class="text-muted">{{ $event->start_time }} - {{ $event->end_time }}</small>
+                            </td>
+                            <td>
+                                {{ $event->rooms->pluck('name')->join(', ') ?: 'Brak' }}
+                            </td>
                             <td>{{ $event->number_of_people }}</td>
                             <td>{{ $event->description }}</td>
-
                             <td>
-                                @if ($event->menu)
-                                    {{ $event->number_of_people * $event->menu->price }} zł
+                                @if ($event->menus->isNotEmpty())
+                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#menuDetailsModal{{ $event->id }}">
+                                        Szczegóły menu
+                                    </button>
+                                    @include('shared.modal', ['event' => $event])
                                 @else
                                     <span class="text-muted">Brak menu</span>
                                 @endif
                             </td>
-
-                            <td>{{ $event->status->name }}</td>
-
                             <td>
-                                @if (!$event->menu)
-                                    <a href="{{ route('menus.user-create', ['restaurant' => $event->restaurant->id, 'event' => $event->id]) }}"
-                                        class="btn btn-sm btn-outline-primary">
-                                        Dodaj menu
-                                    </a>
-                                @else
-                                    <a href="{{ route('events.show', ['restaurant' => $event->restaurant->id, 'event' => $event->id]) }}"
-                                        class="btn btn-sm btn-outline-success">
-                                        Zobacz
-                                    </a>
-                                @endif
+                                <span
+                                    class="badge
+                                    @if ($event->status->name === 'Oczekujące') bg-warning
+                                    @elseif($event->status->name === 'Zaplanowane') bg-info
+                                    @elseif($event->status->name === 'Zakończone') bg-success
+                                    @else bg-secondary @endif">
+                                    {{ $event->status->name }}
+                                </span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center">Brak wydarzeń.</td>
+                            <td colspan="9" class="text-center text-muted py-4">
+                                Brak wydarzeń.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
+
     <script>
         function filterStatus(status) {
             const rows = document.querySelectorAll('tbody tr');

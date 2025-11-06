@@ -15,9 +15,27 @@ class UserController extends Controller
     {
         $userId = Auth::id();
 
-        $events = Event::with(['eventType', 'status', 'menu'])
+        $events = Event::with([
+            'menus',
+            'menus.dishes.dishType',
+            'menus.dishes.diets',
+            'menus.dishes.allergies',
+            'status',
+            'restaurant.address',
+            'rooms',
+            'eventType',
+        ])
             ->where('user_id', $userId)
+            ->orderByDesc('date')
             ->get();
+
+        $events->each(function ($event) {
+            $event->menus->each(function ($menu) {
+                $menu->dishesByType = $menu->dishes
+                    ->groupBy(fn($dish) => $dish->dishType->name ?? 'Brak typu');
+            });
+        });
+
 
         return view('users.user-dashboard', compact('events'));
     }

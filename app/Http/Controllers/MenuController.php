@@ -30,7 +30,7 @@ class MenuController extends Controller
     }
 
     /**
-     * Show the form for creating a new menu.
+     * Show the form for creating a new resource.
      */
     public function create(Restaurant $restaurant, Request $request)
     {
@@ -73,7 +73,7 @@ class MenuController extends Controller
 
 
     /**
-     * Display a menu assigned to event.
+     * Display a menu assigned to resource.
      */
     public function show($id)
     {
@@ -84,7 +84,7 @@ class MenuController extends Controller
     }
 
     /**
-     * Show the form for editing the specified menu.
+     * Show the form for editing the specified resource.
      */
     public function edit($id)
     {
@@ -102,7 +102,7 @@ class MenuController extends Controller
     }
 
     /**
-     * Update the specified menu in storage.
+     * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
     {
@@ -127,7 +127,7 @@ class MenuController extends Controller
     }
 
     /**
-     * Remove the specified menu from storage.
+     * Remove the specified resource from storage.
      */
     public function destroy($id)
     {
@@ -158,6 +158,9 @@ class MenuController extends Controller
         $validated = $request->validate([
             'price' => 'required|numeric|min:0',
             'dishes' => 'required|array|min:1',
+            'dishes.*' => 'exists:dishes,id',
+        ], [
+            'dishes.required' => 'Musisz wybrać przynajmniej jedno danie.',
         ]);
 
         $menu = Menu::create([
@@ -168,9 +171,7 @@ class MenuController extends Controller
 
         $menu->dishes()->attach($validated['dishes']);
 
-        $event->update([
-            'menu_id' => $menu->id,
-        ]);
+        $event->menus()->attach($menu->id);
 
         return redirect()->route('events.show', [
             'restaurant' => $event->restaurant_id,

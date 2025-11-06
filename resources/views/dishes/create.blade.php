@@ -81,7 +81,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Dodaj danie</button>
-            <a href="{{ route('users.manager-dashboard') }}" class="btn btn-secondary">Anuluj</a>
+            <a href="{{ route('menus.index') }}" class="btn btn-secondary">Wróć do zarządzania menu</a>
         </form>
     </div>
 </body>

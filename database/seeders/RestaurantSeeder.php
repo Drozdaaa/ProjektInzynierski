@@ -21,7 +21,7 @@ class RestaurantSeeder extends Seeder
                 'name' => 'Qwe',
                 'description' => 'Super kuchnia polska',
                 'user_id' => 5,
-                'address_id' => 1,
+                'address_id' => 2,
             ],
         ]);
     }

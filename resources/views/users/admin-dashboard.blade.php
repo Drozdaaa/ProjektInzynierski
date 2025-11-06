@@ -8,7 +8,7 @@
 
     <div class="container-fluid mt-5 px-5">
         <h1>Panel Admina</h1>
-        <div class="btn-group mt-3" role="group" aria-label="tabela przełączająca">
+        <div class="btn-group mt-3 mb-4" role="group" aria-label="tabela przełączająca">
             <input type="radio" class="btn-check" name="btnradio" id="btn-users" autocomplete="off" checked
                 onclick="showTable('users')">
             <label class="btn btn-outline-primary" for="btn-users">Użytkownicy</label>
@@ -17,10 +17,11 @@
                 onclick="showTable('restaurants')">
             <label class="btn btn-outline-primary" for="btn-restaurants">Lokale</label>
         </div>
+
         <div class="table-responsive-sm">
             <div id="table-users">
-                <table class="table table-users table-striped">
-                    <thead>
+                 <table class="table table-striped align-middle text-center">
+                    <thead class="table-primary">
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Imię</th>
@@ -28,6 +29,7 @@
                             <th scope="col">Email</th>
                             <th scope="col">Numer telefonu</th>
                             <th scope="col">Rola</th>
+                            <th scope="col">Akcje</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,10 +41,8 @@
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->phone }}</td>
                                 <td>{{ $user->role->name }}</td>
-                                <td>
+                                <td class="d-flex justify-content-center gap-2">
                                     <button type="button" class="btn btn-info">Edytuj</button>
-                                </td>
-                                <td>
                                     <button type="submit" class="btn btn-danger">Usuń</button>
                                 </td>
                             </tr>
@@ -56,17 +56,17 @@
                 </table>
             </div>
             <div id="table-restaurants" class="d-none">
-                <table class="table table-restaurants table-striped">
-                    <thead>
+                <table class="table table-striped align-middle text-center">
+                    <thead class="table-primary">
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Nazwa</th>
                             <th scope="col">Miejscowość</th>
                             <th scope="col">Ulica</th>
                             <th scope="col">Kod pocztowy</th>
-                            <th scope="col">Numer budynku</th>
                             <th scope="col">Opis</th>
                             <th scope="col">Właściciel</th>
+                            <th scope="col">Akcje</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -75,14 +75,13 @@
                                 <th scope="row">{{ $loop->iteration }}</th>
                                 <td>{{ $restaurant->name }}</td>
                                 <td>{{ $restaurant->address->city }}</td>
-                                <td>{{ $restaurant->address->street }}</td>
+                                <td>{{ $restaurant->address->street }} {{ $restaurant->address->building_number }}</td>
                                 <td>{{ $restaurant->address->postal_code }}</td>
-                                <td>{{ $restaurant->address->building_number }}</td>
                                 <td>{{ $restaurant->description }}</td>
                                 <td>{{ $restaurant->user->first_name }} {{ $restaurant->user->last_name }}</td>
-                                <td> <a href="{{ route('restaurants.edit', $restaurant->id) }}"
-                                        class="btn btn-info">Edytuj</a></td>
-                                <td>
+                                <td class="d-flex justify-content-center gap-2"> <a href="{{ route('restaurants.edit', $restaurant->id) }}"
+                                        class="btn btn-info">Edytuj</a>
+
                                     <form method="POST" action="{{ route('restaurants.destroy', $restaurant->id) }}">
                                         @csrf
                                         @method('DELETE')

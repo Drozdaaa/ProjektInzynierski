@@ -8,7 +8,7 @@
         <h1 class="mb-4">Dania w restauracji</h1>
 
         <div class="mb-3">
-            <a href="{{ route('menus.index') }}" class="btn btn-secondary me-2">Powrót do menu</a>
+            <a href="{{ route('menus.index') }}" class="btn btn-secondary me-2">Wróć do zarządzania menu</a>
             <a href="{{ route('dishes.create', ['restaurant' => $restaurant->id]) }}" class="btn btn-primary">
                 Dodaj danie
             </a>

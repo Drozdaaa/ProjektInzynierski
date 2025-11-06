@@ -30,21 +30,25 @@
                     </small>
                 </p>
 
-                @if ($event->menu)
+                @if ($event->menus->isNotEmpty())
                     <h5 class="mt-3">Menu</h5>
-                    <p class="mb-2"><strong>Cena:</strong> {{ $event->menu->price }} zł</p>
-                    <ul class="list-group">
-                        @foreach ($event->menu->dishes as $dish)
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <div>
-                                    <strong>{{ $dish->name }}</strong><br>
-                                    {{ $dish->description }}<br>
-                                    <small>{{ $dish->dishType->name ?? 'Inne' }}</small>
-                                </div>
-                                <span>{{ $dish->price }} zł</span>
-                            </li>
-                        @endforeach
-                    </ul>
+                    @foreach ($event->menus as $menu)
+                        <div class="mb-3">
+                            <p><strong>Cena:</strong> {{ $menu->price }} zł</p>
+                            <ul class="list-group">
+                                @foreach ($menu->dishes as $dish)
+                                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong>{{ $dish->name }}</strong><br>
+                                            {{ $dish->description }}<br>
+                                            <small>{{ $dish->dishType->name ?? 'Inne' }}</small>
+                                        </div>
+                                        <span>{{ $dish->price }} zł</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endforeach
                 @else
                     <p class="text-muted mt-2">Brak przypisanego menu do tego wydarzenia.</p>
                 @endif

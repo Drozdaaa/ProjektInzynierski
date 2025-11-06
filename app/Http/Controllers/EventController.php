@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
+use App\Models\Room;
 use App\Models\User;
 use App\Models\Event;
 use App\Models\Status;
@@ -24,7 +25,7 @@ class EventController extends Controller
     }
 
     /**
-     * Update status of the event.
+     * Update status of the resource.
      */
     public function updateStatus(Event $event, Request $request)
     {
@@ -41,12 +42,13 @@ class EventController extends Controller
     }
 
     /**
-     * Show the form for creating a new event.
+     * Show the form for creating a new resource.
      */
     public function create($id)
     {
         $restaurant = Restaurant::findOrFail($id);
         $eventTypes = EventType::all();
+        $rooms = $restaurant->rooms;
 
         $menus = $restaurant->menus;
         $restaurant->menus->transform(function ($menu) {
@@ -54,11 +56,11 @@ class EventController extends Controller
             return $menu;
         });
 
-        return view('events.create', compact('restaurant', 'eventTypes', 'menus'));
+        return view('events.create', compact('restaurant', 'eventTypes', 'menus', 'rooms'));
     }
 
     /**
-     * Store a newly created event in storage.
+     * Store a newly created resource in storage.
      */
     public function store(EventRequest $request, $id)
     {
@@ -67,6 +69,8 @@ class EventController extends Controller
 
         $event = Event::create([
             'date' => $request->date,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
             'number_of_people' => $request->number_of_people,
             'description' => $request->description,
             'event_type_id' => $request->event_type_id,
@@ -76,6 +80,7 @@ class EventController extends Controller
             'restaurant_id' => $restaurant->id,
             'manager_id' => $restaurant->user_id,
         ]);
+        $event->rooms()->sync($request->rooms);
 
         if ($action === 'custom') {
             return redirect()->route('menus.user-create', [
@@ -84,7 +89,7 @@ class EventController extends Controller
             ])->with('info', 'Stwórz własne menu dla tego wydarzenia.');
         }
 
-        $event->update(['menu_id' => $request->menu_id]);
+        $event->menus()->sync($request->menus_id);
 
         return redirect()->route('events.show', [
             'restaurant' => $event->restaurant_id,
@@ -96,7 +101,7 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
-     public function show(Restaurant $restaurant, Event $event)
+    public function show(Restaurant $restaurant, Event $event)
     {
         if ($event->restaurant_id !== $restaurant->id) {
             abort(404);
@@ -106,7 +111,7 @@ class EventController extends Controller
             'eventType',
             'status',
             'restaurant.address',
-            'menu.dishes.dishType',
+            'menus.dishes.dishType',
         ]);
 
         return view('events.show', compact('event'));
@@ -135,12 +140,13 @@ class EventController extends Controller
         $eventTypes = EventType::all();
         $users = User::all();
         $statuses = Status::all();
+        $rooms = Room::all();
 
-        return view('events.edit', compact('event', 'restaurant', 'menus', 'eventTypes', 'users', 'statuses'));
+        return view('events.edit', compact('event', 'restaurant', 'menus', 'eventTypes', 'users', 'statuses', 'rooms'));
     }
 
     /**
-     * Update the specified event in storage.
+     * Update the specified resource in storage.
      */
     public function update(EventRequest $request, $id)
     {

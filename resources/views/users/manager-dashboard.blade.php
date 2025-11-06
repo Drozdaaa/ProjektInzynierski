@@ -49,15 +49,12 @@
             </div>
         </div>
 
-
-
-
         <div class="table-responsive">
             <table class="table table-striped align-middle text-center">
-                <thead>
+                <thead class="table-primary">
                     <tr>
                         <th>#</th>
-                        <th>Imię i nazwisko</th>
+                        <th>Klient</th>
                         <th>Rodzaj wydarzenia</th>
                         <th>Data</th>
                         <th>Sala</th>
@@ -127,6 +124,15 @@
                                         <button type="submit" class="btn btn-sm btn-success"
                                             onclick="return confirm('Na pewno zaplanować to wydarzenie?')">
                                             Zaplanuj
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('events.destroy', $event->id) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Na pewno odrzucić to wydarzenie?')">
+                                            Odrzuć
                                         </button>
                                     </form>
                                 @else
