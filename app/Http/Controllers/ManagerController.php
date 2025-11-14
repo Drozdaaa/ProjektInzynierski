@@ -25,7 +25,10 @@ class ManagerController extends Controller
             'menus.dishes.diets',
             'menus.dishes.allergies'
         ])
-            ->where('manager_id', $managerId)
+            ->where('restaurant_id', function ($query) use ($managerId) {
+                $query->select('id')->from('restaurants')->where('user_id', $managerId);
+            })
+            ->orderByDesc('date')
             ->get();
 
         $restaurant = Restaurant::where('user_id', $managerId)

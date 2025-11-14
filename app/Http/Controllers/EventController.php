@@ -132,7 +132,7 @@ class EventController extends Controller
         $restaurant = $event->restaurant;
 
         $restaurant->menus->transform(function ($menu) {
-            $menu->dishesByType = $menu->dishes->groupBy(fn($dish) => $dish->dishType?->name ?? 'Inne');
+            $menu->dishesByType = $menu->dishes->groupBy(fn($dish) => $dish->dishType?->name);
             return $menu;
         });
 

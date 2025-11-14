@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
             AllergySeeder::class,
             DietSeeder::class,
             MenuDishSeeder::class,
-            UserAllergySeeder::class,
             EventRoomSeeder::class,
             EventMenuSeeder::class,
         ]);

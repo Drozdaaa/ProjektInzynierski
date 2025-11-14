@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Models\Restaurant;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cookie\Middleware\EncryptCookies;
