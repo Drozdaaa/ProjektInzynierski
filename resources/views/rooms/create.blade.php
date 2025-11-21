@@ -1,0 +1,46 @@
+@include('shared.html')
+@include('shared.head', ['pageTitle' => 'Tworzenie sal'])
+
+<body>
+    @include('shared.navbar')
+    <div class="container-fluid mt-5 px-5">
+        <h1>Sale w restauracji: {{ $restaurant->name }}</h1>
+
+        @if ($restaurant->rooms->count())
+            <ul class="list-group mb-4">
+                @foreach ($restaurant->rooms as $room)
+                    <li class="list-group-item">
+                        <strong>{{ $room->name }}</strong> - {{ $room->capacity }} osób
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+
+        <hr>
+
+        <h3>Dodaj kolejną salę</h3>
+
+        <form action="{{ route('rooms.store', $restaurant->id) }}" method="POST">
+            @csrf
+
+            <div class="mb-3">
+                <label>Nazwa sali</label>
+                <input type="text" name="name" class="form-control" value="{{ old('name') }}">
+            </div>
+
+            <div class="mb-3">
+                <label>Pojemność</label>
+                <input type="number" name="capacity" class="form-control" value="{{ old('capacity') }}" min="1">
+            </div>
+
+            <div class="mb-3">
+                <label>Opis (opcjonalnie)</label>
+                <input type="text" name="description" class="form-control" value="{{ old('description') }}">
+            </div>
+
+            <button type="submit" name="action" value="add" class="btn btn-primary">Dodaj salę</button>
+            <button type="submit" name="action" value="finish" class="btn btn-success">Zakończ dodawanie</button>
+        </form>
+
+    </div>
+</body>

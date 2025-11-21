@@ -43,6 +43,7 @@
                         <th>Data</th>
                         <th>Sala</th>
                         <th>Liczba osób</th>
+                        <th>Koszt</th>
                         <th>Opis</th>
                         <th>Menu</th>
                         <th>Status</th>
@@ -70,14 +71,17 @@
                                 {{ $event->rooms->pluck('name')->join(', ') ?: 'Brak' }}
                             </td>
                             <td>{{ $event->number_of_people }}</td>
+                            <td>{{ number_format($event->total_cost, 2, '.', '') }} zł</td>
                             <td>{{ $event->description }}</td>
                             <td>
                                 @if ($event->menus->isNotEmpty())
-                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#menuDetailsModal{{ $event->id }}">
-                                        Szczegóły menu
-                                    </button>
-                                    @include('shared.modal', ['event' => $event])
+                                    @foreach ($event->menus as $menu)
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#menuDetailsModal{{ $menu->id }}">
+                                            Szczegóły
+                                        </button>
+                                        @include('shared.modal', ['menu' => $menu])
+                                    @endforeach
                                 @else
                                     <span class="text-muted">Brak menu</span>
                                 @endif

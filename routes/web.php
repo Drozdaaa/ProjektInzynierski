@@ -11,6 +11,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\RoomController;
 
 Route::controller(MainController::class)->group(function () {
     Route::get('/', 'index')->name('main.index');
@@ -46,6 +47,7 @@ Route::controller(RestaurantController::class)->group(function () {
         Route::get('/restaurants/{id}/edit', 'edit')->name('restaurants.edit');
         Route::put('/restaurants/{id}', 'update')->name('restaurants.update');
         Route::delete('/restaurants/{restaurant}', 'destroy')->name('restaurants.destroy');
+        Route::get('/manager/restaurant', 'index')->name('restaurants.index');
     });
     Route::get('/restaurants/{id}', 'show')->name('restaurants.show');
 });
@@ -53,7 +55,7 @@ Route::controller(RestaurantController::class)->group(function () {
 Route::middleware(['auth'])->controller(EventController::class)->group(function () {
     Route::delete('/manager/{event}', 'destroy')->name('events.destroy');
     Route::patch('/events/{event}/status', 'updateStatus')->name('events.update-status');
-    Route::get('/events/{id}/edit', 'edit')->name('events.edit');
+    //Route::get('/events/{id}/edit', 'edit')->name('events.edit');
     Route::put('/events/{id}', 'update')->name('events.update');
     Route::get('/restaurants/{id}/events/create', 'create')->name('events.create');
     Route::post('/restaurants/{id}/events', 'store')->name('events.store');
@@ -93,4 +95,10 @@ Route::middleware(['auth', 'can:create-custom-menu'])->group(function () {
         '/restaurants/{restaurant}/menus/store-for-event/{event}',
         [MenuController::class, 'storeForEvent']
     )->name('menus.store-for-event');
+});
+
+Route::middleware(['auth'])->controller(RoomController::class)->group(function () {
+    Route::get('/restaurants/{restaurant}/rooms/create', 'create') ->name('rooms.create');
+    Route::post('/restaurants/{restaurant}/rooms', 'store')->name('rooms.store');
+
 });

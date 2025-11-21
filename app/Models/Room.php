@@ -14,6 +14,8 @@ class Room extends Model
         'restaurant_id',
     ];
 
+    public $timestamps = false;
+
     public function restaurant()
     {
         return $this->belongsTo(Restaurant::class);

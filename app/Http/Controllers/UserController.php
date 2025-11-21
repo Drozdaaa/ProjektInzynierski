@@ -32,8 +32,10 @@ class UserController extends Controller
         $events->each(function ($event) {
             $event->menus->each(function ($menu) {
                 $menu->dishesByType = $menu->dishes
-                    ->groupBy(fn($dish) => $dish->dishType->name ?? 'Brak typu');
+                    ->groupBy(fn($dish) => $dish->dishType->name);
             });
+            $averageMenuPrice = $event->menus->avg('price');
+            $event->total_cost = $event->number_of_people * $averageMenuPrice;
         });
 
 

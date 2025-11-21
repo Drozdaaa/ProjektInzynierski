@@ -25,8 +25,10 @@
                         <ul class="dropdown-menu" {{ request()->routeIs('users.manager-dashboard') ? 'active' : '' }}>
                             <li><a class="dropdown-item" href="{{ route('users.manager-dashboard') }}">Wydarzenia</a></li>
                             <li><a class="dropdown-item" href="{{ route('menus.index') }}">Zarządzaj menu</a></li>
-                            <li><a class="dropdown-item" href="#">Informacje o lokalu</a></li>
-                            <li><a class="dropdown-item" href="{{ route('restaurants.create') }}">Utwórz lokal</a></li>
+                            <li><a class="dropdown-item" href="{{ route('restaurants.index') }}">Informacje o lokalu</a></li>
+                            @if (!\App\Models\Restaurant::where('user_id', auth()->id())->exists())
+                                <li><a class="dropdown-item" href="{{ route('restaurants.create') }}">Utwórz lokal</a></li>
+                            @endif
                         </ul>
                     </li>
                 @endcan
@@ -57,7 +59,8 @@
             <ul id="navbar-user" class="navbar-nav mb-2 mb-lg-0">
                 @if (Auth::check())
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('logout') ? 'active' : '' }}" href="{{ route('logout') }}">
+                        <a class="nav-link {{ request()->is('logout') ? 'active' : '' }}"
+                            href="{{ route('logout') }}">
                             {{ Auth::user()->name }} Wyloguj się
                         </a>
                     </li>

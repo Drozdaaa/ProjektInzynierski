@@ -63,7 +63,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
-            <a href="{{ route('users.admin-dashboard') }}" class="btn btn-secondary">Anuluj</a>
+            <a href="{{ route('restaurants.index') }}" class="btn btn-secondary">Anuluj</a>
         </form>
     </div>
 </body>

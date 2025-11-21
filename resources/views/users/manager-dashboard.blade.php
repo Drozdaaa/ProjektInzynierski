@@ -159,8 +159,6 @@
             </table>
         </div>
     </div>
-
-
     <script>
         function filterStatus(status) {
             const rows = document.querySelectorAll('tbody tr');

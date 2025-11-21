@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Menu;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\Event;
@@ -12,7 +11,7 @@ use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use App\Http\Requests\EventRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
+
 
 class EventController extends Controller
 {
