@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Room;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -42,13 +43,13 @@ class RoomController extends Controller
         }
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'room_name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
             'description' => 'nullable|string|max:255',
         ]);
 
         $restaurant->rooms()->create([
-            'name' => $request->name,
+            'name' => $request->room_name,
             'capacity' => $request->capacity,
             'description' => $request->description,
         ]);
@@ -77,16 +78,48 @@ class RoomController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Restaurant $restaurant, Room $room)
     {
-        //
+        if (! Gate::allows('restaurant-owner', $restaurant)) {
+            abort(403);
+        }
+
+        if ($room->restaurant_id !== $restaurant->id) {
+            abort(404);
+        }
+
+        $request->validate([
+            'room_name' => 'required|string|max:255',
+            'capacity' => 'required|integer|min:1',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        $room->update([
+            'name' => $request->room_name,
+            'capacity' => $request->capacity,
+            'description' => $request->description,
+        ]);
+
+        return redirect()->route('restaurants.index')
+            ->with('success', 'Sala została zaktualizowana.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Restaurant $restaurant, Room $room)
     {
-        //
+        if (! Gate::allows('restaurant-owner', $restaurant)) {
+            abort(403);
+        }
+
+        if ($room->restaurant_id !== $restaurant->id) {
+            abort(404);
+        }
+
+        $room->delete();
+
+        return redirect()->route('restaurants.index')
+            ->with('success', 'Sala została usunięta.');
     }
 }

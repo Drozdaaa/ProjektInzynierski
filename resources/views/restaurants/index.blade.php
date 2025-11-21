@@ -3,182 +3,260 @@
 
 @include('shared.navbar')
 
-<body>
-    <div class="container-fluid mt-5 px-5">
-        <h1>Moja restauracja</h1>
+<div class="container-fluid mt-5 px-5">
+    <h1>Moja restauracja</h1>
 
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-        <div class="card mt-4">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <span>Podstawowe informacje</span>
-                <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal"
-                    data-bs-target="#editRestaurantModal">
-                    Edytuj dane
-                </button>
-            </div>
-            <div class="card-body">
-                <h4 class="card-title">{{ $restaurant->name }}</h4>
-                <p class="card-text">{{ $restaurant->description ?? '-' }}</p>
-            </div>
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <span>Podstawowe informacje</span>
+            <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal"
+                data-bs-target="#editRestaurantModal">Edytuj dane</button>
         </div>
-
-        <div class="card mt-3">
-            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-                <span>Adres</span>
-            </div>
-            <div class="card-body">
-                <ul>
-                    <li>Ulica: {{ $restaurant->address->street }} {{ $restaurant->address->building_number }}</li>
-                    <li>Miasto: {{ $restaurant->address->city }}</li>
-                    <li>Kod pocztowy: {{ $restaurant->address->postal_code }}</li>
-                </ul>
-            </div>
+        <div class="card-body">
+            <h4 class="card-title">{{ $restaurant->name }}</h4>
+            <p class="card-text">{{ $restaurant->description ?? '-' }}</p>
         </div>
+    </div>
 
-        <div class="card mt-3">
-            <div class="card-header bg-success text-white">
-                Sale
-            </div>
-            <div class="card-body">
-                @if ($restaurant->rooms->isEmpty())
-                    <p>Brak dodanych sal.</p>
-                @else
-                    <table class="table table-striped align-middle text-center">
-                        <thead class="table-success">
+    <div class="card mt-3">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+            <span>Adres</span>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li>Ulica: {{ $restaurant->address->street }} {{ $restaurant->address->building_number }}</li>
+                <li>Miasto: {{ $restaurant->address->city }}</li>
+                <li>Kod pocztowy: {{ $restaurant->address->postal_code }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <span>Sale</span>
+            <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#roomModal"
+                onclick="openRoomModal('add')">Dodaj salę</button>
+        </div>
+        <div class="card-body">
+            @if ($restaurant->rooms->isEmpty())
+                <p>Brak dodanych sal.</p>
+            @else
+                <table class="table table-striped align-middle text-center">
+                    <thead class="table-success">
+                        <tr>
+                            <th>#</th>
+                            <th>Nazwa sali</th>
+                            <th>Pojemność</th>
+                            <th>Opis</th>
+                            <th>Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($restaurant->rooms as $room)
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Nazwa sali</th>
-                                <th scope="col">Pojemność</th>
-                                <th scope="col">Opis</th>
-                                <th scope="col">Dostępność</th>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $room->name }}</td>
+                                <td>{{ $room->capacity }}</td>
+                                <td>{{ $room->description ?? '-' }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm gap-1">
+                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#roomModal"
+                                            onclick="openRoomModal('edit', {{ $room->id }}, '{{ $room->name }}', {{ $room->capacity }}, '{{ $room->description }}')">
+                                            Edytuj
+                                        </button>
+                                        <form action="{{ route('rooms.destroy', [$restaurant->id, $room->id]) }}"
+                                            method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Na pewno usunąć salę?')">Usuń</button>
+                                        </form>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($restaurant->rooms as $room)
-                                <tr>
-                                    <th scope="row">{{ $loop->iteration }}</th>
-                                    <td>{{ $room->name }}</td>
-                                    <td>{{ $room->capacity }}</td>
-                                    <td>{{ $room->description ?? '-' }}</td>
-                                    <td>{{ $room->is_available ? 'Dostępna' : 'Niedostępna' }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @endif
-            </div>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
         </div>
     </div>
+</div>
 
-    <div class="modal fade" id="editRestaurantModal" tabindex="-1" aria-labelledby="editRestaurantModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form method="POST" action="{{ route('restaurants.update', $restaurant->id) }}">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editRestaurantModalLabel">Edytuj dane restauracji i adres</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+<div class="modal fade" id="editRestaurantModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ route('restaurants.update', $restaurant->id) }}">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edytuj dane restauracji i adres</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h6>Dane restauracji</h6>
+                        <div class="mb-3">
+                            <label for="restaurant_name" class="form-label">Nazwa restauracji</label>
+                            <input type="text" name="name" id="restaurant_name"
+                                class="form-control @error('name') is-invalid @enderror"
+                                value="{{ old('name', $restaurant->name) }}" required>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="restaurant_description" class="form-label">Opis</label>
+                            <textarea name="description" id="restaurant_description" class="form-control @error('description') is-invalid @enderror"
+                                rows="3">{{ old('description', $restaurant->description) }}</textarea>
+                            @error('description')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
 
-                    <div class="modal-body">
-                        <div class="mb-4">
-                            <h6 class="border-bottom pb-2">Dane restauracji</h6>
-
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Nazwa restauracji</label>
-                                <input type="text" name="name" id="name"
-                                    class="form-control @error('name') is-invalid @enderror"
-                                    value="{{ old('name', $restaurant->name) }}" required>
-                                @error('name')
+                    <div class="mb-4">
+                        <h6>Adres</h6>
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="street" class="form-label">Ulica</label>
+                                <input type="text" name="street" id="street"
+                                    class="form-control @error('street') is-invalid @enderror"
+                                    value="{{ old('street', $restaurant->address->street) }}" required>
+                                @error('street')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Opis</label>
-                                <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror"
-                                    rows="3">{{ old('description', $restaurant->description) }}</textarea>
-                                @error('description')
+                            <div class="col-md-4 mb-3">
+                                <label for="building_number" class="form-label">Numer budynku</label>
+                                <input type="number" name="building_number" id="building_number"
+                                    class="form-control @error('building_number') is-invalid @enderror"
+                                    value="{{ old('building_number', $restaurant->address->building_number) }}"
+                                    required>
+                                @error('building_number')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
-
-                        <div class="mb-4">
-                            <h6 class="border-bottom pb-2">Adres</h6>
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="mb-3">
-                                        <label for="street" class="form-label">Ulica</label>
-                                        <input type="text" name="street" id="street"
-                                            class="form-control @error('street') is-invalid @enderror"
-                                            value="{{ old('street', $restaurant->address->street) }}" required>
-                                        @error('street')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="building_number" class="form-label">Numer budynku</label>
-                                        <input type="number" name="building_number" id="building_number"
-                                            class="form-control @error('building_number') is-invalid @enderror"
-                                            value="{{ old('building_number', $restaurant->address->building_number) }}"
-                                            required>
-                                        @error('building_number')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label">Miasto</label>
+                                <input type="text" name="city" id="city"
+                                    class="form-control @error('city') is-invalid @enderror"
+                                    value="{{ old('city', $restaurant->address->city) }}" required>
+                                @error('city')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="city" class="form-label">Miasto</label>
-                                        <input type="text" name="city" id="city"
-                                            class="form-control @error('city') is-invalid @enderror"
-                                            value="{{ old('city', $restaurant->address->city) }}" required>
-                                        @error('city')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="postal_code" class="form-label">Kod pocztowy</label>
-                                        <input type="text" name="postal_code" id="postal_code"
-                                            class="form-control @error('postal_code') is-invalid @enderror"
-                                            value="{{ old('postal_code', $restaurant->address->postal_code) }}"
-                                            required>
-                                        @error('postal_code')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="postal_code" class="form-label">Kod pocztowy</label>
+                                <input type="text" name="postal_code" id="postal_code"
+                                    class="form-control @error('postal_code') is-invalid @enderror"
+                                    value="{{ old('postal_code', $restaurant->address->postal_code) }}" required>
+                                @error('postal_code')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                        <button type="submit" class="btn btn-primary">Zapisz wszystkie zmiany</button>
-                    </div>
-                </form>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+                </div>
+            </form>
         </div>
     </div>
-</body>
-@if ($errors->any())
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = new bootstrap.Modal(document.getElementById('editRestaurantModal'));
-            modal.show();
-        });
-    </script>
-@endif
+</div>
+
+<div class="modal fade" id="roomModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="roomForm" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roomModalLabel">Dodaj salę</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="_method" id="roomFormMethod" value="POST">
+                    <div class="mb-3">
+                        <label for="room_name" class="form-label">Nazwa sali</label>
+                        <input type="text" name="room_name" id="room_name"
+                            class="form-control @error('room_name') is-invalid @enderror"
+                            value="{{ old('room_name') }}" required>
+                        @error('room_name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="room_capacity" class="form-label">Pojemność</label>
+                        <input type="number" name="capacity" id="room_capacity"
+                            class="form-control @error('capacity') is-invalid @enderror"
+                            value="{{ old('capacity') }}" min="1" required>
+                        @error('capacity')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="room_description" class="form-label">Opis</label>
+                        <textarea name="description" id="room_description" class="form-control @error('description') is-invalid @enderror"
+                            rows="3">{{ old('description') }}</textarea>
+                        @error('description')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-primary" id="roomSubmitBtn">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openRoomModal(mode, id = null, name = '', capacity = '', description = '') {
+        const form = document.getElementById('roomForm');
+        const title = document.getElementById('roomModalLabel');
+        const methodInput = document.getElementById('roomFormMethod');
+
+        if (mode === 'add') {
+            title.textContent = 'Dodaj salę';
+            form.action = "{{ route('rooms.store', $restaurant->id) }}";
+            methodInput.value = 'POST';
+
+            document.getElementById('room_name').value = "{{ old('room_name', '') }}";
+            document.getElementById('room_capacity').value = "{{ old('capacity', '') }}";
+            document.getElementById('room_description').value = "{{ old('description', '') }}";
+        } else if (mode === 'edit') {
+            title.textContent = 'Edytuj salę';
+            form.action = "{{ url('/restaurants/' . $restaurant->id . '/rooms') }}/" + id;
+            methodInput.value = 'PUT';
+
+            document.getElementById('room_name').value = "{{ old('room_name', '') }}" || name;
+            document.getElementById('room_capacity').value = "{{ old('capacity', '') }}" || capacity;
+            document.getElementById('room_description').value = "{{ old('description', '') }}" || description;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        @if ($errors->any())
+            @if ($errors->hasAny(['name', 'description', 'street', 'building_number', 'city', 'postal_code']))
+                var restaurantModal = new bootstrap.Modal(document.getElementById('editRestaurantModal'));
+                restaurantModal.show();
+            @elseif ($errors->hasAny(['room_name', 'capacity', 'description']))
+                var roomModal = new bootstrap.Modal(document.getElementById('roomModal'));
+                roomModal.show();
+            @endif
+        @endif
+    });
+</script>

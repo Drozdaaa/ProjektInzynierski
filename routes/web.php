@@ -100,5 +100,7 @@ Route::middleware(['auth', 'can:create-custom-menu'])->group(function () {
 Route::middleware(['auth'])->controller(RoomController::class)->group(function () {
     Route::get('/restaurants/{restaurant}/rooms/create', 'create') ->name('rooms.create');
     Route::post('/restaurants/{restaurant}/rooms', 'store')->name('rooms.store');
-
+    Route::get('/restaurants/{restaurant}/rooms/{room}/edit', 'edit')->name('rooms.edit');
+    Route::put('/restaurants/{restaurant}/rooms/{room}', 'update')->name('rooms.update');
+    Route::delete('/restaurants/{restaurant}/rooms/{room}', 'destroy')->name('rooms.destroy');
 });
