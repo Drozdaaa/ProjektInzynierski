@@ -92,13 +92,16 @@
                                 </span>
                             </td>
                             <td>
-                                @foreach ($event->menus as $menu)
-                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#menuDetailsModal{{ $menu->id }}">
+                                @if ($event->menus->isNotEmpty())
+                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#menuDetailsModal{{ $event->id }}">
                                         Szczegóły
                                     </button>
-                                    @include('shared.modal', ['menu' => $menu])
-                                @endforeach
+
+                                    @include('shared.modal', ['event' => $event])
+                                @else
+                                    <strong><span class="text-muted">Brak menu</span></strong>
+                                @endif
 
                                 @if ($event->status->name === 'Zaplanowane')
                                     <a href="{{ route('events.edit', $event->id) }}" class="btn btn-sm btn-info">
@@ -156,6 +159,9 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        <div class="d-flex justify-content-center mt-4">
+            {{ $events->links() }}
         </div>
     </div>
     <script>

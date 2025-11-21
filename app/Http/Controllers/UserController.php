@@ -27,7 +27,7 @@ class UserController extends Controller
         ])
             ->where('user_id', $userId)
             ->orderByDesc('date')
-            ->get();
+            ->paginate(6);
 
         $events->each(function ($event) {
             $event->menus->each(function ($menu) {

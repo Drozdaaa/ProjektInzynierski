@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Models\Restaurant;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -27,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
             $middleware->disableFor('laravel_session');
             $middleware->disableFor('XSRF-TOKEN');
         });
+
+        Paginator::useBootstrap();
 
         Gate::define('is-admin', function (User $user) {
             return $user->isAdmin();

@@ -75,13 +75,12 @@
                             <td>{{ $event->description }}</td>
                             <td>
                                 @if ($event->menus->isNotEmpty())
-                                    @foreach ($event->menus as $menu)
-                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#menuDetailsModal{{ $menu->id }}">
-                                            Szczegóły
-                                        </button>
-                                        @include('shared.modal', ['menu' => $menu])
-                                    @endforeach
+                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#menuDetailsModal{{ $event->id }}">
+                                        Szczegóły
+                                    </button>
+
+                                    @include('shared.modal', ['event' => $event])
                                 @else
                                     <span class="text-muted">Brak menu</span>
                                 @endif

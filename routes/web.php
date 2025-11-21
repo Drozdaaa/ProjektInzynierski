@@ -55,7 +55,7 @@ Route::controller(RestaurantController::class)->group(function () {
 Route::middleware(['auth'])->controller(EventController::class)->group(function () {
     Route::delete('/manager/{event}', 'destroy')->name('events.destroy');
     Route::patch('/events/{event}/status', 'updateStatus')->name('events.update-status');
-    //Route::get('/events/{id}/edit', 'edit')->name('events.edit');
+    Route::get('/events/{id}/edit', 'edit')->name('events.edit');
     Route::put('/events/{id}', 'update')->name('events.update');
     Route::get('/restaurants/{id}/events/create', 'create')->name('events.create');
     Route::post('/restaurants/{id}/events', 'store')->name('events.store');

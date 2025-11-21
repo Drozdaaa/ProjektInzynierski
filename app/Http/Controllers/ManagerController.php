@@ -29,7 +29,7 @@ class ManagerController extends Controller
                 $query->select('id')->from('restaurants')->where('user_id', $managerId);
             })
             ->orderByDesc('date')
-            ->get();
+            ->paginate(6);
 
         $restaurant = Restaurant::where('user_id', $managerId)
             ->with('menus.dishes.dishType')

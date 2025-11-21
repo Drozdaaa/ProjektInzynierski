@@ -21,7 +21,7 @@
                         </div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-3">
-                        <a href="{{ route('restaurants.show', ['id' => $restaurant->id]) }}"
+                        <a href="{{ route('events.create', ['id' => $restaurant->id]) }}"
                            class="btn btn-primary">
                             Rezerwuj teraz
                         </a>
