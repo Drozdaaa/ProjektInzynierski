@@ -70,10 +70,15 @@ Route::controller(MenuController::class)->group(function () {
     Route::post('/restaurants/{restaurant}/menus', 'store')->name('menus.store');
     Route::put('/menus/{menu}', 'update')->name('menus.update');
     Route::delete('/menus/{menu}', 'destroy')->name('menus.destroy');
+
     Route::get('/restaurants/{restaurant}/events/{event}/menus/create', 'createForUser')
         ->name('menus.user-create');
     Route::post('/restaurants/{restaurant}/events/{event}/menus', 'storeForUser')
         ->name('menus.user-store');
+    Route::get('/events/{event}/menus/edit', 'editForUser')
+        ->name('menus.user.edit');
+    Route::put('/events/{event}/menus/{menu}', 'updateForUser')
+        ->name('menus.user.update');
 });
 
 Route::controller(DishController::class)->group(function () {
@@ -98,7 +103,7 @@ Route::middleware(['auth', 'can:create-custom-menu'])->group(function () {
 });
 
 Route::middleware(['auth'])->controller(RoomController::class)->group(function () {
-    Route::get('/restaurants/{restaurant}/rooms/create', 'create') ->name('rooms.create');
+    Route::get('/restaurants/{restaurant}/rooms/create', 'create')->name('rooms.create');
     Route::post('/restaurants/{restaurant}/rooms', 'store')->name('rooms.store');
     Route::get('/restaurants/{restaurant}/rooms/{room}/edit', 'edit')->name('rooms.edit');
     Route::put('/restaurants/{restaurant}/rooms/{room}', 'update')->name('rooms.update');

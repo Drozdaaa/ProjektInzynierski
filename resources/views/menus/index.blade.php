@@ -70,14 +70,7 @@
                                             Usuń
                                         </button>
                                     </form>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="menu_id"
-                                            id="menu_{{ $menu->id }}" value="{{ $menu->id }}"
-                                            @checked(old('menu_id') == $menu->id)>
-                                        <label class="form-check-label" for="menu_{{ $menu->id }}">
-                                            Wybierz
-                                        </label>
-                                    </div>
+                                    <div class="form-check"> </div>
                                 </div>
                             </div>
                         </div>

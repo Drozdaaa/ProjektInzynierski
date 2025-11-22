@@ -1,5 +1,4 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 $(function () {
     $('#filters-form').on('submit', function(e) {
         e.preventDefault();
@@ -10,6 +9,12 @@ $(function () {
         e.preventDefault();
         let url = $(this).attr('href');
         fetchRestaurants(url);
+    });
+
+    $(document).on('click', '#filters-form .btn-outline-secondary', function(e) {
+        e.preventDefault();
+        $('#filters-form')[0].reset();
+        fetchRestaurants();
     });
 
     function fetchRestaurants(url) {

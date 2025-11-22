@@ -1,27 +1,37 @@
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const cards = document.querySelectorAll('.dish-card');
-        const priceInput = document.getElementById('price');
+document.addEventListener('DOMContentLoaded', function() {
+
+    document.querySelectorAll('.menu-editor-form').forEach(form => {
+
+        const cards = form.querySelectorAll('.dish-card');
+        const priceInput = form.querySelector('input[name="price"]');
         let selectedDishes = new Set();
 
-        document.querySelectorAll('.dish-checkbox:checked').forEach(checkbox => {
+        // inicjalizacja zaznaczonych dań
+        form.querySelectorAll('.dish-checkbox:checked').forEach(checkbox => {
             const card = checkbox.closest('.dish-card');
             selectedDishes.add(card.dataset.dishId);
             card.classList.add('selected');
         });
-        updateTotalPrice();
 
         function updateTotalPrice() {
             let total = 0;
+
             selectedDishes.forEach(id => {
-                const dishElement = document.querySelector(`.dish-card[data-dish-id="${id}"]`);
-                total += parseFloat(dishElement.dataset.price);
+                const dishElement = form.querySelector(`.dish-card[data-dish-id="${id}"]`);
+                if (dishElement) {
+                    total += parseFloat(dishElement.dataset.price);
+                }
             });
+
             priceInput.value = total.toFixed(2);
         }
 
+        updateTotalPrice();
+
+        // obsługa kliknięcia na kartę
         cards.forEach(card => {
-            card.addEventListener('click', function(e) {
+            card.addEventListener('click', function() {
                 const dishId = card.dataset.dishId;
                 const checkbox = card.querySelector('.dish-checkbox');
 
@@ -39,13 +49,13 @@
             });
         });
 
-        const form = document.getElementById('menu-form');
         form.addEventListener('submit', function(e) {
-            const anyChecked = selectedDishes.size > 0;
-            if (!anyChecked) {
+            if (selectedDishes.size === 0) {
                 e.preventDefault();
                 alert('Wybierz przynajmniej jedno danie do menu.');
             }
         });
     });
+
+});
 </script>

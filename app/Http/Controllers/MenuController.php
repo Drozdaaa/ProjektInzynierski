@@ -178,4 +178,54 @@ class MenuController extends Controller
             'event' => $event->id,
         ])->with('success', 'Menu zostało utworzone i przypisane do wydarzenia.');
     }
+
+    public function editForUser(Event $event)
+    {
+        if ($event->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($event->status->name !== 'Oczekujące') {
+            return redirect()->back()->with('error', 'Menu można edytować tylko dla wydarzeń oczekujących.');
+        }
+
+        $restaurant = $event->restaurant;
+        $dishes = $restaurant->dishes()->with(['dishType', 'diets', 'allergies'])->get();
+        $menus = $event->menus()->with('dishes')->get();
+
+        return view('menus.user-edit', compact('event', 'menus', 'dishes'));
+    }
+
+
+    public function updateForUser(Request $request, Event $event, Menu $menu)
+    {
+        if ($event->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($event->status->name !== 'Oczekujące') {
+            return redirect()->back()->with('error', 'Nie można edytować menu, bo wydarzenie nie jest oczekujące.');
+        }
+
+        if (!$event->menus->contains($menu->id)) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'price' => 'required|numeric|min:0',
+            'dishes' => 'required|array|min:1',
+            'dishes.*' => 'exists:dishes,id',
+        ]);
+
+        $menu->update([
+            'price' => $validated['price']
+        ]);
+
+        $menu->dishes()->sync($validated['dishes']);
+
+        return redirect()->route('events.show', [
+            'restaurant' => $event->restaurant_id,
+            'event' => $event->id
+        ])->with('success', 'Menu zostało zaktualizowane.');
+    }
 }

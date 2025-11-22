@@ -21,6 +21,11 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
+                                    <label for="name" class="form-label">Nazwa restauracji</label>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                           value="{{ request('name') }}" placeholder="Wpisz nazwę">
+                                </div>
+                                <div class="mb-3">
                                     <label for="city" class="form-label">Miasto</label>
                                     <input type="text" class="form-control" id="city" name="city"
                                            value="{{ request('city') }}" placeholder="Wpisz miasto">
@@ -30,9 +35,19 @@
                                     <input type="text" class="form-control" id="street" name="street"
                                            value="{{ request('street') }}" placeholder="Wpisz ulicę">
                                 </div>
-                                <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-primary">Zastosuj filtry</button>
-                                    <a href="{{ route('main.index') }}" class="btn btn-outline-secondary">Wyczyść filtry</a>
+                                <div class="mb-3">
+                                    <label for="postal_code" class="form-label">Kod pocztowy</label>
+                                    <input type="text" class="form-control" id="postal_code" name="postal_code"
+                                           value="{{ request('postal_code') }}" placeholder="00-000">
+                                </div>
+
+                                <div class="d-grid gap-2 mt-3">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-filter"></i> Zastosuj filtry
+                                    </button>
+                                    <a href="{{ route('main.index') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Wyczyść filtry
+                                    </a>
                                 </div>
                             </div>
                         </div>

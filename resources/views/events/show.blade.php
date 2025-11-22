@@ -32,9 +32,18 @@
 
                 @if ($event->menus->isNotEmpty())
                     <h5 class="mt-3">Menu</h5>
+
+                    @if ($event->menus->count() > 1)
+                        <p>
+                            <strong>Średnia cena menu:</strong>
+                            {{ number_format($event->menus->avg('price'), 2, ',', ' ') }} zł
+                        </p>
+                    @endif
+
                     @foreach ($event->menus as $menu)
                         <div class="mb-3">
                             <p><strong>Cena:</strong> {{ $menu->price }} zł</p>
+
                             <ul class="list-group">
                                 @foreach ($menu->dishes as $dish)
                                     <li class="list-group-item d-flex justify-content-between align-items-start">
@@ -54,7 +63,7 @@
                 @endif
             </div>
 
-            <div class="card-footer text-end">
+            <div class="card-footer text-center">
                 <a href="{{ route('main.index') }}" class="btn btn-secondary">Powrót</a>
             </div>
         </div>

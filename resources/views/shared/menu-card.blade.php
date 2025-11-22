@@ -43,7 +43,6 @@
                     </div>
                 </div>
             </div>
-
             @include('shared.modal', ['menu' => $menu])
         @endforeach
     </div>
