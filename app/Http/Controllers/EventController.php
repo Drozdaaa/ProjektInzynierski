@@ -139,7 +139,7 @@ class EventController extends Controller
         $eventTypes = EventType::all();
         $users = User::all();
         $statuses = Status::all();
-        $rooms = Room::all();
+        $rooms = $restaurant->rooms;
 
         return view('events.edit', compact('event', 'restaurant', 'menus', 'eventTypes', 'users', 'statuses', 'rooms'));
     }
@@ -151,10 +151,16 @@ class EventController extends Controller
     {
         $event = Event::findOrFail($id);
         $event->update($request->validated());
+        $rooms = $request->input('rooms', []);
+        $event->rooms()->sync($rooms);
+        $menus = $request->input('menus_id', []);
+        $event->menus()->sync($menus);
 
-        return redirect()->route('users.manager-dashboard')
+        return redirect()
+            ->route('users.manager-dashboard')
             ->with('success', 'Wydarzenie zostało zaktualizowane.');
     }
+
 
     /**
      * Remove the specified resource from storage.

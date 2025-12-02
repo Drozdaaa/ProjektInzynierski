@@ -56,4 +56,12 @@ class Event extends Model
     {
         return $this->belongsToMany(Room::class, 'event_room');
     }
+
+    public function scopeFilterStatus($query, $status)
+    {
+        if ($status && $status !== 'all') {
+            $query->whereHas('status', fn($q) => $q->where('name', $status));
+        }
+        return $query;
+    }
 }

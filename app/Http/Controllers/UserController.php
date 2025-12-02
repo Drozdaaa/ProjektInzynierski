@@ -11,9 +11,10 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $userId = Auth::id();
+        $status = $request->get('status', 'all');
 
         $events = Event::with([
             'menus',
@@ -26,8 +27,10 @@ class UserController extends Controller
             'eventType',
         ])
             ->where('user_id', $userId)
+            ->filterStatus($status)
             ->orderByDesc('date')
-            ->paginate(6);
+            ->paginate(6)
+            ->appends(['status' => $status]);
 
         $events->each(function ($event) {
             $event->menus->each(function ($menu) {
@@ -38,9 +41,9 @@ class UserController extends Controller
             $event->total_cost = $event->number_of_people * $averageMenuPrice;
         });
 
-
-        return view('users.user-dashboard', compact('events'));
+        return view('users.user-dashboard', compact('events', 'status'));
     }
+
 
     /**
      * Show the form for creating a new resource.

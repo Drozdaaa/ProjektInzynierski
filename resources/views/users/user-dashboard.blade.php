@@ -3,16 +3,14 @@
 
 <body>
     @include('shared.navbar')
-
     <div class="container-fluid mt-5 px-5">
         <h1 class="mb-4">Moje wydarzenia</h1>
-
-        <!-- Filtr statusu -->
         <div class="d-grid d-sm-flex gap-2 justify-content flex-sm-wrap mb-4" role="group" aria-label="Status filtr">
             @foreach (['all' => 'Wszystkie', 'Oczekujące' => 'Oczekujące', 'Zaplanowane' => 'Zaplanowane', 'Zakończone' => 'Zakończone'] as $id => $label)
                 <div class="flex">
                     <input type="radio" class="btn-check" name="btnstatus" id="btn-{{ $id }}" autocomplete="off"
-                        @if ($loop->first) checked @endif onclick="filterStatus('{{ $id }}')">
+                        onclick="applyFilter('{{ $id }}')" {{ $status === $id ? 'checked' : '' }}>
+
                     <label class="btn btn-outline-primary w-100 text-center"
                         for="btn-{{ $id }}">{{ $label }}</label>
                 </div>
@@ -101,14 +99,8 @@
             </table>
         </div>
     </div>
-
-    <script>
-        function filterStatus(status) {
-            const rows = document.querySelectorAll('tbody tr');
-            rows.forEach(row => {
-                const rowStatus = row.getAttribute('data-status');
-                row.style.display = (status === 'all' || rowStatus === status) ? '' : 'none';
-            });
-        }
-    </script>
+    <div class="d-flex justify-content-center mt-4">
+        {{ $events->links() }}
+    </div>
+    <script src="{{ asset('js/filter.js') }}"></script>
 </body>

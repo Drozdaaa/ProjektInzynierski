@@ -3,6 +3,7 @@
 
 <body>
     @include('shared.navbar')
+
     <div class="container-fluid mt-5 px-5">
         <h1>Edytuj dane wydarzenia</h1>
 
@@ -19,37 +20,101 @@
         <form action="{{ route('events.update', $event->id) }}" method="POST">
             @csrf
             @method('PUT')
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Data</label>
+                    <input type="date" name="date" class="form-control" value="{{ old('date', $event->date) }}"
+                        required>
+                </div>
 
-            <div class="mb-3">
-                <label for="date" class="form-label">Data wydarzenia</label>
-                <input type="date" class="form-control" id="date" name="date"
-                    value="{{ old('date', $event->date) }}" required>
+                <div class="col-md-4">
+                    <label class="form-label">Godzina rozpoczęcia</label>
+                    <input type="time" name="start_time" class="form-control"
+                        value="{{ old('start_time', \Carbon\Carbon::parse($event->start_time)->format('H:i')) }}"
+                        required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Godzina zakończenia</label>
+                    <input type="time" name="end_time" class="form-control"
+                        value="{{ old('end_time', \Carbon\Carbon::parse($event->end_time)->format('H:i')) }}" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Liczba osób</label>
+                    <input type="number" name="number_of_people" class="form-control"
+                        value="{{ old('number_of_people', $event->number_of_people) }}" min="1" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Typ wydarzenia</label>
+                    <select name="event_type_id" class="form-select" required>
+                        @foreach ($eventTypes as $type)
+                            <option value="{{ $type->id }}" @selected(old('event_type_id', $event->event_type_id) == $type->id)>
+                                {{ $type->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
             <div class="mb-3">
-                <label for="number_of_people" class="form-label">Liczba osób</label>
-                <input type="number" class="form-control" id="number_of_people" name="number_of_people"
-                    value="{{ old('number_of_people', $event->number_of_people) }}" required>
+                <label class="form-label">Opis</label>
+                <textarea name="description" class="form-control" rows="3" required>{{ old('description', $event->description) }}</textarea>
             </div>
 
             <div class="mb-3">
-                <label for="description" class="form-label">Opis</label>
-                <textarea class="form-control" id="description" name="description" rows="3">{{ old('description', $event->description) }}</textarea>
-            </div>
+                <label class="form-label">Wybierz salę (lub sale)</label>
 
-            <div class="mb-3">
-                <label for="event_type_id" class="form-label">Typ wydarzenia</label>
-                <select class="form-select" id="event_type_id" name="event_type_id" required>
-                    @foreach ($eventTypes as $type)
-                        <option value="{{ $type->id }}" {{ $event->event_type_id == $type->id ? 'selected' : '' }}>
-                            {{ $type->name }}
-                        </option>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    @foreach ($rooms as $room)
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $room->name }}</h5>
+
+                                    <ul class="list-group list-group-flush mb-3">
+                                        <li class="list-group-item">
+                                            <strong>Pojemność:</strong> {{ $room->capacity }} osób
+                                        </li>
+                                        <li class="list-group-item">
+                                            <strong>Opis:</strong>
+                                            {{ $room->description ?? 'Brak opisu' }}
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="card-footer d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold">
+                                        Sala dostępna
+                                    </span>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="rooms[]"
+                                            value="{{ $room->id }}" @checked(in_array($room->id, old('rooms', $event->rooms->pluck('id')->toArray())))>
+
+                                        <label class="form-check-label">
+                                            Wybierz
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                     @endforeach
-                </select>
+                </div>
             </div>
+
             @include('shared.menu-card')
-            <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
-            <a href="{{ route('users.manager-dashboard') }}" class="btn btn-secondary">Anuluj</a>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+                <a href="{{ route('users.manager-dashboard') }}" class="btn btn-secondary">Anuluj</a>
+            </div>
         </form>
     </div>
+
 </body>

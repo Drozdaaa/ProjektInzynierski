@@ -30,7 +30,7 @@ class EventRequest extends FormRequest
             'event_type_id' => 'required|exists:event_types,id',
             'menus_id' => 'required_if:action,event|array|min:1',
             'menus_id.*' => 'exists:menus,id',
-            'action' => 'required|in:event,custom',
+            'action' => 'in:event,custom',
             'rooms' => 'required|array|min:1',
             'rooms.*' => 'exists:rooms,id',
             'start_time' => 'required|date_format:H:i',

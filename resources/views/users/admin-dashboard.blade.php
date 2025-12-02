@@ -2,10 +2,7 @@
 @include('shared.head', ['pageTitle' => 'Panel Administratora'])
 
 <body>
-
     @include('shared.navbar')
-
-
     <div class="container-fluid mt-5 px-5">
         <h1>Panel Admina</h1>
         <div class="btn-group mt-3 mb-4" role="group" aria-label="tabela przełączająca">

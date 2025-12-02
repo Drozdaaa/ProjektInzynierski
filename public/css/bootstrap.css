@@ -202,6 +202,12 @@
     }
 }
 
+td.description {
+    max-width: 250px;
+    white-space: normal;
+    word-break: break-word;
+}
+
 .dish-card {
     transition: all 0.3s ease;
     border: 1px solid #dee2e6;

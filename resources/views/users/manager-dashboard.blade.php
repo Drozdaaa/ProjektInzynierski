@@ -23,28 +23,37 @@
 
             <div class="d-grid d-sm-flex gap-2 justify-content-center flex-sm-wrap" style="min-width: 300px;"
                 role="group" aria-label="Status filtr">
+
                 <div class="flex-fill">
-                    <input type="radio" class="btn-check" name="btnstatus" id="btn-all" autocomplete="off" checked
-                        onclick="filterStatus('all')">
-                    <label class="btn btn-outline-primary w-100 text-center" for="btn-all">Wszystkie</label>
+                    <input type="radio" class="btn-check" name="btnstatus" id="btn-all" autocomplete="off"
+                        onclick="applyFilter('all')" {{ $status === 'all' ? 'checked' : '' }}>
+                    <label class="btn btn-outline-primary w-100 text-center" for="btn-all">
+                        Wszystkie
+                    </label>
                 </div>
 
                 <div class="flex-fill">
                     <input type="radio" class="btn-check" name="btnstatus" id="btn-oczekujące" autocomplete="off"
-                        onclick="filterStatus('Oczekujące')">
-                    <label class="btn btn-outline-primary w-100 text-center" for="btn-oczekujące">Oczekujące</label>
+                        onclick="applyFilter('Oczekujące')" {{ $status === 'Oczekujące' ? 'checked' : '' }}>
+                    <label class="btn btn-outline-primary w-100 text-center" for="btn-oczekujące">
+                        Oczekujące
+                    </label>
                 </div>
 
                 <div class="flex-fill">
                     <input type="radio" class="btn-check" name="btnstatus" id="btn-zaplanowane" autocomplete="off"
-                        onclick="filterStatus('Zaplanowane')">
-                    <label class="btn btn-outline-primary w-100 text-center" for="btn-zaplanowane">Zaplanowane</label>
+                        onclick="applyFilter('Zaplanowane')" {{ $status === 'Zaplanowane' ? 'checked' : '' }}>
+                    <label class="btn btn-outline-primary w-100 text-center" for="btn-zaplanowane">
+                        Zaplanowane
+                    </label>
                 </div>
 
                 <div class="flex-fill">
                     <input type="radio" class="btn-check" name="btnstatus" id="btn-zakonczone" autocomplete="off"
-                        onclick="filterStatus('Zakończone')">
-                    <label class="btn btn-outline-primary w-100 text-center" for="btn-zakonczone">Zakończone</label>
+                        onclick="applyFilter('Zakończone')" {{ $status === 'Zakończone' ? 'checked' : '' }}>
+                    <label class="btn btn-outline-primary w-100 text-center" for="btn-zakonczone">
+                        Zakończone
+                    </label>
                 </div>
             </div>
         </div>
@@ -66,11 +75,13 @@
                 </thead>
                 <tbody>
                     @forelse ($events as $event)
-                        <tr data-status="{{ $event->status->name }}">
+                        <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td><strong>{{ $event->user->first_name }} {{ $event->user->last_name }}</strong><br>
+
+                            <td>
+                                <strong>{{ $event->user->first_name }} {{ $event->user->last_name }}</strong><br>
                                 <small class="text-muted">{{ $event->user->email }}</small><br>
-                                <small class="text-muted"> nr. telefonu: {{ $event->user->phone }}</small>
+                                <small class="text-muted">nr telefonu: {{ $event->user->phone }}</small>
                             </td>
                             <td>{{ $event->eventType->name }}</td>
                             <td>
@@ -78,9 +89,8 @@
                                 <small class="text-muted">{{ $event->start_time }} - {{ $event->end_time }}</small>
                             </td>
                             <td>{{ $event->rooms->pluck('name')->join(', ') }}</td>
-
                             <td>{{ $event->number_of_people }}</td>
-                            <td>{{ $event->description }}</td>
+                            <td class="description">{{ $event->description }}</td>
                             <td>
                                 <span
                                     class="badge
@@ -104,9 +114,9 @@
                                 @endif
 
                                 @if ($event->status->name === 'Zaplanowane')
-                                    <a href="{{ route('events.edit', $event->id) }}" class="btn btn-sm btn-info">
-                                        Edytuj
-                                    </a>
+                                    <a href="{{ route('events.edit', $event->id) }}"
+                                        class="btn btn-sm btn-info">Edytuj</a>
+
                                     <form action="{{ route('events.update-status', $event->id) }}" method="POST"
                                         class="d-inline">
                                         @csrf
@@ -128,6 +138,7 @@
                                             Zaplanuj
                                         </button>
                                     </form>
+
                                     <form action="{{ route('events.destroy', $event->id) }}" method="POST"
                                         class="d-inline">
                                         @csrf
@@ -160,17 +171,10 @@
                 </tbody>
             </table>
         </div>
+
         <div class="d-flex justify-content-center mt-4">
-            {{ $events->links() }}
+            {{ $events->appends(['status' => $status])->links() }}
         </div>
     </div>
-    <script>
-        function filterStatus(status) {
-            const rows = document.querySelectorAll('tbody tr');
-            rows.forEach(row => {
-                const rowStatus = row.getAttribute('data-status');
-                row.style.display = (status === 'all' || rowStatus === status) ? '' : 'none';
-            });
-        }
-    </script>
+    <script src="{{ asset('js/filter.js') }}"></script>
 </body>
