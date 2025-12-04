@@ -161,7 +161,6 @@ class EventController extends Controller
             ->with('success', 'Wydarzenie zostało zaktualizowane.');
     }
 
-
     /**
      * Remove the specified resource from storage.
      */
@@ -170,5 +169,55 @@ class EventController extends Controller
         $event->delete();
         return redirect()->route('users.manager-dashboard')
             ->with('success', 'Wydarzenie usunięte.');
+    }
+
+    public function calendar(Restaurant $restaurant)
+    {
+        $events = Event::where('restaurant_id', $restaurant->id)
+            ->with('rooms')
+            ->get()
+            ->map(function ($event) {
+                return [
+                    'title' => 'Zajęte',
+                    'start' => $event->date . 'T' . $event->start_time,
+                    'end'   => $event->date . 'T' . $event->end_time,
+                    'extendedProps' => [
+                        'rooms' => $event->rooms->pluck('name')->join(', '),
+                        'time' => substr($event->start_time, 0, 5) . ' - ' . substr($event->end_time, 0, 5),
+                    ]
+                ];
+            });
+
+        return response()->json($events);
+    }
+
+
+    public function busyRooms(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required',
+            'restaurant_id' => 'required|exists:restaurants,id',
+        ]);
+
+        $busyRoomIds = Event::where('restaurant_id', $request->restaurant_id)
+            ->where('date', $request->date)
+            ->where(function ($q) use ($request) {
+                $q->whereBetween('start_time', [$request->start_time, $request->end_time])
+                    ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
+                    ->orWhere(function ($q) use ($request) {
+                        $q->where('start_time', '<=', $request->start_time)
+                            ->where('end_time', '>=', $request->end_time);
+                    });
+            })
+            ->with('rooms:id')
+            ->get()
+            ->pluck('rooms')
+            ->flatten()
+            ->pluck('id')
+            ->unique();
+
+        return response()->json($busyRoomIds);
     }
 }

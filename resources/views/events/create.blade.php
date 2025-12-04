@@ -14,6 +14,12 @@
                 </ul>
             </div>
         @endif
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="mb-3">Dostępność terminów</h5>
+                <div id="calendar"></div>
+            </div>
+        </div>
         <form method="POST" action="{{ route('events.store', ['id' => $restaurant->id]) }}">
             @csrf
             <div class="row mb-3">
@@ -78,26 +84,23 @@
 
                                 <div class="card-footer d-flex justify-content-between align-items-center">
                                     <span class="fw-semibold">
-                                        Sala dostępna
+                                        Cena sali:
                                     </span>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="rooms[]"
+                                        <input class="form-check-input room-checkbox" type="checkbox" name="rooms[]"
                                             id="room_{{ $room->id }}" value="{{ $room->id }}"
-                                            @checked(in_array($room->id, old('rooms', [])))>
-
+                                            data-room-id="{{ $room->id }}">
                                         <label class="form-check-label" for="room_{{ $room->id }}">
                                             Wybierz
                                         </label>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     @endforeach
                 </div>
             </div>
-
             @include('shared.menu-card')
             <div class="mt-3">
                 <button type="submit" name="action"value="custom" class="btn btn-primary"> Utwórz własne menu</button>
@@ -105,4 +108,12 @@
             </div>
         </form>
     </div>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" >
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="{{ asset('js/calendar.js') }}"></script>
+    <script>
+        window.busyRoomsUrl = "{{ route('events.busy-rooms') }}";
+        window.calendarUrl = "{{ route('events.calendar', $restaurant->id) }}";
+        window.restaurantId = "{{ $restaurant->id }}";
+    </script>
 </body>

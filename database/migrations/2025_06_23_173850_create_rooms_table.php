@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('capacity')->nullable();
             $table->string('description')->nullable();
-            $table->boolean('is_available')->default(true);
+            $table->decimal('price', 10, 2);
             $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
         });
     }

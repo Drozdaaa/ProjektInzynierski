@@ -60,6 +60,8 @@ Route::middleware(['auth'])->controller(EventController::class)->group(function 
     Route::get('/restaurants/{id}/events/create', 'create')->name('events.create');
     Route::post('/restaurants/{id}/events', 'store')->name('events.store');
     Route::get('/restaurants/{restaurant}/events/{event}', 'show')->name('events.show');
+    Route::get('/restaurants/{restaurant}/events-calendar', 'calendar')->name('events.calendar');
+    Route::get('/events/busy-rooms', 'busyRooms')->name('events.busy-rooms');
 });
 
 Route::controller(MenuController::class)->group(function () {

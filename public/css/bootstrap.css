@@ -202,6 +202,35 @@
     }
 }
 
+.fc-daygrid-day:not(.fc-day-other) {
+    cursor: pointer;
+}
+
+.fc-toolbar.fc-header-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: space-between;
+}
+
+@media (max-width: 576px) {
+    .fc-toolbar-chunk {
+        flex: 1 1 100%;
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 0.3rem;
+    }
+
+    .fc-button {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.3rem !important;
+    }
+}
+
 td.description {
     max-width: 250px;
     white-space: normal;
