@@ -10,7 +10,7 @@ class Room extends Model
         'name',
         'capacity',
         'description',
-        'is_available',
+        'price',
         'restaurant_id',
     ];
 

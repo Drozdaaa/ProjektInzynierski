@@ -84,7 +84,7 @@
 
                                 <div class="card-footer d-flex justify-content-between align-items-center">
                                     <span class="fw-semibold">
-                                        Cena sali:
+                                        Cena sali: {{$room->price}} zł
                                     </span>
 
                                     <div class="form-check">

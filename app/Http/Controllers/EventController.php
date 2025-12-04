@@ -174,23 +174,28 @@ class EventController extends Controller
     public function calendar(Restaurant $restaurant)
     {
         $events = Event::where('restaurant_id', $restaurant->id)
-            ->with('rooms')
+            ->with('rooms:id,name')
             ->get()
-            ->map(function ($event) {
-                return [
-                    'title' => 'Zajęte',
-                    'start' => $event->date . 'T' . $event->start_time,
-                    'end'   => $event->date . 'T' . $event->end_time,
-                    'extendedProps' => [
-                        'rooms' => $event->rooms->pluck('name')->join(', '),
-                        'time' => substr($event->start_time, 0, 5) . ' - ' . substr($event->end_time, 0, 5),
-                    ]
-                ];
+            ->flatMap(function ($event) {
+
+                return $event->rooms->map(function ($room) use ($event) {
+
+                    $time = substr($event->start_time, 0, 5) . ' - ' . substr($event->end_time, 0, 5);
+
+                    return [
+                        'title' => $room->name . ' (' . $time . ')',
+                        'start' => $event->date . 'T' . $event->start_time,
+                        'end'   => $event->date . 'T' . $event->end_time,
+                        'extendedProps' => [
+                            'room' => $room->name,
+                            'time' => $time,
+                        ]
+                    ];
+                });
             });
 
         return response()->json($events);
     }
-
 
     public function busyRooms(Request $request)
     {
