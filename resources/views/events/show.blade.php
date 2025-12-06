@@ -41,9 +41,7 @@
 
                                 <p><strong>Cena menu:</strong> {{ $menu->price }} zł</p>
 
-
                                 <div class="mb-2">
-
                                     @if ($event->menus->count() > 1)
                                         <label class="form-label">
                                             Ile osób ma dostać to menu:
