@@ -51,7 +51,13 @@
                                 {{ $event->date }}<br>
                                 <small class="text-muted">{{ $event->start_time }} - {{ $event->end_time }}</small>
                             </td>
-                            <td>{{ $event->rooms->pluck('name')->join(', ') ?: 'Brak' }}</td>
+                            <td>
+                                {{ $event->rooms->pluck('name')->join(', ') }}
+                                <br>
+                                <small class="text-muted">
+                                    {{ $event->rooms->sum('price') }} zł
+                                </small>
+                            </td>
                             <td>{{ $event->number_of_people }}</td>
                             <td>{{ number_format($event->total_cost, 2, '.', '') }} zł</td>
                             <td>{{ $event->description }}</td>

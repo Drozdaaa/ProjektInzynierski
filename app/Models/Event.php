@@ -48,7 +48,8 @@ class Event extends Model
 
     public function menus()
     {
-        return $this->belongsToMany(Menu::class, 'event_menu');
+        return $this->belongsToMany(Menu::class, 'event_menu')
+            ->withPivot('amount');
     }
 
 

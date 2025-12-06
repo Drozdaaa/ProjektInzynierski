@@ -28,7 +28,7 @@
             <div class="form-check">
                 <input class="form-check-input dish-checkbox" type="checkbox" name="dishes[]"
                     value="{{ $dish->id }}" id="dish_check_{{ $dish->id }}"
-                    {{ !empty($selected) && $selected ? 'checked' : '' }} style="pointer-events: none;">
+                    {{ !empty($selected) && $selected ? 'checked' : '' }}>
                 <label class="form-check-label" for="dish_check_{{ $dish->id }}">
                     Zaznacz
                 </label>

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Room;
 use App\Models\User;
 use App\Models\Event;
 use App\Models\Status;
@@ -113,7 +112,7 @@ class EventController extends Controller
             'menus.dishes.dishType',
         ]);
 
-        return view('events.show', compact('event'));
+         return view('events.show', compact('event', 'restaurant'));
     }
 
     /**

@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Carbon\Carbon;
 use App\Models\Room;
 use Illuminate\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 
 class EventRequest extends FormRequest
 {
@@ -76,6 +77,23 @@ class EventRequest extends FormRequest
                         'number_of_people',
                         "Liczba osób ({$numPeople}) przekracza łączną liczbę miejsc w wybranych salach ({$totalCapacity})."
                     );
+                }
+            }
+            $selectedDate = isset($this->date) ? Carbon::parse($this->date) : null;
+            $now = Carbon::now();
+
+            if ($selectedDate && $selectedDate->isToday()) {
+                if (isset($this->start_time) && Carbon::parse($this->start_time)->lessThan($now)) {
+                    $validator->errors()->add('start_time', 'Nie można ustawić godziny rozpoczęcia w przeszłości.');
+                }
+                if (isset($this->end_time) && Carbon::parse($this->end_time)->lessThan($now)) {
+                    $validator->errors()->add('end_time', 'Nie można ustawić godziny zakończenia w przeszłości.');
+                }
+            }
+
+            if (isset($this->start_time, $this->end_time)) {
+                if (Carbon::parse($this->end_time)->lessThanOrEqualTo(Carbon::parse($this->start_time))) {
+                    $validator->errors()->add('end_time', 'Godzina zakończenia musi być późniejsza niż godzina rozpoczęcia.');
                 }
             }
         });

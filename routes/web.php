@@ -36,7 +36,7 @@ Route::middleware(['auth', 'can:admin-or-manager'])->controller(ManagerControlle
     Route::get('/manager', 'index')->name('users.manager-dashboard');
 });
 
-Route::middleware(['auth', 'can:is-user'])->controller(UserController::class)->group(function () {
+Route::middleware(['auth'])->controller(UserController::class)->group(function () {
     Route::get('/user', 'index')->name('users.user-dashboard');
 });
 
@@ -81,6 +81,8 @@ Route::controller(MenuController::class)->group(function () {
         ->name('menus.user.edit');
     Route::put('/events/{event}/menus/{menu}', 'updateForUser')
         ->name('menus.user.update');
+    Route::post('/restaurants/{restaurant}/events/{event}/menus/amounts', 'updateAmounts')
+        ->name('menus.update-amounts');
 });
 
 Route::controller(DishController::class)->group(function () {

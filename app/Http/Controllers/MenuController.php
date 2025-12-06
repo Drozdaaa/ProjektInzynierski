@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dish;
 use App\Models\Menu;
 use App\Models\User;
 use App\Models\Event;
@@ -170,13 +171,20 @@ class MenuController extends Controller
         ]);
 
         $menu->dishes()->attach($validated['dishes']);
-
         $event->menus()->attach($menu->id);
 
-        return redirect()->route('events.show', [
-            'restaurant' => $event->restaurant_id,
-            'event' => $event->id,
-        ])->with('success', 'Menu zostało utworzone i przypisane do wydarzenia.');
+        if ($request->has('create_another')) {
+            return redirect()
+                ->route('menus.user-create', [$restaurant->id, $event->id])
+                ->with('success', 'Menu zapisane. Możesz dodać kolejne.');
+        }
+
+        return redirect()
+            ->route('events.show', [
+                'restaurant' => $restaurant->id,
+                'event' => $event->id
+            ])
+            ->with('success', 'Menu zapisane i przypisane do wydarzenia.');
     }
 
     public function editForUser(Event $event)
@@ -227,5 +235,31 @@ class MenuController extends Controller
             'restaurant' => $event->restaurant_id,
             'event' => $event->id
         ])->with('success', 'Menu zostało zaktualizowane.');
+    }
+
+    public function updateAmounts(Request $request, Restaurant $restaurant, Event $event)
+    {
+        $validated = $request->validate([
+            'amounts' => 'required|array',
+            'amounts.*' => 'required|integer|min:0|max:' . $event->number_of_people,
+        ], [
+            'amounts.*.max' => 'Liczba porcji nie może być większa niż liczba uczestników wydarzenia.',
+        ]);
+
+        $totalAssigned = array_sum($validated['amounts']);
+
+        if ($totalAssigned !== $event->number_of_people) {
+            return redirect()
+                ->back()
+                ->withErrors(['amounts' => 'Suma wszystkich porcji musi być równa liczbie uczestników wydarzenia (' . $event->number_of_people . ').'])
+                ->withInput();
+        }
+
+        foreach ($validated['amounts'] as $menuId => $amount) {
+            $event->menus()->updateExistingPivot($menuId, ['amount' => $amount]);
+        }
+
+        return redirect()->route('users.user-dashboard')
+            ->with('success', 'Liczba porcji dla menu została zaktualizowana.');
     }
 }

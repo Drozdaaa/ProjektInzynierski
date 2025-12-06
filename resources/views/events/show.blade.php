@@ -31,40 +31,57 @@
                 </p>
 
                 @if ($event->menus->isNotEmpty())
-                    <h5 class="mt-3">Menu</h5>
+                    <h5 class="mt-3">Menu dla wydarzenia</h5>
 
-                    @if ($event->menus->count() > 1)
-                        <p>
-                            <strong>Średnia cena menu:</strong>
-                            {{ number_format($event->menus->avg('price'), 2, ',', ' ') }} zł
-                        </p>
-                    @endif
+                    <form action="{{ route('menus.update-amounts', [$event->restaurant->id, $event->id]) }}"
+                        method="POST">
+                        @csrf
+                        @foreach ($event->menus as $menu)
+                            <div class="mb-4 border p-3 rounded">
 
-                    @foreach ($event->menus as $menu)
-                        <div class="mb-3">
-                            <p><strong>Cena:</strong> {{ $menu->price }} zł</p>
+                                <p><strong>Cena menu:</strong> {{ $menu->price }} zł</p>
 
-                            <ul class="list-group">
-                                @foreach ($menu->dishes as $dish)
-                                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <strong>{{ $dish->name }}</strong><br>
-                                            {{ $dish->description }}<br>
-                                            <small>{{ $dish->dishType->name ?? 'Inne' }}</small>
-                                        </div>
-                                        <span>{{ $dish->price }} zł</span>
-                                    </li>
-                                @endforeach
-                            </ul>
+
+                                <div class="mb-2">
+
+                                    @if ($event->menus->count() > 1)
+                                        <label class="form-label">
+                                            Ile osób ma dostać to menu:
+                                        </label>
+                                        <input type="number" name="amounts[{{ $menu->id }}]" class="form-control"
+                                            value="{{ $menu->pivot->amount }}">
+                                    @else
+                                        <input type="hidden" name="amounts[{{ $menu->id }}]" class="form-control"
+                                            value="{{ $event->number_of_people }}" readonly>
+                                    @endif
+                                </div>
+
+                                <ul class="list-group mt-3">
+                                    @foreach ($menu->dishes as $dish)
+                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <strong>{{ $dish->name }}</strong><br>
+                                                {{ $dish->description }}<br>
+                                                <small>{{ $dish->dishType->name ?? 'Inne' }}</small>
+                                            </div>
+                                            <span>{{ $dish->price }} zł</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+
+                            </div>
+                        @endforeach
+
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                Zapisz menu
+                            </button>
                         </div>
-                    @endforeach
+
+                    </form>
                 @else
                     <p class="text-muted mt-2">Brak przypisanego menu do tego wydarzenia.</p>
                 @endif
-            </div>
-
-            <div class="card-footer text-center">
-                <a href="{{ route('main.index') }}" class="btn btn-secondary">Powrót</a>
             </div>
         </div>
     </div>

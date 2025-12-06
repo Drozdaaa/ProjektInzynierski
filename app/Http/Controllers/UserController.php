@@ -37,10 +37,15 @@ class UserController extends Controller
                 $menu->dishesByType = $menu->dishes
                     ->groupBy(fn($dish) => $dish->dishType->name);
             });
-            $averageMenuPrice = $event->menus->avg('price');
+            $menusCost = $event->menus->sum(function ($menu) {
+                $amount = $menu->pivot->amount;
+                return $menu->price * $amount;
+            });
+
             $roomsPrice = $event->rooms->sum('price');
-            $event->total_cost = $event->number_of_people * $averageMenuPrice +$roomsPrice;
+            $event->total_cost = $menusCost + $roomsPrice;
         });
+
 
         return view('users.user-dashboard', compact('events', 'status'));
     }

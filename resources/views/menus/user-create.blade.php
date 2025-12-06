@@ -17,14 +17,20 @@
             </div>
         @endif
 
+        @if (session('success'))
+            <div class="alert alert-success mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <form action="{{ route('menus.user-store', ['restaurant' => $restaurant->id, 'event' => $event->id]) }}"
-              method="POST" id="menu-form">
+            method="POST" id="menu-form">
             @csrf
 
             <div class="mb-3">
                 <h3>Cena menu</h3>
-                <input type="number" step="0.01" min="0" name="price" id="price"
-                       class="form-control" value="{{ old('price', 0) }}" required readonly>
+                <input type="number" step="0.01" min="0" name="price" id="price" class="form-control"
+                    value="{{ old('price', 0) }}" required readonly>
             </div>
 
             <h3>Wybierz dania:</h3>
@@ -72,9 +78,18 @@
                 </tr>
                 <tr>
                     <td>
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-success">Utwórz menu dla wydarzenia</button>
-                            <a href="{{ route('events.create', ['id' => $restaurant->id]) }}" class="btn btn-secondary">Anuluj</a>
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                Utwórz menu
+                            </button>
+
+                            <button type="submit" name="create_another" value="1" class="btn btn-primary">
+                                Utwórz i dodaj kolejne menu
+                            </button>
+
+                            <a href="{{ route('events.create', ['id' => $restaurant->id]) }}" class="btn btn-secondary">
+                                Anuluj
+                            </a>
                         </div>
                     </td>
                 </tr>

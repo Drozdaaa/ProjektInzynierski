@@ -9,7 +9,6 @@ class Menu extends Model
     protected $fillable = [
         'price',
         'user_id',
-        'event_id',
     ];
 
     public $timestamps = false;
