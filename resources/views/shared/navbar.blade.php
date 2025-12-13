@@ -52,10 +52,6 @@
                 @endcan
 
             </ul>
-            <form class="d-flex">
-                <input class="form-control me-sm-2" type="search" placeholder="Search">
-                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-            </form>
             <ul id="navbar-user" class="navbar-nav mb-2 mb-lg-0">
                 @if (Auth::check())
                     <li class="nav-item">
@@ -67,7 +63,7 @@
                 @else
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}"
-                            href="{{ route('login') }}">
+                            href="{{ route('login', !request()->routeIs('login') && !request()->routeIs('register') ? ['redirect_to' => url()->full()] : []) }}">
                             Zaloguj się
                         </a>
                     </li>

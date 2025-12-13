@@ -36,6 +36,16 @@
             </div>
 
             <div class="mb-3">
+                <label for="booking_regulations" class="form-label">
+                    Regulamin rezerwacji
+                </label>
+
+                <textarea name="booking_regulations" id="booking_regulations" class="form-control" rows="6"
+                    placeholder="Wpisz regulamin rezerwacji...">{{ old('booking_regulations') }}</textarea>
+            </div>
+
+
+            <div class="mb-3">
                 <label for="street" class="form-label">Ulica</label>
                 <input type="text" name="street" id="street" class="form-control" value="{{ old('street') }}"
                     required>

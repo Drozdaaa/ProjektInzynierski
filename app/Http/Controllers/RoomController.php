@@ -43,19 +43,20 @@ class RoomController extends Controller
         }
 
         $request->validate([
-            'room_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
             'description' => 'nullable|string|max:255',
         ]);
 
         $restaurant->rooms()->create([
-            'name' => $request->room_name,
+            'name' => $request->name,
             'capacity' => $request->capacity,
+            'price' => $request->price,
             'description' => $request->description,
         ]);
 
-        return redirect()->route('rooms.create', $restaurant->id)
-            ->with('success', 'Sala została dodana.');
+        return redirect()->back();
     }
 
 
@@ -89,13 +90,13 @@ class RoomController extends Controller
         }
 
         $request->validate([
-            'room_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
             'description' => 'nullable|string|max:255',
         ]);
 
         $room->update([
-            'name' => $request->room_name,
+            'name' => $request->name,
             'capacity' => $request->capacity,
             'description' => $request->description,
         ]);

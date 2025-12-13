@@ -64,6 +64,12 @@ document.addEventListener('DOMContentLoaded', function () {
             dateInput.value = info.dateStr;
             highlightSelectedFromInput();
             checkBusyRooms();
+            if (dateInput) {
+                dateInput.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
         },
 
         datesSet: function () {

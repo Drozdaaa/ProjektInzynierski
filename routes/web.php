@@ -49,19 +49,21 @@ Route::controller(RestaurantController::class)->group(function () {
         Route::delete('/restaurants/{restaurant}', 'destroy')->name('restaurants.destroy');
         Route::get('/manager/restaurant', 'index')->name('restaurants.index');
     });
-    Route::get('/restaurants/{id}', 'show')->name('restaurants.show');
 });
 
-Route::middleware(['auth'])->controller(EventController::class)->group(function () {
+Route::controller(EventController::class)->group(function () {
+    Route::get('/restaurants/{id}/events/create', 'create')->name('events.create');
+    Route::get('/restaurants/{restaurant}/events/{event}', 'show')->name('events.show');
+    Route::get('/restaurants/{restaurant}/events-calendar', 'calendar')->name('events.calendar');
+    Route::get('/events/busy-rooms', 'busyRooms')->name('events.busy-rooms');
+});
+
+Route::middleware('auth')->controller(EventController::class)->group(function () {
+    Route::post('/restaurants/{id}/events', 'store')->name('events.store');
     Route::delete('/manager/{event}', 'destroy')->name('events.destroy');
     Route::patch('/events/{event}/status', 'updateStatus')->name('events.update-status');
     Route::get('/events/{id}/edit', 'edit')->name('events.edit');
     Route::put('/events/{id}', 'update')->name('events.update');
-    Route::get('/restaurants/{id}/events/create', 'create')->name('events.create');
-    Route::post('/restaurants/{id}/events', 'store')->name('events.store');
-    Route::get('/restaurants/{restaurant}/events/{event}', 'show')->name('events.show');
-    Route::get('/restaurants/{restaurant}/events-calendar', 'calendar')->name('events.calendar');
-    Route::get('/events/busy-rooms', 'busyRooms')->name('events.busy-rooms');
 });
 
 Route::controller(MenuController::class)->group(function () {

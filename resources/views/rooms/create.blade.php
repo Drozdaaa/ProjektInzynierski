@@ -15,11 +15,8 @@
                 @endforeach
             </ul>
         @endif
-
         <hr>
-
         <h3>Dodaj kolejną salę</h3>
-
         <form action="{{ route('rooms.store', $restaurant->id) }}" method="POST">
             @csrf
 
@@ -31,6 +28,11 @@
             <div class="mb-3">
                 <label>Pojemność</label>
                 <input type="number" name="capacity" class="form-control" value="{{ old('capacity') }}" min="1">
+            </div>
+
+            <div class="mb-3">
+                <label>Cena za wynajem (zł)</label>
+                <input type="number" name="price" class="form-control" value="{{ old('price') }}" step="0.01" min="0" required>
             </div>
 
             <div class="mb-3">

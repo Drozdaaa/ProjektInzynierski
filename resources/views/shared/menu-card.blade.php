@@ -38,7 +38,6 @@
                                     Wybierz
                                 </label>
                             </div>
-
                         </div>
                     </div>
                 </div>

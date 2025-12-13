@@ -62,6 +62,10 @@ class EventController extends Controller
      */
     public function store(EventRequest $request, $id)
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         $restaurant = Restaurant::findOrFail($id);
         $action = $request->input('action');
 
@@ -72,7 +76,6 @@ class EventController extends Controller
             'number_of_people' => $request->number_of_people,
             'description' => $request->description,
             'event_type_id' => $request->event_type_id,
-            'menu_id' => null,
             'user_id' => Auth::id(),
             'status_id' => 1,
             'restaurant_id' => $restaurant->id,
@@ -112,7 +115,7 @@ class EventController extends Controller
             'menus.dishes.dishType',
         ]);
 
-         return view('events.show', compact('event', 'restaurant'));
+        return view('events.show', compact('event', 'restaurant'));
     }
 
     /**

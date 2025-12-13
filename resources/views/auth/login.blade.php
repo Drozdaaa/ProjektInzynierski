@@ -15,11 +15,14 @@
                     <div class="alert alert-danger text-center">
                         {{ $errors->first('login') }}
                     </div>
-                 @endif
+                @endif
 
-                 <form method="POST" action="{{ route('login.authenticate') }}" class="needs-validation" novalidate>
+                <form method="POST" action="{{ route('login.authenticate') }}" class="needs-validation" novalidate>
                     @csrf
 
+                    @if (request()->has('redirect_to'))
+                        <input type="hidden" name="redirect_to" value="{{ request()->get('redirect_to') }}">
+                    @endif
 
                     <div class="form-group mb-2">
                         <label for="email" class="form-label">Email</label>

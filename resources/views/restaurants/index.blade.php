@@ -19,6 +19,8 @@
         <div class="card-body">
             <h4 class="card-title">{{ $restaurant->name }}</h4>
             <p class="card-text">{{ $restaurant->description ?? '-' }}</p>
+            <span>Regulamin rezerwacji</span><br>
+            {!! nl2br(e($restaurant->booking_regulations ?? 'Brak regulaminu')) !!}
         </div>
     </div>
 
@@ -66,7 +68,7 @@
                                     <div class="btn-group btn-group-sm gap-1">
                                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
                                             data-bs-target="#roomModal"
-                                            onclick="openRoomModal('edit', {{ $room->id }}, '{{ $room->name }}', {{ $room->capacity }}, '{{ $room->description }}')">
+                                            onclick="openRoomModal('edit', {{ $room->id }}, '{{ $room->name }}', {{ $room->capacity }}, {{ $room->price }}, '{{ $room->description }}')">
                                             Edytuj
                                         </button>
                                         <form action="{{ route('rooms.destroy', [$restaurant->id, $room->id]) }}"
@@ -119,8 +121,16 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        <div class="mb-3">
+                            <label for="booking_regulations" class="form-label">Regulamin rezerwacji</label>
+                            <textarea name="booking_regulations" id="booking_regulations"
+                                class="form-control @error('booking_regulations') is-invalid @enderror" rows="5"
+                                placeholder="Wpisz regulamin rezerwacji">{{ old('booking_regulations', $restaurant->booking_regulations) }}</textarea>
+                            @error('booking_regulations')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
-
                     <div class="mb-4">
                         <h6>Adres</h6>
                         <div class="row">
@@ -166,7 +176,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
                     <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
@@ -181,6 +190,7 @@
         <div class="modal-content">
             <form id="roomForm" method="POST">
                 @csrf
+                <input type="hidden" name="form_type" value="room_action">
                 <div class="modal-header">
                     <h5 class="modal-title" id="roomModalLabel">Dodaj salę</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -189,10 +199,10 @@
                     <input type="hidden" name="_method" id="roomFormMethod" value="POST">
                     <div class="mb-3">
                         <label for="room_name" class="form-label">Nazwa sali</label>
-                        <input type="text" name="room_name" id="room_name"
-                            class="form-control @error('room_name') is-invalid @enderror"
-                            value="{{ old('room_name') }}" required>
-                        @error('room_name')
+                        <input type="text" name="name" id="room_name"
+                            class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}"
+                            required>
+                        @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -202,6 +212,15 @@
                             class="form-control @error('capacity') is-invalid @enderror"
                             value="{{ old('capacity') }}" min="1" required>
                         @error('capacity')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="room_price" class="form-label">Cena za wynajem (zł)</label>
+                        <input type="number" name="price" id="room_price"
+                            class="form-control @error('price') is-invalid @enderror" value="{{ old('price') }}"
+                            step="0.01" min="0" required>
+                        @error('price')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -224,7 +243,7 @@
 </div>
 
 <script>
-    function openRoomModal(mode, id = null, name = '', capacity = '', description = '') {
+    function openRoomModal(mode, id = null, name = '', capacity = '', price = '', description = '') {
         const form = document.getElementById('roomForm');
         const title = document.getElementById('roomModalLabel');
         const methodInput = document.getElementById('roomFormMethod');
@@ -234,26 +253,28 @@
             form.action = "{{ route('rooms.store', $restaurant->id) }}";
             methodInput.value = 'POST';
 
-            document.getElementById('room_name').value = "{{ old('room_name', '') }}";
+            document.getElementById('room_name').value = "{{ old('name', '') }}";
             document.getElementById('room_capacity').value = "{{ old('capacity', '') }}";
+            document.getElementById('room_price').value = "{{ old('price', '') }}";
             document.getElementById('room_description').value = "{{ old('description', '') }}";
         } else if (mode === 'edit') {
             title.textContent = 'Edytuj salę';
             form.action = "{{ url('/restaurants/' . $restaurant->id . '/rooms') }}/" + id;
             methodInput.value = 'PUT';
 
-            document.getElementById('room_name').value = "{{ old('room_name', '') }}" || name;
+            document.getElementById('room_name').value = "{{ old('name', '') }}" || name;
             document.getElementById('room_capacity').value = "{{ old('capacity', '') }}" || capacity;
+            document.getElementById('room_price').value = "{{ old('price', '') }}" || price;
             document.getElementById('room_description').value = "{{ old('description', '') }}" || description;
         }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         @if ($errors->any())
-            @if ($errors->hasAny(['name', 'description', 'street', 'building_number', 'city', 'postal_code']))
+            @if (old('form_type') === 'restaurant_edit')
                 var restaurantModal = new bootstrap.Modal(document.getElementById('editRestaurantModal'));
                 restaurantModal.show();
-            @elseif ($errors->hasAny(['room_name', 'capacity', 'description']))
+            @elseif (old('form_type') === 'room_action')
                 var roomModal = new bootstrap.Modal(document.getElementById('roomModal'));
                 roomModal.show();
             @endif
