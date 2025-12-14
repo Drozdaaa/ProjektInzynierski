@@ -38,6 +38,10 @@ Route::middleware(['auth', 'can:admin-or-manager'])->controller(ManagerControlle
 
 Route::middleware(['auth'])->controller(UserController::class)->group(function () {
     Route::get('/user', 'index')->name('users.user-dashboard');
+    Route::get('/users/{id}/edit', 'edit')->name('users.edit');
+    Route::put('/users/{id}', 'update')->name('users.update');
+    Route::put('/users/{id}/password', 'updatePassword')->name('users.update-password');
+    Route::delete('/users/{id}', 'destroy')->name('users.destroy');
 });
 
 Route::controller(RestaurantController::class)->group(function () {
@@ -87,6 +91,14 @@ Route::controller(MenuController::class)->group(function () {
         ->name('menus.update-amounts');
 });
 
+Route::middleware('auth', 'can:create-custom-menu')->controller(MenuController::class)->group(function () {
+    Route::get('/restaurants/{restaurant}/menus/create-for-event/{event}', 'createForEvent')
+        ->name('menus.create-for-event');
+    Route::post('/restaurants/{restaurant}/menus/store-for-event/{event}', 'storeForEvent')
+        ->name('menus.store-for-event');
+});
+
+
 Route::controller(DishController::class)->group(function () {
     Route::get('/restaurants/{restaurant}/dishes', 'index')->name('dishes.index');
     Route::get('/restaurants/{restaurant}/dishes/create', 'create')->name('dishes.create');
@@ -96,17 +108,7 @@ Route::controller(DishController::class)->group(function () {
     Route::delete('/dishes/{dish}', 'destroy')->name('dishes.destroy');
 });
 
-Route::middleware(['auth', 'can:create-custom-menu'])->group(function () {
-    Route::get(
-        '/restaurants/{restaurant}/menus/create-for-event/{event}',
-        [MenuController::class, 'createForEvent']
-    )->name('menus.create-for-event');
 
-    Route::post(
-        '/restaurants/{restaurant}/menus/store-for-event/{event}',
-        [MenuController::class, 'storeForEvent']
-    )->name('menus.store-for-event');
-});
 
 Route::middleware(['auth'])->controller(RoomController::class)->group(function () {
     Route::get('/restaurants/{restaurant}/rooms/create', 'create')->name('rooms.create');

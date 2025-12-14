@@ -32,7 +32,7 @@
 
             <div class="mb-3">
                 <label>Cena za wynajem (zł)</label>
-                <input type="number" name="price" class="form-control" value="{{ old('price') }}" step="0.01" min="0" required>
+                <input type="number" name="price" class="form-control" value="{{ old('price') }}" step="0.01" min="0">
             </div>
 
             <div class="mb-3">

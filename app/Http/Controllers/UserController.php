@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -80,7 +83,12 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        if ((int)$id !== Auth::id()) {
+            abort(403, 'Nie masz uprawnień do edycji tego profilu.');
+        }
+
+        $user = Auth::user();
+        return view('users.edit', compact('user'));
     }
 
     /**
@@ -88,7 +96,49 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        if ((int)$id !== Auth::id()) {
+            abort(403);
+        }
+
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $user->update($validated);
+
+        return redirect()->route('users.edit', $user->id)
+            ->with('success', 'Twoje dane zostały zaktualizowane.');
+    }
+
+    public function updatePassword(Request $request, string $id)
+    {
+        if ((int)$id !== Auth::id()) {
+            abort(403);
+        }
+
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed', 'min:8', 'different:current_password'],
+        ], [
+            'current_password.current_password' => 'Obecne hasło jest nieprawidłowe.',
+            'password.confirmed' => 'Potwierdzenie nowego hasła nie pasuje.',
+            'password.min' => 'Nowe hasło musi mieć co najmniej 8 znaków.',
+            'password.different' => 'Nowe hasło musi różnić się od obecnego.',
+        ]);
+
+        $user->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return redirect()->route('users.edit', $user->id)
+            ->with('success', 'Hasło zostało zmienione.');
     }
 
     /**
@@ -96,6 +146,16 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        if ((int)$id !== Auth::id()) {
+            abort(403);
+        }
+        $user = User::findOrFail($id);
+        if ($user->restaurants) {
+            $user->restaurants->delete();
+        }
+        Auth::logout();
+        $user->delete();
+        return redirect()->route('main.index')
+            ->with('success', 'Twoje konto zostało usunięte.');
     }
 }

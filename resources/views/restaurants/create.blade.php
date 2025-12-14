@@ -73,4 +73,5 @@
             <a href="{{ route('users.manager-dashboard') }}" class="btn btn-secondary">Anuluj</a>
         </form>
     </div>
+    <script src="{{ asset('js/postal_code.js') }}"></script>
 </body>

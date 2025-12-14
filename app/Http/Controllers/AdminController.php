@@ -13,8 +13,13 @@ class AdminController extends Controller
     public function index()
     {
         return view('users.admin-dashboard', [
-            'users'=>User::with(['role'])->orderBy('role_id')->get(),
-            'restaurants'=>Restaurant::with(['address', 'user'])->orderBy('id')->get()
+            'users' => User::with('role')
+                ->where('role_id', '!=', 1)
+                ->orderBy('role_id')
+                ->get(),
+            'restaurants' => Restaurant::with(['address', 'user'])
+                ->orderBy('id')
+                ->get()
         ]);
     }
 

@@ -241,7 +241,7 @@
         </div>
     </div>
 </div>
-
+<script src="{{ asset('js/postal_code.js') }}"></script>
 <script>
     function openRoomModal(mode, id = null, name = '', capacity = '', price = '', description = '') {
         const form = document.getElementById('roomForm');

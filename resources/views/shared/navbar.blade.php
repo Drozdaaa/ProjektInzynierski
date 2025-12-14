@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
+        <a class="navbar-brand" href="{{ route('main.index') }}">Navbar</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01"
             aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -22,17 +22,23 @@
                             aria-expanded="false">
                             Menadżer
                         </a>
-                        <ul class="dropdown-menu" {{ request()->routeIs('users.manager-dashboard') ? 'active' : '' }}>
+                        <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ route('users.manager-dashboard') }}">Wydarzenia</a></li>
                             <li><a class="dropdown-item" href="{{ route('menus.index') }}">Zarządzaj menu</a></li>
-                            <li><a class="dropdown-item" href="{{ route('restaurants.index') }}">Informacje o lokalu</a></li>
+                            <li><a class="dropdown-item" href="{{ route('restaurants.index') }}">Informacje o lokalu</a>
+                            </li>
                             @if (!\App\Models\Restaurant::where('user_id', auth()->id())->exists())
                                 <li><a class="dropdown-item" href="{{ route('restaurants.create') }}">Utwórz lokal</a></li>
                             @endif
                         </ul>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('users.user-dashboard') ? 'active' : '' }}"
+                            href="{{ route('users.user-dashboard') }}">
+                            Twoje wydarzenia
+                        </a>
+                    </li>
                     </li>
                 @endcan
-
                 @can('is-admin')
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('users.admin-dashboard') ? 'active' : '' }}"
@@ -41,7 +47,6 @@
                         </a>
                     </li>
                 @endcan
-
                 @can('is-user')
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('users.user-dashboard') ? 'active' : '' }}"
@@ -54,13 +59,24 @@
             </ul>
             <ul id="navbar-user" class="navbar-nav mb-2 mb-lg-0">
                 @if (Auth::check())
+                    {{-- ZALOGOWANY UŻYTKOWNIK --}}
+
+                    {{-- Link do Profilu (wyświetla imię użytkownika) --}}
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('logout') ? 'active' : '' }}"
-                            href="{{ route('logout') }}">
-                            {{ Auth::user()->name }} Wyloguj się
+                        <a class="nav-link {{ request()->routeIs('users.edit') ? 'active' : '' }}"
+                            href="{{ route('users.edit', Auth::id()) }}">
+                            Profil {{ Auth::user()->name }}
+                        </a>
+                    </li>
+
+                    {{-- Link Wyloguj --}}
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="{{ route('logout') }}">
+                            Wyloguj się
                         </a>
                     </li>
                 @else
+                    {{-- NIEZALOGOWANY --}}
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}"
                             href="{{ route('login', !request()->routeIs('login') && !request()->routeIs('register') ? ['redirect_to' => url()->full()] : []) }}">
