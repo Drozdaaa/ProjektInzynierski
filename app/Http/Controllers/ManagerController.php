@@ -39,13 +39,23 @@ class ManagerController extends Controller
         $events->appends(['status' => $status]);
         $events->each(function ($event) {
             $event->menus->each(function ($menu) {
-                $menu->dishesByType = $menu->dishes->groupBy(fn($dish) => $dish->dishType?->name);
+                $menu->dishesByType = $menu->dishes
+                    ->groupBy(fn($dish) => $dish->dishType->name);
             });
+            $menusCost = $event->menus->sum(function ($menu) {
+                $amount = $menu->pivot->amount;
+                return $menu->price * $amount;
+            });
+
+            $roomsPrice = $event->rooms->sum('price');
+            $event->total_cost = $menusCost + $roomsPrice;
         });
 
         $restaurant = Restaurant::where('user_id', $managerId)
             ->with('menus.dishes.dishType')
             ->first();
+
+
 
         return view('users.manager-dashboard', compact('events', 'restaurant', 'status'));
     }

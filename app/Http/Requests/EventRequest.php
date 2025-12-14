@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Event;
 use Carbon\Carbon;
 use App\Models\Room;
 use Illuminate\Validation\Validator;
@@ -29,7 +30,7 @@ class EventRequest extends FormRequest
             'number_of_people' => 'required|integer|min:1',
             'description' => 'required|string|max:255',
             'event_type_id' => 'required|exists:event_types,id',
-            'menus_id' => 'required_if:action,event|array|min:1',
+            'menus_id' => 'array|min:1',
             'menus_id.*' => 'exists:menus,id',
             'action' => 'in:event,custom',
             'rooms' => 'required|array|min:1',
@@ -94,6 +95,36 @@ class EventRequest extends FormRequest
             if (isset($this->start_time, $this->end_time)) {
                 if (Carbon::parse($this->end_time)->lessThanOrEqualTo(Carbon::parse($this->start_time))) {
                     $validator->errors()->add('end_time', 'Godzina zakończenia musi być późniejsza niż godzina rozpoczęcia.');
+                }
+            }
+        });
+
+        $validator->after(function ($validator) {
+
+            if (!$this->date || !$this->start_time || !$this->end_time || empty($this->rooms)) {
+                return;
+            }
+
+            $start = Carbon::createFromFormat('H:i', $this->start_time);
+            $end   = Carbon::createFromFormat('H:i', $this->end_time);
+
+            foreach ($this->rooms as $roomId) {
+                $conflictExists = Event::whereDate('date', $this->date)
+                    ->whereHas('rooms', function ($q) use ($roomId) {
+                        $q->where('rooms.id', $roomId);
+                    })
+                    ->where(function ($q) use ($start, $end) {
+                        $q->where('start_time', '<', $end->format('H:i'))
+                            ->where('end_time', '>', $start->format('H:i'));
+                    })
+                    ->exists();
+
+                if ($conflictExists) {
+                    $validator->errors()->add(
+                        'rooms',
+                        'Jedna z wybranych sal jest już zajęta w podanym przedziale godzin.'
+                    );
+                    break;
                 }
             }
         });

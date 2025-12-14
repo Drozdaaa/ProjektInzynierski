@@ -29,14 +29,10 @@ class LoginController extends Controller
 
             $user = Auth::user();
 
-            // --- NOWY FRAGMENT KODU START ---
-            // Sprawdzamy, czy formularz przesłał adres powrotny
             if ($request->has('redirect_to')) {
                 return redirect($request->input('redirect_to'));
             }
-            // --- NOWY FRAGMENT KODU KONIEC ---
 
-            // Standardowa logika ról (wykona się tylko, jeśli nie ma redirect_to)
             if($user->role->name === 'Administrator'){
                 return redirect()->route('users.admin-dashboard');
             }

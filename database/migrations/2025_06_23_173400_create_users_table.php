@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('phone')->unique();
             $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->rememberToken();
             $table->string('password');
             $table->foreignId('role_id')->constrained('roles');
         });

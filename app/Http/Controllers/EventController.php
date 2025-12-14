@@ -206,19 +206,22 @@ class EventController extends Controller
             'start_time' => 'required',
             'end_time' => 'required',
             'restaurant_id' => 'required|exists:restaurants,id',
+            'exclude_event_id' => 'nullable|integer' 
         ]);
 
-        $busyRoomIds = Event::where('restaurant_id', $request->restaurant_id)
+        $query = Event::where('restaurant_id', $request->restaurant_id)
             ->where('date', $request->date)
             ->where(function ($q) use ($request) {
-                $q->whereBetween('start_time', [$request->start_time, $request->end_time])
-                    ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
-                    ->orWhere(function ($q) use ($request) {
-                        $q->where('start_time', '<=', $request->start_time)
-                            ->where('end_time', '>=', $request->end_time);
-                    });
+                $q->where('start_time', '<', $request->end_time)
+                    ->where('end_time', '>', $request->start_time);
             })
-            ->with('rooms:id')
+            ->where('status_id', '!=', 3);
+
+        if ($request->has('exclude_event_id') && $request->exclude_event_id) {
+            $query->where('id', '!=', $request->exclude_event_id);
+        }
+
+        $busyRoomIds = $query->with('rooms:id')
             ->get()
             ->pluck('rooms')
             ->flatten()

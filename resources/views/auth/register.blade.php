@@ -58,6 +58,12 @@
                             class="form-control @error('password') is-invalid @enderror"
                             required>
                     </div>
+                    
+                    <div class="form-group mb-2">
+                        <label for="password_confirmation" class="form-label">Powtórz hasło</label>
+                        <input id="password_confirmation" name="password_confirmation" type="password"
+                            class="form-control" required>
+                    </div>
 
                     <div class="form-group mb-4">
                         <label for="role_id" class="form-label">Typ konta</label>
@@ -77,5 +83,3 @@
         </div>
     </div>
 </body>
-
-</html>

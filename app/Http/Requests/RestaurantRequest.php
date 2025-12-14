@@ -25,13 +25,10 @@ class RestaurantRequest extends FormRequest
         return [
             'name' => 'required|string|max:50',
             'description' => 'nullable|string|max:255',
-
             'street' => 'required|string|max:50',
             'city' => 'required|string|max:50',
             'postal_code' => 'required|string|max:6',
             'building_number' => 'required|integer|min:1',
-
-
         ];
     }
     public function messages(): array

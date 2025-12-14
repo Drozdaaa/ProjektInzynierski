@@ -17,26 +17,34 @@
             </div>
         @endif
 
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="mb-3">Dostępność terminów</h5>
+                <div id="calendar"></div>
+            </div>
+        </div>
+
         <form action="{{ route('events.update', $event->id) }}" method="POST">
             @csrf
             @method('PUT')
+
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label class="form-label">Data</label>
-                    <input type="date" name="date" class="form-control" value="{{ old('date', $event->date) }}"
-                        required>
+                    <input type="date" name="date" id="date" class="form-control"
+                        value="{{ old('date', $event->date) }}" required>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label">Godzina rozpoczęcia</label>
-                    <input type="time" name="start_time" class="form-control"
+                    <input type="time" name="start_time" id="start_time" class="form-control"
                         value="{{ old('start_time', \Carbon\Carbon::parse($event->start_time)->format('H:i')) }}"
                         required>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label">Godzina zakończenia</label>
-                    <input type="time" name="end_time" class="form-control"
+                    <input type="time" name="end_time" id="end_time" class="form-control"
                         value="{{ old('end_time', \Carbon\Carbon::parse($event->end_time)->format('H:i')) }}" required>
                 </div>
             </div>
@@ -89,7 +97,7 @@
 
                                 <div class="card-footer d-flex justify-content-between align-items-center">
                                     <span class="fw-semibold">
-                                        Sala dostępna
+                                        Cena sali: {{ $room->price }} zł
                                     </span>
 
                                     <div class="form-check">
@@ -110,11 +118,22 @@
 
             @include('shared.menu-card')
 
-            <div class="mt-3">
+            <div class="mt-3 mb-5">
                 <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
                 <a href="{{ route('users.manager-dashboard') }}" class="btn btn-secondary">Anuluj</a>
             </div>
         </form>
     </div>
+
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="{{ asset('js/calendar.js') }}"></script>
+
+    <script>
+        window.busyRoomsUrl = "{{ route('events.busy-rooms') }}";
+        window.calendarUrl = "{{ route('events.calendar', $event->restaurant_id) }}";
+        window.restaurantId = "{{ $event->restaurant_id }}";
+        window.eventId = "{{ $event->id }}";
+    </script>
 
 </body>

@@ -79,6 +79,11 @@
                     </form>
                 @else
                     <p class="text-muted mt-2">Brak przypisanego menu do tego wydarzenia.</p>
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            Kontynuuj
+                        </button>
+                    </div>
                 @endif
             </div>
         </div>

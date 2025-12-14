@@ -68,6 +68,7 @@
                         <th>Data</th>
                         <th>Sala</th>
                         <th>Liczba osób</th>
+                        <th>Koszt</th>
                         <th>Opis</th>
                         <th>Status</th>
                         <th>Akcje</th>
@@ -88,8 +89,15 @@
                                 {{ $event->date }}<br>
                                 <small class="text-muted">{{ $event->start_time }} - {{ $event->end_time }}</small>
                             </td>
-                            <td>{{ $event->rooms->pluck('name')->join(', ') }}</td>
+                            <td>
+                                {{ $event->rooms->pluck('name')->join(', ') }}
+                                <br>
+                                <small class="text-muted">
+                                    {{ $event->rooms->sum('price') }} zł
+                                </small>
+                            </td>
                             <td>{{ $event->number_of_people }}</td>
+                            <td>{{ number_format($event->total_cost, 2, '.', '') }} zł</td>
                             <td class="description">{{ $event->description }}</td>
                             <td>
                                 <span

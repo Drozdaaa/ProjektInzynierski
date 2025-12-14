@@ -38,6 +38,12 @@
                             class="form-control @if ($errors->has('password')) is-invalid @endif" required>
                     </div>
 
+                    <div class="mb-2 text-end">
+                        <a href="{{ route('password.request') }}" class="text-decoration-none small">
+                            Zapomniałeś hasła?
+                        </a>
+                    </div>
+
                     <div class="text-center mt-4 mb-4">
                         <input class="btn btn-primary" type="submit" value="Zaloguj się">
                     </div>
@@ -49,5 +55,3 @@
         </div>
     </div>
 </body>
-
-</html>

@@ -112,13 +112,18 @@ document.addEventListener('DOMContentLoaded', function () {
     function checkBusyRooms() {
         if (!dateInput.value || !startTimeInput.value || !endTimeInput.value) return;
 
-        fetch(`${window.busyRoomsUrl}?date=${dateInput.value}&start_time=${startTimeInput.value}&end_time=${endTimeInput.value}&restaurant_id=${window.restaurantId}`)
+        let url = `${window.busyRoomsUrl}?date=${dateInput.value}&start_time=${startTimeInput.value}&end_time=${endTimeInput.value}&restaurant_id=${window.restaurantId}`;
+
+        if (window.eventId) {
+            url += `&exclude_event_id=${window.eventId}`;
+        }
+
+        fetch(url)
             .then(res => res.json())
             .then(busyRooms => {
                 document.querySelectorAll('.room-checkbox').forEach(checkbox => {
-                    const roomId = checkbox.dataset.roomId;
-
-                    if (busyRooms.includes(Number(roomId))) {
+                    const roomId = Number(checkbox.dataset.roomId);
+                    if (busyRooms.includes(roomId)) {
                         checkbox.checked = false;
                         checkbox.disabled = true;
                         checkbox.closest('.card').classList.add('opacity-50');
