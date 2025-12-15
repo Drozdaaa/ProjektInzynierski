@@ -7,6 +7,8 @@ use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\RestaurantRequest;
 
 class RestaurantController extends Controller
 {
@@ -42,31 +44,30 @@ class RestaurantController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(RestaurantRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'booking_regulations' => 'nullable|string',
-            'street' => 'required|string|max:255',
-            'building_number' => 'required|string|max:20',
-            'city' => 'required|string|max:255',
-            'postal_code' => 'required|string|max:20',
-        ]);
+        $validated = $request->validated();
+
+        $imagePath = null;
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('restaurants', 'public');
+        }
 
         $address = Address::create([
-            'city' => $request->city,
-            'street' => $request->street,
-            'postal_code' => $request->postal_code,
-            'building_number' => $request->building_number,
+            'city' => $validated['city'],
+            'street' => $validated['street'],
+            'postal_code' => $validated['postal_code'],
+            'building_number' => $validated['building_number'],
         ]);
 
         $restaurant = Restaurant::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'booking_regulations' => $request->booking_regulations,
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'booking_regulations' => $validated['booking_regulations'] ?? null,
             'address_id' => $address->id,
             'user_id' => Auth::id(),
+            'image' => $imagePath,
         ]);
 
         return redirect()->route('rooms.create', $restaurant->id)
@@ -91,7 +92,7 @@ class RestaurantController extends Controller
         $restaurant = Restaurant::findOrFail($id);
 
         if (!Gate::allows('restaurant-owner', $restaurant)) {
-             abort(403);
+            abort(403);
         }
 
         return view('restaurants.edit', compact('restaurant'));
@@ -100,7 +101,7 @@ class RestaurantController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(RestaurantRequest $request, $id)
     {
         $restaurant = Restaurant::findOrFail($id);
 
@@ -108,27 +109,27 @@ class RestaurantController extends Controller
             abort(403);
         }
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'booking_regulations' => 'nullable|string',
-            'street' => 'required|string|max:255',
-            'building_number' => 'required|string|max:20',
-            'city' => 'required|string|max:255',
-            'postal_code' => 'required|string|max:20',
-        ]);
+        $validated = $request->validated();
+
+        if ($request->hasFile('image')) {
+            if ($restaurant->image) {
+                Storage::disk('public')->delete($restaurant->image);
+            }
+            $path = $request->file('image')->store('restaurants', 'public');
+            $restaurant->image = $path;
+        }
 
         $restaurant->update([
-            'name' => $request->name,
-            'description' => $request->description,
-            'booking_regulations' => $request->booking_regulations,
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'booking_regulations' => $validated['booking_regulations'] ?? null,
         ]);
 
         $restaurant->address->update([
-            'city' => $request->city,
-            'street' => $request->street,
-            'postal_code' => $request->postal_code,
-            'building_number' => $request->building_number,
+            'city' => $validated['city'],
+            'street' => $validated['street'],
+            'postal_code' => $validated['postal_code'],
+            'building_number' => $validated['building_number'],
         ]);
 
         return redirect()->route('restaurants.index')
@@ -143,8 +144,13 @@ class RestaurantController extends Controller
         if (!Gate::allows('restaurant-owner', $restaurant)) {
             abort(403);
         }
-        if($restaurant->address) {
-             $restaurant->address->delete();
+
+        if ($restaurant->image) {
+            Storage::disk('public')->delete($restaurant->image);
+        }
+
+        if ($restaurant->address) {
+            $restaurant->address->delete();
         }
 
         $restaurant->delete();

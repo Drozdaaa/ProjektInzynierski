@@ -51,35 +51,62 @@
                     @endforeach
                 </select>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label">Rodzaje diet</label>
-                @foreach ($diets as $diet)
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="diets[]" value="{{ $diet->id }}"
-                            id="diet_{{ $diet->id }}"
-                            {{ in_array($diet->id, old('diets', [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="diet_{{ $diet->id }}">
-                            {{ $diet->name }}
-                        </label>
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Rodzaje diet (Opcjonalne)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                        @foreach ($diets as $diet)
+                            <div class="col">
+                                <input type="checkbox" class="btn-check" name="diets[]" value="{{ $diet->id }}"
+                                    id="diet_{{ $diet->id }}" autocomplete="off"
+                                    {{ in_array($diet->id, old('diets', [])) ? 'checked' : '' }}>
+                                <label
+                                    class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center text-center py-3"
+                                    for="diet_{{ $diet->id }}">
+                                    <span class="fw-bold mb-1">{{ $diet->name }}</span>
+                                    @if ($diet->description)
+                                        <small style="font-size: 1.0rem; opacity: 0.8;">
+                                            {{ $diet->description }}
+                                        </small>
+                                    @endif
+                                </label>
+                            </div>
+                        @endforeach
                     </div>
-                @endforeach
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Alergie</label>
-                @foreach ($allergies as $allergy)
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="allergies[]" value="{{ $allergy->id }}"
-                            id="allergy_{{ $allergy->id }}"
-                            {{ in_array($allergy->id, old('allergies', [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="allergy_{{ $allergy->id }}">
-                            {{ $allergy->name }}
-                        </label>
-                    </div>
-                @endforeach
-            </div>
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 text">Alergeny (Zaznacz jeśli występują)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                        @foreach ($allergies as $allergy)
+                            <div class="col">
+                                <input type="checkbox" class="btn-check" name="allergies[]" value="{{ $allergy->id }}"
+                                    id="allergy_{{ $allergy->id }}" autocomplete="off"
+                                    {{ in_array($allergy->id, old('allergies', [])) ? 'checked' : '' }}>
 
+                                <label
+                                    class="btn btn-outline-danger w-100 h-100 d-flex flex-column align-items-center justify-content-center text-center py-3"
+                                    for="allergy_{{ $allergy->id }}">
+
+                                    <span class="fw-bold mb-1">{{ $allergy->name }}</span>
+
+                                    @if ($allergy->description)
+                                        <small style="font-size: 1.0rem; opacity: 0.8;">
+                                            {{ $allergy->description }}
+                                        </small>
+                                    @endif
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
             <button type="submit" class="btn btn-primary">Dodaj danie</button>
             <a href="{{ route('menus.index') }}" class="btn btn-secondary">Wróć do zarządzania menu</a>
         </form>

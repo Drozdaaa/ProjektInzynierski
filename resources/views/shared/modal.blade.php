@@ -27,17 +27,59 @@
                             </h5>
 
                             @foreach ($menuItem->dishesByType ?? [] as $type => $dishes)
-                                <h6 class="mt-3">{{ $type }}</h6>
+                                <h6 class="mt-3 border-bottom pb-1">{{ $type }}</h6>
                                 <ul class="list-group mb-3">
                                     @foreach ($dishes as $dish)
                                         <li class="list-group-item text-start">
-                                            <strong>{{ $dish->name }}</strong> - {{ number_format($dish->price, 2) }}
-                                            zł<br>
-                                            {{ $dish->description }}<br>
-                                            <small>Diety:
-                                                {{ $dish->diets->pluck('name')->join(', ') ?: 'Brak' }}</small><br>
-                                            <small>Alergeny:
-                                                {{ $dish->allergies->pluck('name')->join(', ') ?: 'Brak' }}</small>
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <strong>{{ $dish->name }}</strong>
+                                                </div>
+                                                <span class="text-nowrap fw-bold">{{ number_format($dish->price, 2) }}
+                                                    zł</span>
+                                            </div>
+
+                                            <div class="mb-2 text-muted small">
+                                                {{ $dish->description }}
+                                            </div>
+                                            <div class="mb-1" style="font-size: 0.85rem;">
+                                                <span class="fw-bold">Diety:</span>
+                                                @if ($dish->diets->isEmpty())
+                                                    <span class="text-muted">Brak</span>
+                                                @else
+                                                    @foreach ($dish->diets as $diet)
+                                                        <br>
+                                                        <span class="d-inline-block me-1">
+                                                            <span
+                                                                class="text-success fw-semibold">{{ $diet->name }}</span>
+                                                            @if ($diet->description)
+                                                                <span
+                                                                    class="text-muted fst-italic">({{ $diet->description }})</span>
+                                                            @endif
+                                                            {{ !$loop->last ? ',' : '' }}
+                                                        </span>
+                                                    @endforeach
+                                                @endif
+                                            </div>
+                                            <div style="font-size: 0.85rem;">
+                                                <span class="fw-bold">Alergeny:</span>
+                                                @if ($dish->allergies->isEmpty())
+                                                    <span class="text-muted">Brak</span>
+                                                @else
+                                                    @foreach ($dish->allergies as $allergy)
+                                                        <br>
+                                                        <span class="d-inline-block me-1">
+                                                            <span
+                                                                class="text-danger fw-semibold">{{ $allergy->name }}</span>
+                                                            @if ($allergy->description)
+                                                                <span
+                                                                    class="text-muted fst-italic">({{ $allergy->description }})</span>
+                                                            @endif
+                                                            {{ !$loop->last ? ',' : '' }}
+                                                        </span>
+                                                    @endforeach
+                                                @endif
+                                            </div>
                                         </li>
                                     @endforeach
                                 </ul>

@@ -29,6 +29,8 @@ class RestaurantRequest extends FormRequest
             'city' => 'required|string|max:50',
             'postal_code' => 'required|string|max:6',
             'building_number' => 'required|integer|min:1',
+            'booking_regulations' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
     }
     public function messages(): array
@@ -51,6 +53,10 @@ class RestaurantRequest extends FormRequest
             'building_number.required' => 'Pole "Numer budynku" jest wymagane.',
             'building_number.integer' => 'Pole "Numer budynku" musi być liczbą całkowitą.',
             'building_number.min' => 'Pole "Numer budynku" musi być większe lub równe 1.',
+
+            'image.image' => 'Plik musi być poprawnym obrazem.',
+            'image.mimes' => 'Dozwolone formaty zdjęcia to: jpeg, png, jpg.',
+            'image.max' => 'Zdjęcie nie może być większe niż 2 MB. Zalecane wymiary: 1200x800 px (format poziomy).',
         ];
     }
 }

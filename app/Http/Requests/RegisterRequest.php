@@ -24,12 +24,20 @@ class RegisterRequest extends FormRequest
             'last_name' => [
                 'required',
                 'string',
-                'min:1',
+                'min:2',
                 'max:255',
-                'regex:/^[A-ZĄĆĘŁŃÓŚŻŹ][a-ząćęłńóśżź]+$/u',
+                'regex:/^[A-ZĄĆĘŁŃÓŚŻŹ][a-ząćęłńóśżź]+(-[A-ZĄĆĘŁŃÓŚŻŹ][a-ząćęłńóśżź]+)*$/u',
             ],
             'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|string|max:15|unique:users',
+            'phone' => [
+                'required',
+                'string',
+                'regex:/^\+?[0-9]+$/',
+                'max:9',
+                'min:9',
+                'unique:users',
+            ],
+
             'password' => [
                 'required',
                 'string',
@@ -46,11 +54,11 @@ class RegisterRequest extends FormRequest
     {
         return [
             'first_name.required' => 'Imię jest wymagane.',
-            'first_name.regex' => 'Imię musi zaczynać się wielką literą i zawierać tylko litery.',
+            'first_name.regex' => 'Imię musi zaczynać się wielką literą.',
             'first_name.min' => 'Imię musi mieć co najmniej :min znaki.',
 
             'last_name.required' => 'Nazwisko jest wymagane.',
-            'last_name.regex' => 'Nazwisko musi zaczynać się wielką literą i zawierać tylko litery.',
+            'last_name.regex' => 'Nazwisko musi zaczynać się wielką literą.',
 
             'email.required' => 'Email jest wymagany.',
             'email.email' => 'Podaj poprawny adres email.',

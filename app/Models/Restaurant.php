@@ -10,6 +10,7 @@ class Restaurant extends Model
         'name',
         'description',
         'booking_regulations',
+        'image',
         'address_id',
         'user_id'
     ];

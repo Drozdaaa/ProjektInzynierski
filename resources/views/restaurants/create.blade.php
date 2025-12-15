@@ -69,6 +69,12 @@
                     value="{{ old('postal_code') }}" required>
             </div>
 
+            <div class="mb-3">
+                <label for="image" class="form-label">Zdjęcie lokalu</label>
+                <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                <div class="form-text">Dozwolone formaty: jpg, png, jpeg. Max: 2MB.</div>
+            </div>
+
             <button type="submit" class="btn btn-primary">Dodaj restaurację</button>
             <a href="{{ route('users.manager-dashboard') }}" class="btn btn-secondary">Anuluj</a>
         </form>

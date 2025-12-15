@@ -2,8 +2,14 @@
     <div class="card mb-4 shadow-sm">
         <div class="row g-0">
             <div class="col-md-4">
-                <img src="..." class="img-fluid rounded-start h-100"
-                    style="object-fit: cover; min-height: 200px;" alt="{{ $restaurant->name }}">
+                @if ($restaurant->image)
+                    <img src="{{ asset('storage/' . $restaurant->image) }}" class="img-fluid rounded-start w-100"
+                        style="height: 250px; object-fit: cover; object-position: center;" alt="{{ $restaurant->name }}">
+                @else
+                    <img src="https://via.placeholder.com/600x400?text=Brak+zdjęcia"
+                        class="img-fluid rounded-start w-100 bg-light"
+                        style="height: 250px; object-fit: cover; object-position: center;" alt="{{ $restaurant->name }}">
+                @endif
             </div>
             <div class="col-md-8">
                 <div class="card-body h-100 d-flex flex-column">
@@ -21,8 +27,7 @@
                         </div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-3">
-                        <a href="{{ route('events.create', ['id' => $restaurant->id]) }}"
-                           class="btn btn-primary">
+                        <a href="{{ route('events.create', ['id' => $restaurant->id]) }}" class="btn btn-primary">
                             Rezerwuj teraz
                         </a>
                     </div>

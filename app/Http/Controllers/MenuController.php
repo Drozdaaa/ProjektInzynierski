@@ -20,15 +20,23 @@ class MenuController extends Controller
     {
         $restaurant = Restaurant::where('user_id', Auth::id())
             ->with('menus.dishes.dishType', 'menus.dishes.diets', 'menus.dishes.allergies')
-            ->firstOrFail();
+            ->first();
 
-        $restaurant->menus->transform(function ($menu) {
-            $menu->dishesByType = $menu->dishes->groupBy(fn($dish) => $dish->dishType->name);
-            return $menu;
+        if (!$restaurant) {
+            return view('menus.index', [
+                'restaurant' => null,
+            ]);
+        }
+
+        $restaurant->menus->each(function ($menu) {
+            $menu->dishesByType = $menu->dishes->groupBy(
+                fn($dish) => optional($dish->dishType)->name ?? 'Inne'
+            );
         });
 
         return view('menus.index', compact('restaurant'));
     }
+
 
     /**
      * Show the form for creating a new resource.

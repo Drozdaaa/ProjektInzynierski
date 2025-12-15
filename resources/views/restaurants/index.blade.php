@@ -17,10 +17,27 @@
                 data-bs-target="#editRestaurantModal">Edytuj dane</button>
         </div>
         <div class="card-body">
-            <h4 class="card-title">{{ $restaurant->name }}</h4>
-            <p class="card-text">{{ $restaurant->description ?? '-' }}</p>
-            <span>Regulamin rezerwacji</span><br>
-            {!! nl2br(e($restaurant->booking_regulations ?? 'Brak regulaminu')) !!}
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    @if ($restaurant->image)
+                        <img src="{{ asset('storage/' . $restaurant->image) }}" class="img-fluid rounded shadow-sm"
+                            alt="{{ $restaurant->name }}" style="object-fit: cover; width: 100%; max-height: 300px;">
+                    @else
+                        <img src="https://via.placeholder.com/400x300?text=Brak+zdjęcia" class="img-fluid rounded shadow-sm"
+                            alt="Brak zdjęcia">
+                    @endif
+                </div>
+
+                <div class="col-md-8">
+                    <h4 class="card-title">{{ $restaurant->name }}</h4>
+                    <p class="card-text">{{ $restaurant->description ?? '-' }}</p>
+                    <hr>
+                    <strong>Regulamin rezerwacji</strong><br>
+                    <div class="text-muted small mt-2">
+                        {!! nl2br(e($restaurant->booking_regulations ?? 'Brak regulaminu')) !!}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -44,11 +61,11 @@
                 onclick="openRoomModal('add')">Dodaj salę</button>
         </div>
         <div class="card-body">
-            @if ($restaurant->rooms->isEmpty())
+             @if ($restaurant->rooms->isEmpty())
                 <p>Brak dodanych sal.</p>
             @else
                 <table class="table table-striped align-middle text-center">
-                    <thead class="table-success">
+                     <thead class="table-success">
                         <tr>
                             <th>#</th>
                             <th>Nazwa sali</th>
@@ -92,9 +109,10 @@
 <div class="modal fade" id="editRestaurantModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="POST" action="{{ route('restaurants.update', $restaurant->id) }}">
+            <form method="POST" action="{{ route('restaurants.update', $restaurant->id) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
+                <input type="hidden" name="form_type" value="restaurant_edit">
 
                 <div class="modal-header">
                     <h5 class="modal-title">Edytuj dane restauracji i adres</h5>
@@ -105,6 +123,15 @@
                     <div class="mb-4">
                         <h6>Dane restauracji</h6>
                         <div class="mb-3">
+                            <label for="image" class="form-label">Zdjęcie lokalu</label>
+                            <input type="file" name="image" id="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
+                            <div class="form-text">Pozostaw puste, jeśli nie chcesz zmieniać obecnego zdjęcia.</div>
+                            @error('image')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
                             <label for="restaurant_name" class="form-label">Nazwa restauracji</label>
                             <input type="text" name="name" id="restaurant_name"
                                 class="form-control @error('name') is-invalid @enderror"
@@ -113,7 +140,8 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="mb-3">
+
+                         <div class="mb-3">
                             <label for="restaurant_description" class="form-label">Opis</label>
                             <textarea name="description" id="restaurant_description" class="form-control @error('description') is-invalid @enderror"
                                 rows="3">{{ old('description', $restaurant->description) }}</textarea>
@@ -186,7 +214,7 @@
 </div>
 
 <div class="modal fade" id="roomModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+      <div class="modal-dialog">
         <div class="modal-content">
             <form id="roomForm" method="POST">
                 @csrf
