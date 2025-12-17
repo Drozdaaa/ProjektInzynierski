@@ -59,9 +59,6 @@
             </ul>
             <ul id="navbar-user" class="navbar-nav mb-2 mb-lg-0">
                 @if (Auth::check())
-                    {{-- ZALOGOWANY UŻYTKOWNIK --}}
-
-                    {{-- Link do Profilu (wyświetla imię użytkownika) --}}
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('users.edit') ? 'active' : '' }}"
                             href="{{ route('users.edit', Auth::id()) }}">
@@ -69,14 +66,12 @@
                         </a>
                     </li>
 
-                    {{-- Link Wyloguj --}}
                     <li class="nav-item">
                         <a class="nav-link text-danger" href="{{ route('logout') }}">
                             Wyloguj się
                         </a>
                     </li>
                 @else
-                    {{-- NIEZALOGOWANY --}}
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}"
                             href="{{ route('login', !request()->routeIs('login') && !request()->routeIs('register') ? ['redirect_to' => url()->full()] : []) }}">

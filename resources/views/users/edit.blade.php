@@ -103,7 +103,6 @@
         </div>
     </div>
 
-    {{-- MODALE (bez zmian) --}}
     <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -214,7 +213,6 @@
         </div>
     </div>
 
-    {{-- Ten modal jest w kodzie, ale guzik wyżej używa zwykłego submit z confirm(). Zostawiam go, jeśli planujesz go użyć w JS. --}}
     <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -256,5 +254,3 @@
         </script>
     @endif
 </body>
-
-</html>

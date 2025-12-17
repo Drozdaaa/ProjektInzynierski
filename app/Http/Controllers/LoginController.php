@@ -24,37 +24,35 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
-            $user = Auth::user();
-
-            if (!$user->is_active) {
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-
-                return back()->withErrors([
-                    'login' => 'Twoje konto jest nieaktywne. Skontaktuj się z administratorem.',
-                ]);
-            }
-
-            if ($request->has('redirect_to')) {
-                return redirect($request->input('redirect_to'));
-            }
-
-            if ($user->role->name === 'Administrator') {
-                return redirect()->route('users.admin-dashboard');
-            } elseif ($user->role->name === 'Manager') {
-                return redirect()->route('users.manager-dashboard');
-            }
-
-            return redirect()->route('main.index');
+        if (!Auth::attempt($credentials)) {
+            return back()->withErrors([
+                'login' => 'Podany email lub hasło są nieprawidłowe.',
+            ])->onlyInput('email');
         }
 
-        return back()->withErrors([
-            'login' => 'Podany email lub hasło są nieprawidłowe.',
-        ])->onlyInput('email');
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+
+        if (!$user->is_active) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors([
+                'login' => 'Twoje konto jest nieaktywne. Skontaktuj się z administratorem.',
+            ]);
+        }
+
+        if ($user->role_id === 1) {
+            return redirect()->intended(route('users.admin-dashboard'));
+        }
+
+        if ($user->role_id === 3) {
+            return redirect()->intended(route('users.manager-dashboard'));
+        }
+
+        return redirect()->intended(route('main.index'));
     }
 
     public function logout(Request $request)

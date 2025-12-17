@@ -116,7 +116,9 @@
                 </div>
             </div>
 
-            @include('shared.menu-card')
+            @foreach ($event->menus as $menu)
+                <input type="hidden" name="menus_id[]" value="{{ $menu->id }}">
+            @endforeach
 
             <div class="mt-3 mb-5">
                 <button type="submit" class="btn btn-primary">Zapisz zmiany</button>

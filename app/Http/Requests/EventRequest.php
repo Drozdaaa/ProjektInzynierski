@@ -10,19 +10,11 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class EventRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -39,6 +31,7 @@ class EventRequest extends FormRequest
             'end_time' => 'required|date_format:H:i',
         ];
     }
+
     public function messages(): array
     {
         return [
@@ -52,7 +45,6 @@ class EventRequest extends FormRequest
             'event_type_id.required' => 'Musisz wybrać typ wydarzenia.',
             'event_type_id.exists' => 'Wybrany typ wydarzenia jest nieprawidłowy.',
             'menu_id.required' => 'Musisz wybrać menu.',
-            'menu_id.required_if' => 'Musisz wybrać menu',
             'menu_id.exists' => 'Wybrane menu jest nieprawidłowe.',
             'rooms.required' => 'Musisz wybrać co najmniej jedną salę.',
             'rooms.array' => 'Nieprawidłowy format danych sal.',
@@ -62,7 +54,6 @@ class EventRequest extends FormRequest
             'end_time.required' => 'Podaj godzinę zakończenia wydarzenia.',
             'end_time.date_format' => 'Nieprawidłowy format godziny zakończenia.',
             'end_time.after' => 'Godzina zakończenia musi być późniejsza niż rozpoczęcia.',
-
         ];
     }
 
@@ -107,9 +98,10 @@ class EventRequest extends FormRequest
 
             $start = Carbon::createFromFormat('H:i', $this->start_time);
             $end   = Carbon::createFromFormat('H:i', $this->end_time);
+            $eventId = $this->route('id');
 
             foreach ($this->rooms as $roomId) {
-                $conflictExists = Event::whereDate('date', $this->date)
+                $query = Event::whereDate('date', $this->date)
                     ->whereHas('rooms', function ($q) use ($roomId) {
                         $q->where('rooms.id', $roomId);
                     })
@@ -117,9 +109,13 @@ class EventRequest extends FormRequest
                         $q->where('start_time', '<', $end->format('H:i'))
                             ->where('end_time', '>', $start->format('H:i'));
                     })
-                    ->exists();
+                    ->where('status_id', '!=', 3);
 
-                if ($conflictExists) {
+                if ($eventId) {
+                    $query->where('id', '!=', $eventId);
+                }
+
+                if ($query->exists()) {
                     $validator->errors()->add(
                         'rooms',
                         'Jedna z wybranych sal jest już zajęta w podanym przedziale godzin.'
