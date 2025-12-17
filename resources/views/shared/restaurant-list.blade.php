@@ -6,9 +6,10 @@
                     <img src="{{ asset('storage/' . $restaurant->image) }}" class="img-fluid rounded-start w-100"
                         style="height: 250px; object-fit: cover; object-position: center;" alt="{{ $restaurant->name }}">
                 @else
-                    <img src="https://via.placeholder.com/600x400?text=Brak+zdjęcia"
-                        class="img-fluid rounded-start w-100 bg-light"
-                        style="height: 250px; object-fit: cover; object-position: center;" alt="{{ $restaurant->name }}">
+                    <div class="rounded-start w-100 bg-light d-flex align-items-center justify-content-center"
+                        style="height: 250px; background-color: #f0f0f0;">
+                        <span class="text-muted">Brak zdjęcia</span>
+                    </div>
                 @endif
             </div>
             <div class="col-md-8">

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use App\Models\Restaurant;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -105,8 +104,8 @@ class RestaurantController extends Controller
     {
         $restaurant = Restaurant::findOrFail($id);
 
-        if (!Gate::allows('restaurant-owner', $restaurant)) {
-            abort(403);
+        if (!Gate::allows('restaurant-owner', $restaurant) && !Gate::allows('is-admin')) {
+            abort(403, 'Brak uprawnień do edycji tego lokalu.');
         }
 
         $validated = $request->validated();
@@ -125,12 +124,31 @@ class RestaurantController extends Controller
             'booking_regulations' => $validated['booking_regulations'] ?? null,
         ]);
 
+        if (Gate::allows('is-admin') && $request->filled('user_id')) {
+            $adminData = $request->validate([
+                'user_id' => 'required|integer|exists:users,id'
+            ]);
+
+            if ($restaurant->user_id != $adminData['user_id']) {
+                $restaurant->menus()->update(['user_id' => $adminData['user_id']]);
+                $restaurant->events()->update(['manager_id' => $adminData['user_id']]);
+            }
+
+            $restaurant->user_id = $adminData['user_id'];
+            $restaurant->save();
+        }
+
         $restaurant->address->update([
             'city' => $validated['city'],
             'street' => $validated['street'],
             'postal_code' => $validated['postal_code'],
             'building_number' => $validated['building_number'],
         ]);
+
+        if (Gate::allows('is-admin')) {
+            return redirect()->route('users.admin-dashboard')
+                ->with('success', 'Dane restauracji zostały zaktualizowane przez Administratora.');
+        }
 
         return redirect()->route('restaurants.index')
             ->with('success', 'Dane restauracji zostały zaktualizowane.');
@@ -141,7 +159,7 @@ class RestaurantController extends Controller
      */
     public function destroy(Restaurant $restaurant)
     {
-        if (!Gate::allows('restaurant-owner', $restaurant)) {
+        if (!Gate::allows('restaurant-owner', $restaurant) && !Gate::allows('is-admin')) {
             abort(403);
         }
 
@@ -149,11 +167,22 @@ class RestaurantController extends Controller
             Storage::disk('public')->delete($restaurant->image);
         }
 
-        if ($restaurant->address) {
-            $restaurant->address->delete();
-        }
+        $address = $restaurant->address;
+
+        $restaurant->rooms()->delete();
+        $restaurant->menus()->delete();
+        $restaurant->events()->delete();
 
         $restaurant->delete();
+
+        if ($address) {
+            $address->delete();
+        }
+
+        if (Gate::allows('is-admin')) {
+            return redirect()->route('users.admin-dashboard')
+                ->with('success', 'Restauracja została usunięta przez Administratora.');
+        }
 
         return redirect()->route('users.manager-dashboard')
             ->with('success', 'Restauracja została usunięta.');

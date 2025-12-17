@@ -45,6 +45,12 @@ class EventController extends Controller
     public function create($id)
     {
         $restaurant = Restaurant::findOrFail($id);
+
+        if (!$restaurant->user->is_active) {
+            return redirect()->route('main.index')
+                ->with('error', 'Restauracja tymczasowo nie przyjmuje rezerwacji.');
+        }
+
         $eventTypes = EventType::all();
         $rooms = $restaurant->rooms;
 
@@ -67,6 +73,12 @@ class EventController extends Controller
         }
 
         $restaurant = Restaurant::findOrFail($id);
+
+        if (!$restaurant->user->is_active) {
+            return redirect()->route('main.index')
+                ->with('error', 'Nie można zrealizować rezerwacji. Restauracja jest niedostępna.');
+        }
+
         $action = $request->input('action');
 
         $event = Event::create([
@@ -206,7 +218,7 @@ class EventController extends Controller
             'start_time' => 'required',
             'end_time' => 'required',
             'restaurant_id' => 'required|exists:restaurants,id',
-            'exclude_event_id' => 'nullable|integer' 
+            'exclude_event_id' => 'nullable|integer'
         ]);
 
         $query = Event::where('restaurant_id', $request->restaurant_id)

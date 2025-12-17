@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\Event;
+use App\Models\Restaurant;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Exception;
 
 class UserController extends Controller
 {
@@ -144,18 +147,43 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        if ((int)$id !== Auth::id()) {
-            abort(403);
+        $user = User::findOrFail(Auth::id());
+
+        try {
+            DB::transaction(function () use ($user) {
+                if ($user->role_id === 2) {
+                    $hasActiveEvents = Event::where('user_id', $user->id)
+                        ->whereIn('status_id', [1, 2])
+                        ->exists();
+
+                    if ($hasActiveEvents) {
+                        throw new Exception(
+                            'Nie możesz usunąć konta, ponieważ posiadasz aktywne rezerwacje.'
+                        );
+                    }
+
+                    Event::where('user_id', $user->id)->delete();
+                    $user->delete();
+                }
+            });
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-        $user = User::findOrFail($id);
-        if ($user->restaurants) {
-            $user->restaurants->delete();
-        }
+
         Auth::logout();
-        $user->delete();
-        return redirect()->route('main.index')
-            ->with('success', 'Twoje konto zostało usunięte.');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        $userCheck = User::find($user->id);
+
+        if ($userCheck && $userCheck->is_active == 0) {
+            $message = 'Twoje konto zostało dezaktywowane (lokal posiada aktywne rezerwacje).';
+        } else {
+            $message = 'Twoje konto zostało trwale usunięte.';
+        }
+
+        return redirect()->route('main.index')->with('success', $message);
     }
 }

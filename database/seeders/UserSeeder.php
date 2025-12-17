@@ -21,6 +21,7 @@ class UserSeeder extends Seeder
                     'phone' => '123456789',
                     'email' => 'jan.kowalski@example.com',
                     'password' => Hash::make('haslo123'),
+                    'email_verified_at'=>'2025-12-15 20:47:38',
                     'role_id' => 1
                 ],
                 [
@@ -29,6 +30,7 @@ class UserSeeder extends Seeder
                     'phone' => '123455789',
                     'email' => 'piotr.kowalski@example.com',
                     'password' => Hash::make('haslo123'),
+                    'email_verified_at'=>'2025-12-15 20:47:38',
                     'role_id' => 2
                 ],
                 [
@@ -37,6 +39,7 @@ class UserSeeder extends Seeder
                     'phone' => '123455449',
                     'email' => 'pawel.kowalski@example.com',
                     'password' => Hash::make('haslo123'),
+                    'email_verified_at'=>'2025-12-15 20:47:38',
                     'role_id' => 3
                 ],
                 [
@@ -45,6 +48,7 @@ class UserSeeder extends Seeder
                     'phone' => '123459789',
                     'email' => 'admin@admin.com',
                     'password' => Hash::make('admin123'),
+                    'email_verified_at'=>'2025-12-15 20:47:38',
                     'role_id' => 1
                 ],
                 [
@@ -53,6 +57,7 @@ class UserSeeder extends Seeder
                     'phone' => '123456799',
                     'email' => 'manager@manager.com',
                     'password' => Hash::make('manager123'),
+                    'email_verified_at'=>'2025-12-15 20:47:38',
                     'role_id' => 3
                 ],
                 [
@@ -61,6 +66,7 @@ class UserSeeder extends Seeder
                     'phone' => '123422799',
                     'email' => 'user@user.com',
                     'password' => Hash::make('user123'),
+                    'email_verified_at'=>'2025-12-15 20:47:38',
                     'role_id' => 2
                 ],
             ]

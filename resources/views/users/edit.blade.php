@@ -13,9 +13,11 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        Wystąpiły błędy w formularzu. Sprawdź poprawność danych.
+
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
                 <div class="card shadow-sm mb-4">
@@ -68,15 +70,31 @@
                             </button>
                         </div>
                         <hr>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong class="text-danger">Usuwanie konta</strong>
-                                <p class="text-muted small mb-0">Ta operacja jest nieodwracalna. Wszystkie Twoje dane
-                                    zostaną usunięte.</p>
+                        <div class="card mt-5 border-danger">
+                            <div class="card-header bg-danger text-white">
+                                Strefa niebezpieczna
                             </div>
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                                Usuń konto
-                            </button>
+                            <div class="card-body">
+                                <h5 class="card-title">Usuwanie konta</h5>
+                                <p class="card-text">
+                                    @if (Auth::user()->role_id === 3)
+                                        Jeśli Twoja restauracja nie ma zaplanowanych wydarzeń, konto i lokal zostaną
+                                        usunięte.
+                                        W przeciwnym razie konto zostanie tylko dezaktywowane.
+                                    @else
+                                        Możesz usunąć konto tylko, jeśli nie masz aktywnych rezerwacji.
+                                    @endif
+                                </p>
+
+                                <form action="{{ route('users.destroy') }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger"
+                                        onclick="return confirm('Czy na pewno chcesz usunąć swoje konto? Tej operacji nie można cofnąć.')">
+                                        Usuń konto
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -85,6 +103,7 @@
         </div>
     </div>
 
+    {{-- MODALE (bez zmian) --}}
     <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -195,6 +214,7 @@
         </div>
     </div>
 
+    {{-- Ten modal jest w kodzie, ale guzik wyżej używa zwykłego submit z confirm(). Zostawiam go, jeśli planujesz go użyć w JS. --}}
     <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">

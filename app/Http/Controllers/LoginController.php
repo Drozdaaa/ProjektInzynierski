@@ -29,14 +29,23 @@ class LoginController extends Controller
 
             $user = Auth::user();
 
+            if (!$user->is_active) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'login' => 'Twoje konto jest nieaktywne. Skontaktuj się z administratorem.',
+                ]);
+            }
+
             if ($request->has('redirect_to')) {
                 return redirect($request->input('redirect_to'));
             }
 
-            if($user->role->name === 'Administrator'){
+            if ($user->role->name === 'Administrator') {
                 return redirect()->route('users.admin-dashboard');
-            }
-            elseif($user->role->name === 'Manager'){
+            } elseif ($user->role->name === 'Manager') {
                 return redirect()->route('users.manager-dashboard');
             }
 
@@ -55,5 +64,4 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
         return redirect()->route('main.index');
     }
-
 }

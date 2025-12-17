@@ -54,7 +54,7 @@ class RegisterRequest extends FormRequest
     {
         return [
             'first_name.required' => 'Imię jest wymagane.',
-            'first_name.regex' => 'Imię musi zaczynać się wielką literą.',
+            'first_name.regex' => 'Imię musi zaczynać się wielką literą i nie może zawierać cyfr i znaków specjalnych.',
             'first_name.min' => 'Imię musi mieć co najmniej :min znaki.',
 
             'last_name.required' => 'Nazwisko jest wymagane.',
@@ -66,6 +66,8 @@ class RegisterRequest extends FormRequest
 
             'phone.required' => 'Numer telefonu jest wymagany.',
             'phone.unique' => 'Ten numer telefonu jest już zajęty.',
+            'phone.max'=>'Numer telefonu musi mieć dokładnie 9 cyfr',
+            'phone.min'=>'Numer telefonu musi mieć dokładnie 9 cyfr',
 
             'password.required' => 'Hasło jest wymagane.',
             'password.min' => 'Hasło musi mieć co najmniej :min znaków.',
