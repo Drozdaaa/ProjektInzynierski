@@ -34,7 +34,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form class="menu-editor-form"
+                    <form class="menu-editor-form day-section"
                         action="{{ route('menus.user.update', ['event' => $event->id, 'menu' => $menu->id]) }}"
                         method="POST">
                         @csrf
@@ -43,7 +43,7 @@
                         <div class="mb-3">
                             <label for="price_{{ $menu->id }}" class="form-label fw-bold">Cena menu (zł)</label>
                             <input type="number" step="0.01" min="0" name="price"
-                                id="price_{{ $menu->id }}" class="form-control form-control-lg"
+                                id="price_{{ $menu->id }}" class="form-control form-control-lg day-price-input"
                                 value="{{ old('price', $menu->price) }}" required>
                         </div>
 
@@ -65,11 +65,13 @@
                                                     @include('shared.dish-card', [
                                                         'dish' => $dish,
                                                         'selected' => $selected,
-                                                        'menuId' => $menu->id,
+                                                        'uniqueSuffix' => '_menu_' . $menu->id,
+                                                        'inputName' => 'dishes[]',
                                                     ])
                                                 @empty
-                                                    <div class="col-12 text-muted fst-italic small">Brak dań w tej
-                                                        kategorii.</div>
+                                                    <div class="col-12 text-muted fst-italic small">
+                                                        Brak dań w tej kategorii.
+                                                    </div>
                                                 @endforelse
                                             </div>
                                         </td>

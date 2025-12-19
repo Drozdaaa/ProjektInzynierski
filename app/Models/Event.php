@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Event extends Model
 {
     protected $fillable = [
+        'reservation_id',
         'date',
         'start_time',
         'end_time',
@@ -46,14 +48,13 @@ class Event extends Model
         return $this->belongsTo(User::class, 'manager_id');
     }
 
-    public function menus()
+    public function menus(): BelongsToMany
     {
         return $this->belongsToMany(Menu::class, 'event_menu')
             ->withPivot('amount');
     }
 
-
-    public function rooms()
+    public function rooms(): BelongsToMany
     {
         return $this->belongsToMany(Room::class, 'event_room');
     }
@@ -61,7 +62,7 @@ class Event extends Model
     public function scopeFilterStatus($query, $status)
     {
         if ($status && $status !== 'all') {
-            $query->whereHas('status', fn($q) => $q->where('name', $status));
+            $query->whereHas('status', fn ($q) => $q->where('name', $status));
         }
         return $query;
     }

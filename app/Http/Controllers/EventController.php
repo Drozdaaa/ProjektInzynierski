@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Event;
 use App\Models\Status;
 use App\Models\EventType;
 use App\Models\Restaurant;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Requests\EventRequest;
 use Illuminate\Support\Facades\Auth;
-
 
 class EventController extends Controller
 {
@@ -76,40 +77,72 @@ class EventController extends Controller
 
         if (!$restaurant->user->is_active) {
             return redirect()->route('main.index')
-                ->with('error', 'Nie można zrealizować rezerwacji. Restauracja jest niedostępna.');
+                ->with('error', 'Restauracja jest niedostępna.');
         }
 
-        $action = $request->input('action');
+        $startDate = Carbon::parse($request->start_date);
+        $endDate = Carbon::parse($request->end_date);
 
-        $event = Event::create([
-            'date' => $request->date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'number_of_people' => $request->number_of_people,
-            'description' => $request->description,
-            'event_type_id' => $request->event_type_id,
-            'user_id' => Auth::id(),
-            'status_id' => 1,
-            'restaurant_id' => $restaurant->id,
-            'manager_id' => $restaurant->user_id,
-        ]);
-        $event->rooms()->sync($request->rooms);
+        $hours = $request->input('hours', []);
+        $roomsPerDay = $request->input('rooms', []);
+        $menusPerDay = $request->input('menus', []);
+        $peoplePerDay = $request->input('people', []);
+
+        $action = $request->input('action');
+        $reservationId = (string) Str::uuid7();
+        $createdEvents = [];
+
+        $dayCounter = 1;
+
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+            $dateString = $date->format('Y-m-d');
+
+            $startTime = $hours[$dateString]['start'] ?? '12:00';
+            $endTime = $hours[$dateString]['end'] ?? '20:00';
+            $dailyPeopleCount = $peoplePerDay[$dateString] ?? $request->number_of_people;
+
+            $description = $request->description;
+            if ($startDate->ne($endDate)) {
+                $description .= " (Dzień {$dayCounter})";
+            }
+
+            $event = Event::create([
+                'reservation_id' => $reservationId,
+                'date' => $dateString,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
+                'number_of_people' => $dailyPeopleCount,
+                'description' => $description,
+                'event_type_id' => $request->event_type_id,
+                'user_id' => Auth::id(),
+                'manager_id' => $restaurant->user_id,
+                'restaurant_id' => $restaurant->id,
+                'status_id' => 1,
+            ]);
+
+            if (!empty($roomsPerDay[$dateString])) {
+                $event->rooms()->sync($roomsPerDay[$dateString]);
+            }
+
+            if (!empty($menusPerDay[$dateString])) {
+                $event->menus()->sync($menusPerDay[$dateString]);
+            }
+            $createdEvents[] = $event;
+            $dayCounter++;
+        }
 
         if ($action === 'custom') {
             return redirect()->route('menus.user-create', [
                 'restaurant' => $restaurant->id,
-                'event' => $event->id
-            ])->with('info', 'Stwórz własne menu dla tego wydarzenia.');
+                'event' => $createdEvents[0]->id,
+            ])->with('info', 'Wydarzenia utworzone. Możesz teraz edytować menu.');
         }
 
-        $event->menus()->sync($request->menus_id);
-
         return redirect()->route('events.show', [
-            'restaurant' => $event->restaurant_id,
-            'event' => $event->id,
-        ])->with('success', 'Wydarzenie zostało utworzone.');
+            'restaurant' => $restaurant->id,
+            'event' => $createdEvents[0]->id,
+        ])->with('success', 'Rezerwacja została utworzona.');
     }
-
 
     /**
      * Display the specified resource.
@@ -119,17 +152,22 @@ class EventController extends Controller
         if ($event->restaurant_id !== $restaurant->id) {
             abort(404);
         }
+        $events = Event::where('reservation_id', $event->reservation_id)
+            ->orderBy('date')
+            ->orderBy('start_time')
+            ->with([
+                'eventType',
+                'status',
+                'restaurant.address',
+                'menus.dishes.dishType',
+                'rooms',
+                'menus.dishes.diets',
+            'menus.dishes.allergies',
+            ])
+            ->get();
 
-        $event->load([
-            'eventType',
-            'status',
-            'restaurant.address',
-            'menus.dishes.dishType',
-        ]);
-
-        return view('events.show', compact('event', 'restaurant'));
+        return view('events.show', compact('events', 'restaurant'));
     }
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -199,7 +237,7 @@ class EventController extends Controller
                     return [
                         'title' => $room->name . ' (' . $time . ')',
                         'start' => $event->date . 'T' . $event->start_time,
-                        'end'   => $event->date . 'T' . $event->end_time,
+                        'end' => $event->date . 'T' . $event->end_time,
                         'extendedProps' => [
                             'room' => $room->name,
                             'time' => $time,

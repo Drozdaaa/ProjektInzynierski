@@ -60,7 +60,7 @@
                             </td>
                             <td>{{ $event->number_of_people }}</td>
                             <td>{{ number_format($event->total_cost, 2, '.', '') }} zł</td>
-                            <td>{{ $event->description }}</td>
+                            <td class="description">{{ $event->description }}</td>
                             <td>
                                 @if ($event->menus->isNotEmpty())
                                     <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"

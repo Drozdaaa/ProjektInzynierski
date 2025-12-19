@@ -231,6 +231,10 @@
     }
 }
 
+.selected-range {
+    background-color: rgba(13, 110, 253, 0.2) !important;
+}
+
 .fc-daygrid-day.selected-from-input {
     background-color: rgba(51, 127, 240, 0.2);
 }

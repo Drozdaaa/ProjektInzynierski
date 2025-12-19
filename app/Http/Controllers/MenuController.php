@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DishType;
 use App\Models\Menu;
 use App\Models\User;
+use App\Models\Dish;
 use App\Models\Event;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
@@ -36,7 +37,6 @@ class MenuController extends Controller
 
         return view('menus.index', compact('restaurant'));
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -79,7 +79,6 @@ class MenuController extends Controller
         return redirect()->route('menus.index', ['restaurant' => $restaurant->id])
             ->with('success', 'Menu zostało utworzone.');
     }
-
 
     /**
      * Display a menu assigned to resource.
@@ -159,46 +158,84 @@ class MenuController extends Controller
             ->with(['dishType', 'diets', 'allergies'])
             ->get();
 
-        return view('menus.user-create', compact('restaurant', 'event', 'dishes'));
+        $events = Event::where('reservation_id', $event->reservation_id)
+            ->orderBy('date')
+            ->orderBy('start_time')
+            ->get();
+
+        return view('menus.user-create', compact('restaurant', 'event', 'dishes', 'events'));
     }
 
-    public function storeForUser(Request $request, Restaurant $restaurant, Event $event)
+    public function storeForUser(Request $request, Restaurant $restaurant)
     {
         $validated = $request->validate([
-            'price' => 'required|numeric|min:0',
-            'dishes' => 'required|array|min:1',
-            'dishes.*' => 'exists:dishes,id',
-        ], [
-            'dishes.required' => 'Musisz wybrać przynajmniej jedno danie.',
+            'menus' => 'required|array',
+            'menus.*.dishes' => 'nullable|array',
+            'menus.*.dishes.*' => 'exists:dishes,id',
         ]);
 
-        $menu = Menu::create([
-            'price' => $validated['price'],
-            'user_id' => Auth::id(),
-            'restaurant_id' => $restaurant->id,
-        ]);
+        $createdCount = 0;
+        $firstEventId = null;
 
-        $menu->dishes()->attach($validated['dishes']);
-        $event->menus()->attach($menu->id);
+        foreach ($validated['menus'] as $eventId => $data) {
+
+            if (empty($data['dishes'])) {
+                continue;
+            }
+
+            $event = Event::find($eventId);
+
+            if (!$event || $event->restaurant_id != $restaurant->id) {
+                continue;
+            }
+
+            if (!$firstEventId) {
+                $firstEventId = $event->id;
+            }
+
+            $dishes = Dish::whereIn('id', $data['dishes'])->get();
+            $totalPrice = $dishes->sum('price');
+
+            $menu = Menu::create([
+                'name' => 'Własne menu (' . $event->date . ')',
+                'price' => $totalPrice,
+                'user_id' => Auth::id(),
+                'restaurant_id' => $restaurant->id,
+                'is_custom' => true,
+            ]);
+
+            $menu->dishes()->attach($data['dishes']);
+            $event->menus()->attach($menu->id, ['amount' => 0]);
+
+            $createdCount++;
+        }
+
+        if ($createdCount === 0) {
+            return back()->withErrors(['msg' => 'Nie wybrano żadnych dań dla żadnego dnia.']);
+        }
+
+        $redirectEventId = $firstEventId ?? array_key_first($validated['menus']);
 
         if ($request->has('create_another')) {
             return redirect()
-                ->route('menus.user-create', [$restaurant->id, $event->id])
-                ->with('success', 'Menu zapisane. Możesz dodać kolejne.');
+                ->route('menus.user-create', [
+                    'restaurant' => $restaurant->id,
+                    'event' => $redirectEventId
+                ])
+                ->with('success', "Pomyślnie utworzono menu dla $createdCount dni. Możesz stworzyć kolejne.");
         }
 
         return redirect()
             ->route('events.show', [
                 'restaurant' => $restaurant->id,
-                'event' => $event->id
+                'event' => $redirectEventId
             ])
-            ->with('success', 'Menu zapisane i przypisane do wydarzenia.');
+            ->with('success', "Pomyślnie utworzono i przypisano menu dla $createdCount dni.");
     }
 
     public function editForUser(Event $event, Request $request)
     {
         $user = Auth::user();
-
         $isClient = $event->user_id === $user->id;
         $isManagerOrAdmin = Gate::allows('restaurant-owner', $event->restaurant);
 
@@ -227,10 +264,7 @@ class MenuController extends Controller
             return $type;
         });
 
-        $menus = $event->menus()->with('dishes')->get();
-
-        $menuId = $request->query('menu');
-        $menusToEdit = $menuId ? $menus->where('id', $menuId) : $menus;
+        $menusToEdit = $event->menus()->with('dishes')->get();
 
         return view('menus.user-edit', compact(
             'event',
@@ -260,6 +294,10 @@ class MenuController extends Controller
             abort(403, 'To menu nie jest przypisane do tego wydarzenia.');
         }
 
+        if ($menu->events()->count() > 1 || $menu->event_id === null) {
+            $menu = $this->cloneMenuForEvent($menu, $event);
+        }
+
         $validated = $request->validate([
             'price' => 'required|numeric|min:0',
             'dishes' => 'required|array|min:1',
@@ -269,6 +307,7 @@ class MenuController extends Controller
         $menu->update([
             'price' => $validated['price']
         ]);
+
         $menu->dishes()->sync($validated['dishes']);
 
         $msg = $isManagerOrAdmin
@@ -281,36 +320,57 @@ class MenuController extends Controller
         ])->with('success', $msg);
     }
 
-    public function updateAmounts(Request $request, $restaurantId, Event $event)
+    public function updateAmounts(Request $request, $restaurantId, $firstEventId)
     {
-        $validated = $request->validate([
+        $request->validate([
             'amounts' => 'required|array',
-            'amounts.*' => 'required|integer|min:0|max:' . $event->number_of_people,
-        ], [
-            'amounts.*.max' => 'Liczba porcji nie może być większa niż liczba uczestników wydarzenia.',
+            'amounts.*' => 'array',
+            'amounts.*.*' => 'required|integer|min:0',
         ]);
+        foreach ($request->amounts as $eventId => $menusData) {
+            $event = Event::find($eventId);
 
-        $totalAssigned = array_sum($validated['amounts']);
+            if (!$event || $event->restaurant_id != $restaurantId) {
+                continue;
+            }
+            $dailyTotal = array_sum($menusData);
 
-        if ($totalAssigned !== $event->number_of_people) {
-            return redirect()
-                ->back()
-                ->withErrors(['amounts' => 'Suma wszystkich porcji musi być równa liczbie uczestników wydarzenia (' . $event->number_of_people . ').'])
-                ->withInput();
+            if ($dailyTotal !== $event->number_of_people) {
+                return redirect()
+                    ->back()
+                    ->withErrors(['amounts' => "Błąd w dniu {$event->date}: Suma porcji ($dailyTotal) musi być równa liczbie gości ({$event->number_of_people})."])
+                    ->withInput();
+            }
+            foreach ($menusData as $menuId => $amount) {
+                $event->menus()->updateExistingPivot($menuId, ['amount' => $amount]);
+            }
         }
-
-        foreach ($validated['amounts'] as $menuId => $amount) {
-            $event->menus()->updateExistingPivot($menuId, ['amount' => $amount]);
-        }
-
         $user = Auth::user();
-
-        if ($user->role_id === 2) {
+        if ((int)$user->role_id === 2) {
             return redirect()->route('users.user-dashboard')
                 ->with('success', 'Liczba porcji została zaktualizowana.');
         }
 
         return redirect()->route('users.manager-dashboard')
             ->with('success', 'Liczba porcji została zaktualizowana przez managera.');
+    }
+
+    private function cloneMenuForEvent(Menu $menu, Event $event): Menu
+    {
+        $newMenu = Menu::create([
+            'price' => $menu->price,
+            'user_id' => Auth::id(),
+            'restaurant_id' => $menu->restaurant_id,
+            'event_id' => $event->id,
+        ]);
+
+        $newMenu->dishes()->sync(
+            $menu->dishes->pluck('id')->toArray()
+        );
+
+        $event->menus()->detach($menu->id);
+        $event->menus()->attach($newMenu->id);
+
+        return $newMenu;
     }
 }

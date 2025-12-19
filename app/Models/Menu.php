@@ -32,4 +32,9 @@ class Menu extends Model
     {
         return $this->belongsTo(Restaurant::class);
     }
+
+    public function isShared(): bool
+    {
+        return $this->events()->count() > 1 || is_null($this->event_id);
+    }
 }

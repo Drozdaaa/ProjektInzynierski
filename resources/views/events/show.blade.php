@@ -4,87 +4,132 @@
 <body>
     @include('shared.navbar')
 
-    <div class="container mt-5 d-flex justify-content-center">
+    <div class="container mt-5 d-flex justify-content-center mb-5">
         <div class="card shadow" style="max-width: 1000px; width: 100%;">
-            <div class="card-header bg-primary text-white">
-                Wydarzenie {{ $event->eventType->name }}
+
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <span>Wydarzenie: {{ $events->first()->eventType->name }}</span>
             </div>
+
             <div class="card-body">
-                <h5 class="card-title">{{ $event->eventType->name ?? 'Brak typu' }}</h5>
-                <p class="card-text mb-2">
-                    <strong>Opis:</strong> {{ $event->description }} <br>
-                    <strong>Data:</strong> {{ $event->date }} <br>
-                    <strong>Liczba osób:</strong> {{ $event->number_of_people }} <br>
-                    <strong>Status:</strong> {{ $event->status->name ?? 'Nieznany' }}
-                </p>
 
-                <h5 class="mt-3">Restauracja</h5>
-                <p class="card-text mb-2">
-                    <strong>{{ $event->restaurant->name }}</strong><br>
-                    {{ $event->restaurant->description }} <br>
-                    <small>
-                        {{ $event->restaurant->address->street }}
-                        {{ $event->restaurant->address->building_number }},
-                        {{ $event->restaurant->address->postal_code }}
-                        {{ $event->restaurant->address->city }}
-                    </small>
-                </p>
+                <div class="row mb-4 border-bottom pb-3">
+                    <div class="col-md-6">
+                        <h5 class="text-primary">Restauracja</h5>
+                        <strong>{{ $restaurant->name }}</strong><br>
+                        <span class="text-muted">{{ $restaurant->description }}</span><br>
+                        <small>
+                            {{ $restaurant->address->street }} {{ $restaurant->address->building_number }},
+                            {{ $restaurant->address->postal_code }} {{ $restaurant->address->city }}
+                        </small>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <h5 class="text-primary">Podsumowanie</h5>
+                        <p class="mb-1">Całkowita liczba dni: <strong>{{ $events->count() }}</strong></p>
+                        <p class="mb-1">Data startu: <strong>{{ $events->first()->date }}</strong></p>
+                    </div>
+                </div>
 
-                @if ($event->menus->isNotEmpty())
-                    <h5 class="mt-3">Menu dla wydarzenia</h5>
+                <form action="{{ route('menus.update-amounts', [$restaurant->id, $events->first()->id]) }}"
+                    method="POST">
+                    @csrf
 
-                    <form action="{{ route('menus.update-amounts', [$event->restaurant->id, $event->id]) }}"
-                        method="POST">
-                        @csrf
-                        @foreach ($event->menus as $menu)
-                            <div class="mb-4 border p-3 rounded">
+                    @foreach ($events as $index => $dayEvent)
+                        <div class="card mb-4 border-primary">
+                            <div class="card-header bg-light fw-bold text-primary">
+                                Dzień {{ $index + 1 }} <span class="text-muted fw-normal mx-2">|</span>
+                                {{ $dayEvent->date }}
+                            </div>
+                            <div class="card-body">
 
-                                <p><strong>Cena menu:</strong> {{ $menu->price }} zł</p>
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><strong>Godziny:</strong>
+                                        {{ substr($dayEvent->start_time, 0, 5) }} -
+                                        {{ substr($dayEvent->end_time, 0, 5) }}</div>
+                                    <div class="col-md-4"><strong>Liczba osób:</strong>
+                                        {{ $dayEvent->number_of_people }}</div>
+                                    <div class="col-md-4"><strong>Opis:</strong> {{ $dayEvent->description }}</div>
+                                </div>
 
-                                <div class="mb-2">
-                                    @if ($event->menus->count() > 1)
-                                        <label class="form-label">
-                                            Ile osób ma dostać to menu:
-                                        </label>
-                                        <input type="number" name="amounts[{{ $menu->id }}]" class="form-control"
-                                            value="{{ $menu->pivot->amount }}">
+                                <div class="mb-3">
+                                    <strong class="text-secondary">Sale:</strong>
+                                    @if ($dayEvent->rooms->isNotEmpty())
+                                        @foreach ($dayEvent->rooms as $room)
+                                            <span class="badge bg-secondary me-1">{{ $room->name }}</span>
+                                        @endforeach
                                     @else
-                                        <input type="hidden" name="amounts[{{ $menu->id }}]" class="form-control"
-                                            value="{{ $event->number_of_people }}" readonly>
+                                        <span class="text-muted small">Brak</span>
                                     @endif
                                 </div>
 
-                                <ul class="list-group mt-3">
-                                    @foreach ($menu->dishes as $dish)
-                                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <strong>{{ $dish->name }}</strong><br>
-                                                {{ $dish->description }}<br>
-                                                <small>{{ $dish->dishType->name ?? 'Inne' }}</small>
+                                <hr>
+
+                                <h5 class="text-secondary mt-3 mb-3">Menu</h5>
+
+                                @if ($dayEvent->menus->isNotEmpty())
+                                    @foreach ($dayEvent->menus as $menu)
+                                        <div class="border rounded p-3 mb-3 bg-white shadow-sm">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="fw-bold fs-5">{{ $menu->name }}</span>
+                                                <span class="badge bg-success">{{ $menu->price }} zł / os.</span>
                                             </div>
-                                            <span>{{ $dish->price }} zł</span>
-                                        </li>
+
+                                            @if ($dayEvent->menus->count() > 1)
+                                                <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
+                                                    <label class="fw-bold me-2 mb-0">Liczba porcji dla tego
+                                                        menu:</label>
+                                                    <input type="number"
+                                                        name="amounts[{{ $dayEvent->id }}][{{ $menu->id }}]"
+                                                        class="form-control border-primary" style="width: 100px;"
+                                                        value="{{ $menu->pivot->amount > 0 ? $menu->pivot->amount : '' }}"
+                                                        placeholder="0" min="0" required>
+                                                </div>
+                                            @else
+                                                <input type="hidden"
+                                                    name="amounts[{{ $dayEvent->id }}][{{ $menu->id }}]"
+                                                    value="{{ $dayEvent->number_of_people }}">
+                                            @endif
+
+                                            <ul class="list-group list-group-flush small">
+                                                @foreach ($menu->dishes as $dish)
+                                                    <li class="list-group-item px-0 py-1 border-0">
+                                                        <strong>{{ $dish->name }}</strong> -
+                                                        {{ $dish->description }}
+                                                        <span
+                                                            class="badge bg-secondary rounded-pill ms-1">{{ $dish->dishType->name ?? '' }}</span>
+
+                                                        <div class="mt-1">
+                                                            @foreach ($dish->diets as $diet)
+                                                                <span class="badge bg-success bg-opacity-75"
+                                                                    style="font-size: 0.65rem;">{{ $diet->name }}</span>
+                                                            @endforeach
+                                                            @foreach ($dish->allergies as $allergen)
+                                                                <span class="badge bg-warning text-dark"
+                                                                    style="font-size: 0.65rem;">{{ $allergen->name }}</span>
+                                                            @endforeach
+                                                        </div>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
                                     @endforeach
-                                </ul>
+                                @else
+                                    <div class="alert alert-warning py-2">Brak wybranego menu na ten dzień.</div>
+                                @endif
 
                             </div>
-                        @endforeach
-
-                        <div class="text-center mt-3">
-                            <button type="submit" class="btn btn-primary">
-                                Zapisz menu
-                            </button>
                         </div>
+                    @endforeach
 
-                    </form>
-                @else
-                    <p class="text-muted mt-2">Brak przypisanego menu do tego wydarzenia.</p>
-                    <div class="text-center mt-3">
-                        <button type="submit" class="btn btn-primary">
-                            Kontynuuj
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <button type="submit" class="btn btn-primary btn-md">
+                            Zapisz zmiany dla wszystkich dni
                         </button>
+                        <a href="{{ route('users.user-dashboard') }}" class="btn btn-secondary btn-md">
+                            Przejdź do panelu użytkownika
+                        </a>
                     </div>
-                @endif
+                </form>
             </div>
         </div>
     </div>

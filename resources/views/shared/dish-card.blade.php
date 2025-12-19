@@ -1,6 +1,9 @@
 <div class="col-md-3">
     <div class="card dish-card {{ !empty($selected) && $selected ? 'selected' : '' }}"
-        data-dish-id="{{ $dish->id }}" data-price="{{ $dish->price }}" style="cursor: pointer;">
+        data-dish-id="{{ $dish->id }}"
+        data-price="{{ $dish->price }}"
+        style="cursor: pointer;">
+
         <div class="card-body">
             <h5 class="card-title">{{ $dish->name }}</h5>
             <p class="card-text mb-1">{{ $dish->description }}</p>
@@ -25,11 +28,15 @@
         </div>
 
         <div class="card-footer">
-            <div class="form-check">
-                <input class="form-check-input dish-checkbox" type="checkbox" name="dishes[]"
-                    value="{{ $dish->id }}" id="dish_check_{{ $dish->id }}"
-                    {{ !empty($selected) && $selected ? 'checked' : '' }}>
-                <label class="form-check-label" for="dish_check_{{ $dish->id }}">
+            <div class="form-check pointer-events-none">
+                <input class="form-check-input dish-checkbox"
+                       type="checkbox"
+                       name="{{ $inputName ?? 'dishes[]' }}"
+                       value="{{ $dish->id }}"
+                       id="dish_check_{{ $dish->id }}{{ $uniqueSuffix ?? '' }}"
+                       {{ !empty($selected) && $selected ? 'checked' : '' }}>
+
+                <label class="form-check-label" for="dish_check_{{ $dish->id }}{{ $uniqueSuffix ?? '' }}">
                     Zaznacz
                 </label>
             </div>
