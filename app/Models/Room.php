@@ -11,6 +11,7 @@ class Room extends Model
         'capacity',
         'description',
         'price',
+        'cleaning_duration',
         'restaurant_id',
     ];
 

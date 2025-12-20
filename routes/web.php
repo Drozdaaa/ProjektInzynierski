@@ -164,6 +164,7 @@ Route::controller(EventController::class)->group(function () {
     Route::get('/restaurants/{id}/events/create', 'create')->name('events.create');
     Route::get('/restaurants/{restaurant}/events-calendar', 'calendar')->name('events.calendar');
     Route::get('/events/busy-rooms', 'busyRooms')->name('events.busy-rooms');
+    Route::get('/events/{event}/compare', 'compare')->name('events.compare');
 
     Route::middleware(['auth', 'prevent-back-history'])->group(function () {
         Route::get('/restaurants/{restaurant}/events/{event}', 'show')->name('events.show');

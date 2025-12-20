@@ -1,89 +1,118 @@
 document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
+    if (!calendarEl) return;
+
     const startDateInput = document.getElementById('start_date');
     const endDateInput = document.getElementById('end_date');
+    const singleDateInput = document.getElementById('date');
+
+    const isRangeMode = !!(startDateInput && endDateInput);
+    const isSingleMode = !!singleDateInput;
 
     let initialView = window.innerWidth < 576 ? 'listWeek' : 'dayGridMonth';
 
+    let initialDate = new Date();
+    if (isSingleMode && singleDateInput.value) {
+        initialDate = singleDateInput.value;
+    } else if (isRangeMode && startDateInput.value) {
+        initialDate = startDateInput.value;
+    }
+
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: initialView,
+        initialDate: initialDate,
+
         locale: 'pl',
-        height: 550,
         firstDay: 1,
+
+        height: 'auto',
+        expandRows: true,
+
         headerToolbar: {
             left: 'title',
             right: 'prevYear,prev,next,nextYear today resetDates',
         },
+
+        buttonText: {
+            today: 'Dziś',
+            month: 'Miesiąc',
+            week: 'Tydzień',
+            list: 'Lista',
+        },
+
         customButtons: {
-            prevYear: { text: '<<', click: () => calendar.incrementDate({ years: -1 }) },
-            nextYear: { text: '>>', click: () => calendar.incrementDate({ years: 1 }) },
+            prevYear: {
+                text: '<<',
+                click: () => calendar.incrementDate({ years: -1 }),
+            },
+            nextYear: {
+                text: '>>',
+                click: () => calendar.incrementDate({ years: 1 }),
+            },
             resetDates: {
                 text: 'Wyczyść daty',
                 click: function () {
-                    if (startDateInput) startDateInput.value = '';
-                    if (endDateInput) endDateInput.value = '';
-
-                    triggerChangeEvent(startDateInput);
-                    triggerChangeEvent(endDateInput);
-
+                    if (isRangeMode) {
+                        startDateInput.value = '';
+                        endDateInput.value = '';
+                        triggerChange(startDateInput);
+                        triggerChange(endDateInput);
+                    }
+                    if (isSingleMode) {
+                        singleDateInput.value = '';
+                        triggerChange(singleDateInput);
+                    }
                     highlightSelectedRange();
-                }
-            }
+                },
+            },
         },
-        events: window.calendarUrl,
+
+        events: window.calendarUrl || [],
+
         eventColor: '#dc3545',
         displayEventTime: false,
+
         eventContent: function (arg) {
             return {
-                html: `<div style="font-size:0.75rem"><strong>${arg.event.title}</strong></div>`
+                html: `<div style="font-size:0.75rem"><strong>${arg.event.title}</strong></div>`,
             };
         },
-        eventDidMount: function (info) {
-            if (info.event.extendedProps?.room) {
-                info.el.setAttribute(
-                    'title',
-                    `Sala: ${info.event.extendedProps.room}\nGodzina: ${info.event.extendedProps.time}`
-                );
+
+        dateClick: function (info) {
+            if (isRangeMode) {
+                handleRangeSelection(info.dateStr);
+            } else if (isSingleMode) {
+                handleSingleSelection(info.dateStr);
             }
         },
-        dateClick: function (info) {
-            handleDateSelection(info.dateStr);
-        },
+
         datesSet: function () {
             highlightSelectedRange();
-        }
+        },
     });
 
     calendar.render();
 
-    function triggerChangeEvent(element) {
-        if (element) {
-            element.dispatchEvent(new Event('change'));
-        }
+    // 🔑 Bootstrap / layout fix
+    requestAnimationFrame(() => {
+        calendar.updateSize();
+    });
+
+    // -----------------------
+    // Helpers
+    // -----------------------
+
+    function triggerChange(el) {
+        if (el) el.dispatchEvent(new Event('change'));
     }
 
-    if (startDateInput) {
-        startDateInput.addEventListener('change', function () {
-            if (endDateInput.value && endDateInput.value < this.value) {
-                endDateInput.value = this.value;
-                triggerChangeEvent(endDateInput);
-            }
-            if (this.value) calendar.gotoDate(this.value);
-            highlightSelectedRange();
-        });
+    function handleSingleSelection(dateStr) {
+        singleDateInput.value = dateStr;
+        triggerChange(singleDateInput);
+        highlightSelectedRange();
     }
 
-    if (endDateInput) {
-        endDateInput.addEventListener('change', function () {
-            if (startDateInput.value && startDateInput.value > this.value) {
-                startDateInput.value = this.value;
-                triggerChangeEvent(startDateInput);
-            }
-            highlightSelectedRange();
-        });
-    }
-
-    function handleDateSelection(dateStr) {
+    function handleRangeSelection(dateStr) {
         if (!startDateInput.value) {
             startDateInput.value = dateStr;
             endDateInput.value = dateStr;
@@ -97,30 +126,67 @@ document.addEventListener('DOMContentLoaded', function () {
             endDateInput.value = dateStr;
         }
 
-        triggerChangeEvent(startDateInput);
-        triggerChangeEvent(endDateInput);
-
+        triggerChange(startDateInput);
+        triggerChange(endDateInput);
         highlightSelectedRange();
     }
 
-    function highlightSelectedRange() {
-        document.querySelectorAll('.fc-daygrid-day').forEach(el => {
-            el.classList.remove('selected-range');
+    if (isRangeMode) {
+        startDateInput.addEventListener('change', function () {
+            if (endDateInput.value && endDateInput.value < this.value) {
+                endDateInput.value = this.value;
+                triggerChange(endDateInput);
+            }
+            if (this.value) calendar.gotoDate(this.value);
+            highlightSelectedRange();
         });
 
-        if (!startDateInput.value || !endDateInput.value) return;
+        endDateInput.addEventListener('change', function () {
+            if (startDateInput.value && startDateInput.value > this.value) {
+                startDateInput.value = this.value;
+                triggerChange(startDateInput);
+            }
+            highlightSelectedRange();
+        });
+    }
 
-        let start = new Date(startDateInput.value);
-        let end = new Date(endDateInput.value);
-        start.setHours(0,0,0,0);
-        end.setHours(0,0,0,0);
+    if (isSingleMode) {
+        singleDateInput.addEventListener('change', function () {
+            if (this.value) calendar.gotoDate(this.value);
+            highlightSelectedRange();
+        });
+    }
+
+    function highlightSelectedRange() {
+        document.querySelectorAll('.fc-daygrid-day').forEach(el =>
+            el.classList.remove('selected-range')
+        );
+
+        let start, end;
+
+        if (isRangeMode) {
+            if (!startDateInput.value || !endDateInput.value) return;
+            start = new Date(startDateInput.value);
+            end = new Date(endDateInput.value);
+        } else if (isSingleMode) {
+            if (!singleDateInput.value) return;
+            start = new Date(singleDateInput.value);
+            end = new Date(singleDateInput.value);
+        } else {
+            return;
+        }
+
+        start.setHours(0, 0, 0, 0);
+        end.setHours(0, 0, 0, 0);
 
         document.querySelectorAll('.fc-daygrid-day').forEach(el => {
-            let cellDate = new Date(el.dataset.date);
-            cellDate.setHours(0,0,0,0);
+            const cellDate = new Date(el.dataset.date);
+            cellDate.setHours(0, 0, 0, 0);
             if (cellDate >= start && cellDate <= end) {
                 el.classList.add('selected-range');
             }
         });
     }
+
+    highlightSelectedRange();
 });

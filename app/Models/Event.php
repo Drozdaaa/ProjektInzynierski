@@ -14,6 +14,7 @@ class Event extends Model
         'end_time',
         'number_of_people',
         'description',
+        'original_data',
         'status_id',
         'event_type_id',
         'restaurant_id',
@@ -66,4 +67,8 @@ class Event extends Model
         }
         return $query;
     }
+
+    protected $casts = [
+        'original_data' => 'array',
+    ];
 }

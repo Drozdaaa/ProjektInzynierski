@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Models\Event;
 use App\Models\Restaurant;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
@@ -53,6 +54,17 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('create-custom-menu', function (User $user) {
             return $user->isUser() || $user->isAdmin() || $user->isManager();
+        });
+
+        Gate::define('manage-event', function (User $user, Event $event) {
+            if (Gate::allows('restaurant-owner', $event->restaurant)) {
+                return true;
+            }
+            if ($user->id === $event->user_id && $event->status->name === 'Oczekujące') {
+                return true;
+            }
+
+            return false;
         });
     }
 }

@@ -47,13 +47,20 @@ class RoomController extends Controller
             'capacity' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string|max:255',
+            'cleaning_hours' => 'nullable|integer|min:0',
+            'cleaning_minutes' => 'nullable|integer|min:0|max:59',
         ]);
+
+        $hours = $request->input('cleaning_hours', 0);
+        $minutes = $request->input('cleaning_minutes', 0);
+        $totalDuration = ($hours * 60) + $minutes;
 
         $restaurant->rooms()->create([
             'name' => $request->name,
             'capacity' => $request->capacity,
             'price' => $request->price,
             'description' => $request->description,
+            'cleaning_duration' => $totalDuration,
         ]);
 
         return redirect()->back();
@@ -93,12 +100,19 @@ class RoomController extends Controller
             'name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
             'description' => 'nullable|string|max:255',
+            'cleaning_hours' => 'nullable|integer|min:0',
+            'cleaning_minutes' => 'nullable|integer|min:0|max:59',
         ]);
+
+        $hours = $request->input('cleaning_hours', 0);
+        $minutes = $request->input('cleaning_minutes', 0);
+        $totalDuration = ($hours * 60) + $minutes;
 
         $room->update([
             'name' => $request->name,
             'capacity' => $request->capacity,
             'description' => $request->description,
+            'cleaning_duration' => $totalDuration,
         ]);
 
         return redirect()->route('restaurants.index')

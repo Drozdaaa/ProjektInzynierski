@@ -30,6 +30,7 @@
                         <th>Koszt</th>
                         <th>Opis</th>
                         <th>Menu</th>
+                        <th>Akcje</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -63,28 +64,43 @@
                             <td class="description">{{ $event->description }}</td>
                             <td>
                                 @if ($event->menus->isNotEmpty())
-                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#menuDetailsModal{{ $event->id }}">
-                                        Szczegóły
-                                    </button>
+                                    <div class="d-flex flex-column gap-1">
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#menuDetailsModal{{ $event->id }}">
+                                            Szczegóły
+                                        </button>
+                                    </div>
 
                                     @include('shared.modal', ['event' => $event])
-
-                                    @if ($event->status->name === 'Oczekujące')
-                                        <a href="{{ route('menus.user.edit', ['event' => $event->id, 'menu' => $event->menus->first()->id]) }}"
-                                            class="btn btn-sm btn-info">
-                                            Edytuj menu
-                                        </a>
-                                    @endif
                                 @else
-                                    @if ($event->status->name === 'Oczekujące')
-                                        <a href="{{ route('menus.user-create', ['restaurant' => $event->restaurant_id, 'event' => $event->id]) }}"
-                                            class="btn btn-sm btn-success">
-                                            Utwórz menu
-                                        </a>
+                                    @if (Gate::allows('manage-event', $event))
+                                        <div class="d-flex flex-column gap-1">
+                                            <a href="{{ route('menus.user-create', ['restaurant' => $event->restaurant_id, 'event' => $event->id]) }}"
+                                                class="btn btn-sm btn-success">
+                                                Utwórz menu
+                                            </a>
+                                        </div>
                                     @endif
                                 @endif
                             </td>
+                            <td>
+                                <div class="d-flex flex-column gap-1 align-items-center">
+                                    @if ($event->original_data)
+                                        <a href="{{ route('events.compare', $event->id) }}"
+                                            class="btn btn-sm btn-outline-secondary text-nowrap w-100"
+                                            title="Porównaj zmiany z oryginałem"> Zmiany
+                                        </a>
+                                    @endif
+
+                                    @if (Gate::allows('manage-event', $event))
+                                        <a href="{{ route('events.edit', $event->id) }}"
+                                            class="btn btn-sm btn-warning w-100 text-nowrap">
+                                            Edytuj
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+
                             <td>
                                 <span
                                     class="badge
@@ -98,7 +114,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="text-center text-muted py-4">Brak wydarzeń.</td>
+                            <td colspan="11" class="text-center text-muted py-4">Brak wydarzeń.</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->time('end_time')->nullable();
             $table->integer('number_of_people')->nullable();
             $table->string('description')->nullable();
+            $table->json('original_data')->nullable();
             $table->foreignId('status_id')->constrained('statuses')->onDelete('cascade');
             $table->foreignId('event_type_id')->constrained('event_types')->onDelete('cascade');
             $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');

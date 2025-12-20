@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
             header.classList.remove('bg-light');
             header.classList.add('bg-secondary', 'text-white');
             header.innerHTML =
-                '<h5 class="mb-0"><i class="bi bi-info-circle me-2"></i> Podgląd oferty</h5>';
+                '<h5 class="mb-0">Podgląd oferty</h5>';
         }
 
         clone.querySelectorAll('input, select, button').forEach(el => {

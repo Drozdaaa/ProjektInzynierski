@@ -167,12 +167,21 @@
                     @endforeach
 
                     <div class="d-flex justify-content-center gap-3 mt-4">
-                        <button type="submit" class="btn btn-primary btn-md">
-                            Zapisz zmiany dla wszystkich dni
-                        </button>
-                        <a href="{{ route('users.user-dashboard') }}" class="btn btn-secondary btn-md">
-                            Przejdź do panelu użytkownika
-                        </a>
+                        @php
+                            $hasAnyMenu = $events->contains(function ($dayEvent) {
+                                return $dayEvent->menus->isNotEmpty();
+                            });
+                        @endphp
+
+                        @if ($hasAnyMenu)
+                            <button type="submit" class="btn btn-primary btn-md">
+                                Zapisz menu
+                            </button>
+                        @else
+                            <a href="{{ route('users.user-dashboard') }}" class="btn btn-secondary btn-md">
+                                Przejdź do panelu użytkownika
+                            </a>
+                        @endif
                     </div>
                 </form>
             </div>

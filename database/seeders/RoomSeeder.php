@@ -16,6 +16,7 @@ class RoomSeeder extends Seeder
                 'capacity' => 120,
                 'description' => 'Duża sala bankietowa z parkietem i sceną.',
                 'price' => 5000,
+                'cleaning_duration' => 120,
                 'restaurant_id' => 1,
             ],
 
@@ -24,6 +25,7 @@ class RoomSeeder extends Seeder
                 'capacity' => 40,
                 'description' => 'Mniejsza sala z klimatyzacją.',
                 'price' => 1500,
+                'cleaning_duration' => 60,
                 'restaurant_id' => 1,
             ],
 
@@ -32,8 +34,8 @@ class RoomSeeder extends Seeder
                 'capacity' => 80,
                 'description' => 'Sala z dużymi oknami i widokiem na ogród.',
                 'price' => 2500,
+                'cleaning_duration' => 90,
                 'restaurant_id' => 2,
-
             ],
 
             [
@@ -41,6 +43,7 @@ class RoomSeeder extends Seeder
                 'capacity' => 60,
                 'description' => 'Sala z wyjściem na taras i dostępem do ogrodu.',
                 'price' => 1500,
+                'cleaning_duration' => 45,
                 'restaurant_id' => 2,
             ],
         ]);

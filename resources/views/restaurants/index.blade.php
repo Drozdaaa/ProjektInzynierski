@@ -23,8 +23,8 @@
                         <img src="{{ asset('storage/' . $restaurant->image) }}" class="img-fluid rounded shadow-sm"
                             alt="{{ $restaurant->name }}" style="object-fit: cover; width: 100%; max-height: 300px;">
                     @else
-                        <img src="https://via.placeholder.com/400x300?text=Brak+zdjęcia" class="img-fluid rounded shadow-sm"
-                            alt="Brak zdjęcia">
+                        <img src="https://via.placeholder.com/400x300?text=Brak+zdjęcia"
+                            class="img-fluid rounded shadow-sm" alt="Brak zdjęcia">
                     @endif
                 </div>
 
@@ -61,16 +61,17 @@
                 onclick="openRoomModal('add')">Dodaj salę</button>
         </div>
         <div class="card-body">
-             @if ($restaurant->rooms->isEmpty())
+            @if ($restaurant->rooms->isEmpty())
                 <p>Brak dodanych sal.</p>
             @else
                 <table class="table table-striped align-middle text-center">
-                     <thead class="table-success">
+                    <thead class="table-success">
                         <tr>
                             <th>#</th>
                             <th>Nazwa sali</th>
                             <th>Pojemność</th>
                             <th>Opis</th>
+                            <th>Czas sprzątania</th>
                             <th>Akcje</th>
                         </tr>
                     </thead>
@@ -82,10 +83,28 @@
                                 <td>{{ $room->capacity }}</td>
                                 <td>{{ $room->description ?? '-' }}</td>
                                 <td>
+                                    @php
+                                        $duration = $room->cleaning_duration ?? 0;
+                                        $hours = floor($duration / 60);
+                                        $minutes = $duration % 60;
+                                    @endphp
+
+                                    @if ($duration == 0)
+                                        -
+                                    @else
+                                        @if ($hours > 0)
+                                            {{ $hours }}h
+                                        @endif
+                                        @if ($minutes > 0)
+                                            {{ $minutes }}min
+                                        @endif
+                                    @endif
+                                </td>
+                                <td>
                                     <div class="btn-group btn-group-sm gap-1">
                                         <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
                                             data-bs-target="#roomModal"
-                                            onclick="openRoomModal('edit', {{ $room->id }}, '{{ $room->name }}', {{ $room->capacity }}, {{ $room->price }}, '{{ $room->description }}')">
+                                            onclick="openRoomModal('edit', {{ $room->id }}, '{{ $room->name }}', {{ $room->capacity }}, {{ $room->price }}, '{{ $room->description }}', {{ $room->cleaning_duration ?? 0 }})">
                                             Edytuj
                                         </button>
                                         <form action="{{ route('rooms.destroy', [$restaurant->id, $room->id]) }}"
@@ -109,7 +128,8 @@
 <div class="modal fade" id="editRestaurantModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="POST" action="{{ route('restaurants.update', $restaurant->id) }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('restaurants.update', $restaurant->id) }}"
+                enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="form_type" value="restaurant_edit">
@@ -124,7 +144,8 @@
                         <h6>Dane restauracji</h6>
                         <div class="mb-3">
                             <label for="image" class="form-label">Zdjęcie lokalu</label>
-                            <input type="file" name="image" id="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
+                            <input type="file" name="image" id="image"
+                                class="form-control @error('image') is-invalid @enderror" accept="image/*">
                             <div class="form-text">Pozostaw puste, jeśli nie chcesz zmieniać obecnego zdjęcia.</div>
                             @error('image')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -141,7 +162,7 @@
                             @enderror
                         </div>
 
-                         <div class="mb-3">
+                        <div class="mb-3">
                             <label for="restaurant_description" class="form-label">Opis</label>
                             <textarea name="description" id="restaurant_description" class="form-control @error('description') is-invalid @enderror"
                                 rows="3">{{ old('description', $restaurant->description) }}</textarea>
@@ -214,7 +235,7 @@
 </div>
 
 <div class="modal fade" id="roomModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
+    <div class="modal-dialog">
         <div class="modal-content">
             <form id="roomForm" method="POST">
                 @csrf
@@ -252,6 +273,30 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Czas potrzebny na sprzątanie (po wydarzeniu)</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <input type="number" name="cleaning_hours" id="room_cleaning_hours"
+                                        class="form-control" value="{{ old('cleaning_hours', 0) }}" min="0"
+                                        placeholder="0">
+                                    <span class="input-group-text">Godz.</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <input type="number" name="cleaning_minutes" id="room_cleaning_minutes"
+                                        class="form-control" value="{{ old('cleaning_minutes', 0) }}" min="0"
+                                        max="59" placeholder="0">
+                                    <span class="input-group-text">Min.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-text">Ten czas zostanie doliczony do rezerwacji jako bufor techniczny.</div>
+                    </div>
+
                     <div class="mb-3">
                         <label for="room_description" class="form-label">Opis</label>
                         <textarea name="description" id="room_description" class="form-control @error('description') is-invalid @enderror"
@@ -269,43 +314,28 @@
         </div>
     </div>
 </div>
+
 <script src="{{ asset('js/postal_code.js') }}"></script>
+
 <script>
-    function openRoomModal(mode, id = null, name = '', capacity = '', price = '', description = '') {
-        const form = document.getElementById('roomForm');
-        const title = document.getElementById('roomModalLabel');
-        const methodInput = document.getElementById('roomFormMethod');
-
-        if (mode === 'add') {
-            title.textContent = 'Dodaj salę';
-            form.action = "{{ route('rooms.store', $restaurant->id) }}";
-            methodInput.value = 'POST';
-
-            document.getElementById('room_name').value = "{{ old('name', '') }}";
-            document.getElementById('room_capacity').value = "{{ old('capacity', '') }}";
-            document.getElementById('room_price').value = "{{ old('price', '') }}";
-            document.getElementById('room_description').value = "{{ old('description', '') }}";
-        } else if (mode === 'edit') {
-            title.textContent = 'Edytuj salę';
-            form.action = "{{ url('/restaurants/' . $restaurant->id . '/rooms') }}/" + id;
-            methodInput.value = 'PUT';
-
-            document.getElementById('room_name').value = "{{ old('name', '') }}" || name;
-            document.getElementById('room_capacity').value = "{{ old('capacity', '') }}" || capacity;
-            document.getElementById('room_price').value = "{{ old('price', '') }}" || price;
-            document.getElementById('room_description').value = "{{ old('description', '') }}" || description;
+    window.restaurantConfig = {
+        routes: {
+            store: "{{ route('rooms.store', $restaurant->id) }}",
+            updateBase: "{{ url('/restaurants/' . $restaurant->id . '/rooms') }}"
+        },
+        oldInput: {
+            name: @json(old('name')),
+            capacity: @json(old('capacity')),
+            price: @json(old('price')),
+            description: @json(old('description')),
+            cleaning_hours: @json(old('cleaning_hours')),
+            cleaning_minutes: @json(old('cleaning_minutes'))
+        },
+        errors: {
+            any: {{ $errors->any() ? 'true' : 'false' }},
+            formType: "{{ old('form_type') }}"
         }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        @if ($errors->any())
-            @if (old('form_type') === 'restaurant_edit')
-                var restaurantModal = new bootstrap.Modal(document.getElementById('editRestaurantModal'));
-                restaurantModal.show();
-            @elseif (old('form_type') === 'room_action')
-                var roomModal = new bootstrap.Modal(document.getElementById('roomModal'));
-                roomModal.show();
-            @endif
-        @endif
-    });
+    };
 </script>
+
+<script src="{{ asset('js/restaurant.js') }}"></script>

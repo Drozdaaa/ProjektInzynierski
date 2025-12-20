@@ -176,9 +176,10 @@ class MenuController extends Controller
 
         $createdCount = 0;
         $firstEventId = null;
+        $user = Auth::user();
+        $isManager = Gate::allows('restaurant-owner', $restaurant);
 
         foreach ($validated['menus'] as $eventId => $data) {
-
             if (empty($data['dishes'])) {
                 continue;
             }
@@ -189,17 +190,27 @@ class MenuController extends Controller
                 continue;
             }
 
+            $isClient = $event->user_id === $user->id;
+
+            if (!$isClient && !$isManager) {
+                continue;
+            }
+
+            if ($isClient && !$isManager && $event->status->name !== 'Oczekujące') {
+                continue;
+            }
+
             if (!$firstEventId) {
                 $firstEventId = $event->id;
             }
 
-            $dishes = Dish::whereIn('id', $data['dishes'])->get();
+            $dishes = \App\Models\Dish::whereIn('id', $data['dishes'])->get();
             $totalPrice = $dishes->sum('price');
 
             $menu = Menu::create([
                 'name' => 'Własne menu (' . $event->date . ')',
                 'price' => $totalPrice,
-                'user_id' => Auth::id(),
+                'user_id' => $user->id,
                 'restaurant_id' => $restaurant->id,
                 'is_custom' => true,
             ]);
@@ -207,14 +218,22 @@ class MenuController extends Controller
             $menu->dishes()->attach($data['dishes']);
             $event->menus()->attach($menu->id, ['amount' => 0]);
 
+            if ($isClient && !$isManager) {
+                $originalData = $event->original_data;
+                $originalData['menus'] = $event->menus()->pluck('menus.id')->toArray();
+                $event->update(['original_data' => $originalData]);
+            }
+
             $createdCount++;
         }
 
         if ($createdCount === 0) {
-            return back()->withErrors(['msg' => 'Nie wybrano żadnych dań dla żadnego dnia.']);
+            return back()->withErrors(['msg' => 'Nie udało się utworzyć żadnego menu (brak dań lub brak uprawnień).']);
         }
 
         $redirectEventId = $firstEventId ?? array_key_first($validated['menus']);
+
+        $msg = "Pomyślnie utworzono i przypisano menu dla $createdCount dni.";
 
         if ($request->has('create_another')) {
             return redirect()
@@ -222,7 +241,7 @@ class MenuController extends Controller
                     'restaurant' => $restaurant->id,
                     'event' => $redirectEventId
                 ])
-                ->with('success', "Pomyślnie utworzono menu dla $createdCount dni. Możesz stworzyć kolejne.");
+                ->with('success', $msg . " Możesz stworzyć kolejne.");
         }
 
         return redirect()
@@ -230,7 +249,7 @@ class MenuController extends Controller
                 'restaurant' => $restaurant->id,
                 'event' => $redirectEventId
             ])
-            ->with('success', "Pomyślnie utworzono i przypisano menu dla $createdCount dni.");
+            ->with('success', $msg);
     }
 
     public function editForUser(Event $event, Request $request)
@@ -243,11 +262,10 @@ class MenuController extends Controller
             abort(403, 'Brak uprawnień do edycji tego wydarzenia.');
         }
 
-        if ($isClient && $event->status->name !== 'Oczekujące') {
+        if ($isClient && !$isManagerOrAdmin && $event->status->name !== 'Oczekujące') {
             return redirect()->back()
                 ->with('error', 'Jako klient możesz edytować menu tylko dla wydarzeń oczekujących.');
         }
-
         $cancelUrl = ($user->role_id === 2)
             ? route('users.user-dashboard')
             : route('users.manager-dashboard');
@@ -273,7 +291,6 @@ class MenuController extends Controller
             'cancelUrl'
         ));
     }
-
     public function updateForUser(Request $request, Event $event, Menu $menu)
     {
         $user = Auth::user();
@@ -285,7 +302,7 @@ class MenuController extends Controller
             abort(403);
         }
 
-        if ($isClient && $event->status->name !== 'Oczekujące') {
+        if ($isClient && !$isManagerOrAdmin && $event->status->name !== 'Oczekujące') {
             return redirect()->back()
                 ->with('error', 'Nie można edytować menu, ponieważ status wydarzenia uległ zmianie.');
         }
@@ -309,6 +326,12 @@ class MenuController extends Controller
         ]);
 
         $menu->dishes()->sync($validated['dishes']);
+
+        if ($isClient && !$isManagerOrAdmin) {
+            $originalData = $event->original_data;
+            $originalData['menus'] = $event->menus()->pluck('menus.id')->toArray();
+            $event->update(['original_data' => $originalData]);
+        }
 
         $msg = $isManagerOrAdmin
             ? 'Menu zostało zaktualizowane przez Managera.'
@@ -384,7 +407,6 @@ class MenuController extends Controller
         if (! $isEventOwner && ! $isRestaurantOwner) {
             abort(403, 'Nie masz uprawnień do edycji tego wydarzenia.');
         }
-
         $event->menus()->detach($menu->id);
 
         return back()->with('success', 'Menu zostało usunięte z wydarzenia.');

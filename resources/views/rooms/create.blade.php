@@ -32,7 +32,30 @@
 
             <div class="mb-3">
                 <label>Cena za wynajem (zł)</label>
-                <input type="number" name="price" class="form-control" value="{{ old('price') }}" step="0.01" min="0">
+                <input type="number" name="price" class="form-control" value="{{ old('price') }}" step="0.01"
+                    min="0">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Czas potrzebny na sprzątanie (po wydarzeniu)</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="number" name="cleaning_hours" class="form-control"
+                                value="{{ old('cleaning_hours', 0) }}" min="0" placeholder="0">
+                            <span class="input-group-text">Godz.</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="number" name="cleaning_minutes" class="form-control"
+                                value="{{ old('cleaning_minutes', 0) }}" min="0" max="59" placeholder="0">
+                            <span class="input-group-text">Min.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-text">Ten czas zostanie automatycznie doliczony do rezerwacji jako bufor techniczny.
+                </div>
             </div>
 
             <div class="mb-3">

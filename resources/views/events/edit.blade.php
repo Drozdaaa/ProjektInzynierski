@@ -127,15 +127,17 @@
         </form>
     </div>
 
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-    <script src="{{ asset('js/calendar.js') }}"></script>
 
     <script>
-        window.busyRoomsUrl = "{{ route('events.busy-rooms') }}";
         window.calendarUrl = "{{ route('events.calendar', $event->restaurant_id) }}";
+        window.busyRoomsUrl = "{{ route('events.busy-rooms') }}";
         window.restaurantId = "{{ $event->restaurant_id }}";
         window.eventId = "{{ $event->id }}";
     </script>
+
+    <script src="{{ asset('js/calendar.js') }}"></script>
+    <script src="{{ asset('js/edit_reservation.js') }}"></script>
 
 </body>

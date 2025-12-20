@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
+use App\Models\Event;
+use App\Models\Status;
+use App\Models\Address;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,17 +17,82 @@ use Illuminate\Support\Facades\Gate;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $usersQuery = User::with('role')->where('role_id', '!=', 1);
+
+        if ($request->filled('user_search')) {
+            $search = $request->user_search;
+            $usersQuery->where(function ($q) use ($search) {
+                $q->where('email', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('first_name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('role_id')) {
+            $usersQuery->where('role_id', $request->role_id);
+        }
+
+        if ($request->filled('user_status')) {
+            $usersQuery->where('is_active', $request->user_status);
+        }
+
+        $users = $usersQuery->orderBy('id')
+            ->paginate(10, ['*'], 'users_page')
+            ->withQueryString();
+
+        $restaurantsQuery = Restaurant::with(['address', 'user']);
+
+        if ($request->filled('restaurant_search')) {
+            $restaurantsQuery->where('name', 'like', "%{$request->restaurant_search}%");
+        }
+
+        if ($request->filled('restaurant_city')) {
+            $restaurantsQuery->whereHas('address', function ($q) use ($request) {
+                $q->where('city', $request->restaurant_city);
+            });
+        }
+
+        $restaurants = $restaurantsQuery->orderBy('id')
+            ->paginate(10, ['*'], 'restaurants_page')
+            ->withQueryString();
+
+        $eventsQuery = Event::with(['user', 'restaurant', 'status', 'eventType']);
+
+        if ($request->filled('event_restaurant_id')) {
+            $eventsQuery->where('restaurant_id', $request->event_restaurant_id);
+        }
+
+        if ($request->filled('status_id')) {
+            $eventsQuery->where('status_id', $request->status_id);
+        }
+
+        if ($request->filled('date_from')) {
+            $eventsQuery->whereDate('date', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $eventsQuery->whereDate('date', '<=', $request->date_to);
+        }
+
+        $events = $eventsQuery->orderBy('date', 'desc')
+            ->orderBy('start_time', 'asc')
+            ->paginate(10, ['*'], 'events_page')
+            ->withQueryString();
+
+        $cities = Address::select('city')->distinct()->orderBy('city')->pluck('city');
+        $roles = Role::where('id', '!=', 1)->get();
+
         return view('users.admin-dashboard', [
-            'users' => User::with('role')
-                ->where('role_id', '!=', 1)
-                ->orderBy('id')
-                ->get(),
-            'restaurants' => Restaurant::with(['address', 'user'])
-                ->orderBy('id')
-                ->get(),
-            'managers' => User::where('role_id', 3)->get()
+            'users' => $users,
+            'restaurants' => $restaurants,
+            'events' => $events,
+            'managers' => User::where('role_id', 3)->get(),
+            'statuses' => Status::all(),
+            'filter_restaurants' => Restaurant::orderBy('name')->get(),
+            'cities' => $cities,
+            'roles' => $roles
         ]);
     }
 
@@ -79,8 +148,7 @@ class AdminController extends Controller
 
                     $user->events()->delete();
                     $user->delete();
-                }
-                elseif ($user->role_id == 3) {
+                } elseif ($user->role_id == 3) {
                     $restaurants = $user->restaurants()->with('address', 'events', 'rooms', 'menus')->get();
 
                     $hasActiveEvents = $restaurants->pluck('events')->flatten()

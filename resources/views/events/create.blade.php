@@ -117,6 +117,21 @@
                                                         <strong>Opis:</strong>
                                                         {{ $room->description ?? 'Brak opisu' }}
                                                     </li>
+                                                    <li class="list-group-item">
+                                                        <strong>Szacowany czas sprzątania:</strong>
+                                                        @php
+                                                            $duration = $room->cleaning_duration ?? 0;
+                                                            $hours = floor($duration / 60);
+                                                            $minutes = $duration % 60;
+                                                        @endphp
+
+                                                        @if($duration == 0)
+                                                            -
+                                                        @else
+                                                            @if($hours > 0) {{ $hours }} godz. @endif
+                                                            @if($minutes > 0) {{ $minutes }} min. @endif
+                                                        @endif
+                                                    </li>
                                                 </ul>
                                             </div>
                                             <div class="card-footer d-flex justify-content-between align-items-center">
