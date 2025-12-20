@@ -59,7 +59,7 @@ function showTable(type) {
 
 function openUserModal(id, firstName, lastName, email, phone, roleId, isActive) {
     const form = document.getElementById('userForm');
-    // Używamy base URL przekazanego z widoku lub domyślnej ścieżki
+
     const baseUrl = (window.adminConfig && window.adminConfig.urls.users) ? window.adminConfig.urls.users : '/admin/users';
     form.action = baseUrl + "/" + id;
 

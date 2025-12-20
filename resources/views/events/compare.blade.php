@@ -106,7 +106,6 @@
                                             <div class="d-flex flex-column gap-3">
                                                 @foreach ($originalMenus as $menu)
                                                     <div class="card border bg-white">
-                                                        {{-- NAGŁÓWEK KARTY ORYGINALNEJ - DODANO LICZBĘ PORCJI --}}
                                                         <div class="card-header py-1 px-2 bg-secondary text-white small d-flex justify-content-between align-items-center">
                                                             <span>
                                                                 <strong>{{ $menu->name }}</strong>

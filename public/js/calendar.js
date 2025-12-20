@@ -92,15 +92,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     calendar.render();
-
-    // 🔑 Bootstrap / layout fix
     requestAnimationFrame(() => {
         calendar.updateSize();
     });
 
-    // -----------------------
-    // Helpers
-    // -----------------------
 
     function triggerChange(el) {
         if (el) el.dispatchEvent(new Event('change'));

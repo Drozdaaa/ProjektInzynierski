@@ -84,7 +84,7 @@
 
                 <div class="mb-3">
                     <label for="description" class="form-label">Opis</label>
-                    <textarea name="description" id="description" class="form-control" rows="3" required>{{ old('description') }}</textarea>
+                    <textarea name="description" id="description" class="form-control" rows="3" required maxlength="255">{{ old('description') }}</textarea>
                 </div>
 
                 <div id="daily-selections-container"></div>
@@ -124,10 +124,7 @@
                                                             $hours = floor($duration / 60);
                                                             $minutes = $duration % 60;
                                                         @endphp
-
-                                                        @if($duration == 0)
-                                                            -
-                                                        @else
+                                                        @if($duration == 0) - @else
                                                             @if($hours > 0) {{ $hours }} godz. @endif
                                                             @if($minutes > 0) {{ $minutes }} min. @endif
                                                         @endif
@@ -142,9 +139,7 @@
                                                     <input class="form-check-input room-checkbox" type="checkbox"
                                                         value="{{ $room->id }}"
                                                         data-room-id="{{ $room->id }}">
-                                                    <label class="form-check-label">
-                                                        Wybierz
-                                                    </label>
+                                                    <label class="form-check-label">Wybierz</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -198,19 +193,19 @@
     </div>
 
     @if ($restaurant->booking_regulations)
-        <div class="modal fade" id="bookingRegulationsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="bookingRegulationsModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Regulamin rezerwacji - {{ $restaurant->name }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         {!! nl2br(e($restaurant->booking_regulations)) !!}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                        <button type="button" class="btn btn-success" id="acceptRegulationsBtn">Akceptuję regulamin</button>
                     </div>
                 </div>
             </div>
@@ -228,8 +223,19 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const modalEl = document.getElementById('bookingRegulationsModal');
+            const acceptBtn = document.getElementById('acceptRegulationsBtn');
+            const termsCheckbox = document.getElementById('terms');
+
             if (modalEl) {
-                new bootstrap.Modal(modalEl);
+                const regsModal = new bootstrap.Modal(modalEl);
+                regsModal.show();
+
+                if (acceptBtn && termsCheckbox) {
+                    acceptBtn.addEventListener('click', function() {
+                        termsCheckbox.checked = true;
+                        regsModal.hide();
+                    });
+                }
             }
         });
     </script>

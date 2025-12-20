@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
-            $table->string('booking_regulations')->nullable();
+            $table->text('booking_regulations')->nullable();
             $table->string('image')->nullable();
             $table->foreignId('user_id')->constrained('users')->nullable();
             $table->foreignId('address_id')->constrained('addresses');

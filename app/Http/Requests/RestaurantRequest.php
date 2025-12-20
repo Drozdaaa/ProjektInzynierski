@@ -29,7 +29,7 @@ class RestaurantRequest extends FormRequest
             'city' => 'required|string|max:50',
             'postal_code' => 'required|string|max:6',
             'building_number' => 'required|integer|min:1',
-            'booking_regulations' => 'nullable|string|max:255',
+            'booking_regulations' => 'nullable|string|max:5000',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
     }
@@ -57,6 +57,8 @@ class RestaurantRequest extends FormRequest
             'image.image' => 'Plik musi być poprawnym obrazem.',
             'image.mimes' => 'Dozwolone formaty zdjęcia to: jpeg, png, jpg.',
             'image.max' => 'Zdjęcie nie może być większe niż 2 MB. Zalecane wymiary: 1200x800 px (format poziomy).',
+
+            'booking_regulations.max' => 'Regulamin rezerwacji nie może przekraczać 5000 znaków.',
         ];
     }
 }
