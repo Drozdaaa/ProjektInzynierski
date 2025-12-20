@@ -13,6 +13,29 @@
 
             <div class="card-body">
 
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
                 <div class="row mb-4 border-bottom pb-3">
                     <div class="col-md-6">
                         <h5 class="text-primary">Restauracja</h5>
@@ -42,13 +65,27 @@
                             </div>
                             <div class="card-body">
 
+                                @error("sum_error_{$dayEvent->id}")
+                                    <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
+                                        <div>
+                                            {{ $message }}
+                                        </div>
+                                    </div>
+                                @enderror
+
                                 <div class="row mb-3">
-                                    <div class="col-md-4"><strong>Godziny:</strong>
+                                    <div class="col-md-4">
+                                        <strong>Godziny:</strong>
                                         {{ substr($dayEvent->start_time, 0, 5) }} -
-                                        {{ substr($dayEvent->end_time, 0, 5) }}</div>
-                                    <div class="col-md-4"><strong>Liczba osób:</strong>
-                                        {{ $dayEvent->number_of_people }}</div>
-                                    <div class="col-md-4"><strong>Opis:</strong> {{ $dayEvent->description }}</div>
+                                        {{ substr($dayEvent->end_time, 0, 5) }}
+                                    </div>
+                                    <div
+                                        class="col-md-4 @error("sum_error_{$dayEvent->id}") text-danger fw-bold @enderror">
+                                        <strong>Liczba osób:</strong> {{ $dayEvent->number_of_people }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Opis:</strong> {{ $dayEvent->description }}
+                                    </div>
                                 </div>
 
                                 <div class="mb-3">
@@ -78,11 +115,21 @@
                                                 <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
                                                     <label class="fw-bold me-2 mb-0">Liczba porcji dla tego
                                                         menu:</label>
+                                                    @php
+                                                        $errorKey = "amounts.{$dayEvent->id}.{$menu->id}";
+                                                    @endphp
                                                     <input type="number"
                                                         name="amounts[{{ $dayEvent->id }}][{{ $menu->id }}]"
-                                                        class="form-control border-primary" style="width: 100px;"
-                                                        value="{{ $menu->pivot->amount > 0 ? $menu->pivot->amount : '' }}"
+                                                        class="form-control border-primary @error($errorKey) is-invalid @enderror"
+                                                        style="width: 100px;"
+                                                        value="{{ old($errorKey, $menu->pivot->amount > 0 ? $menu->pivot->amount : '') }}"
                                                         placeholder="0" min="0" required>
+
+                                                    @error($errorKey)
+                                                        <div class="invalid-feedback ms-2">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
                                                 </div>
                                             @else
                                                 <input type="hidden"
@@ -97,7 +144,6 @@
                                                         {{ $dish->description }}
                                                         <span
                                                             class="badge bg-secondary rounded-pill ms-1">{{ $dish->dishType->name ?? '' }}</span>
-
                                                         <div class="mt-1">
                                                             @foreach ($dish->diets as $diet)
                                                                 <span class="badge bg-success bg-opacity-75"
@@ -116,7 +162,6 @@
                                 @else
                                     <div class="alert alert-warning py-2">Brak wybranego menu na ten dzień.</div>
                                 @endif
-
                             </div>
                         </div>
                     @endforeach

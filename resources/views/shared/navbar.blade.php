@@ -10,7 +10,7 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('main.index') ? 'active' : '' }}"
                         href="{{ route('main.index') }}">
-                        Home
+                        Strona główna
                         @if (request()->routeIs('main.index'))
                             <span class="visually-hidden">(current)</span>
                         @endif

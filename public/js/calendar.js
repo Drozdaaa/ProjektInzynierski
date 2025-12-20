@@ -20,11 +20,9 @@ document.addEventListener('DOMContentLoaded', function () {
             resetDates: {
                 text: 'Wyczyść daty',
                 click: function () {
-                    // Czyścimy inputy
                     if (startDateInput) startDateInput.value = '';
                     if (endDateInput) endDateInput.value = '';
 
-                    // WAŻNE: Powiadamiamy reservation.js o zmianie!
                     triggerChangeEvent(startDateInput);
                     triggerChangeEvent(endDateInput);
 
@@ -58,19 +56,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     calendar.render();
 
-    // Funkcja pomocnicza do wyzwalania zdarzenia 'change'
     function triggerChangeEvent(element) {
         if (element) {
             element.dispatchEvent(new Event('change'));
         }
     }
 
-    // Obsługa ręcznej zmiany inputów (przez wpisanie z klawiatury)
     if (startDateInput) {
         startDateInput.addEventListener('change', function () {
             if (endDateInput.value && endDateInput.value < this.value) {
                 endDateInput.value = this.value;
-                triggerChangeEvent(endDateInput); // Synchronizuj koniec
+                triggerChangeEvent(endDateInput);
             }
             if (this.value) calendar.gotoDate(this.value);
             highlightSelectedRange();
@@ -81,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
         endDateInput.addEventListener('change', function () {
             if (startDateInput.value && startDateInput.value > this.value) {
                 startDateInput.value = this.value;
-                triggerChangeEvent(startDateInput); // Synchronizuj początek
+                triggerChangeEvent(startDateInput);
             }
             highlightSelectedRange();
         });
@@ -97,12 +93,10 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (dateStr > endDateInput.value) {
             endDateInput.value = dateStr;
         } else {
-            // Resetuj do jednego dnia przy kliknięciu w środek
             startDateInput.value = dateStr;
             endDateInput.value = dateStr;
         }
 
-        // WAŻNE: Po programowym ustawieniu wartości musimy wyzwolić zdarzenie
         triggerChangeEvent(startDateInput);
         triggerChangeEvent(endDateInput);
 

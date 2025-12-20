@@ -148,6 +148,15 @@ document.addEventListener('DOMContentLoaded', function () {
     async function checkBusyRoomsMultiDay() {
         const timeInputs = document.querySelectorAll('.time-input');
         if (!timeInputs.length) return;
+        document.querySelectorAll('.daily-block .room-checkbox').forEach(cb => {
+            cb.disabled = false;
+
+            const card = cb.closest('.card');
+            if (card) card.classList.remove('opacity-50', 'border-danger');
+
+            const label = cb.closest('.daily-block').querySelector(`label[for="${cb.id}"]`);
+            if (label && label.innerText === 'Zajęta') label.innerText = 'Wybierz';
+        });
 
         const days = {};
         timeInputs.forEach(input => {
@@ -173,7 +182,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         await Promise.all(requests);
     }
-
     function disableBusyRooms(date, busyIds) {
         const block = document.querySelector(`.daily-block[data-date="${date}"]`);
         if (!block) return;

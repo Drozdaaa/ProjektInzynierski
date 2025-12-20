@@ -5,7 +5,6 @@
 @if ($menusForModal->isNotEmpty())
     @php
         $modalId = isset($menu) ? 'menuDetailsModal' . $menu->id : 'menuDetailsModal' . $event->id;
-
         $labelId = isset($menu) ? 'menuDetailsLabel' . $menu->id : 'menuDetailsLabel' . $event->id;
     @endphp
 
@@ -23,7 +22,6 @@
                     @foreach ($menusForModal as $menuItem)
                         <div class="border rounded p-3 mb-4 shadow-sm">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-
                                 <h5 class="mb-1 me-3">
                                     {{ $menuItem->name }}
                                     <span class="badge bg-primary">
@@ -37,16 +35,51 @@
                                     @endif
                                 </h5>
 
-                                @if (Auth::check() && isset($event) && $event->restaurant && Auth::id() === $event->restaurant->user_id)
-                                    <a href="{{ route('menus.user.edit', [
-                                        'menu' => $menuItem->id,
-                                        'event' => $event->id,
-                                    ]) }}"
-                                        class="btn btn-warning btn-sm text-nowrap">
-                                        <i class="bi bi-pencil-square"></i> Edytuj
-                                    </a>
-                                @endif
+                                <div class="btn-group" role="group">
+                                    @if (Auth::check() && isset($event) && $event->restaurant && Auth::id() === $event->restaurant->user_id)
+                                        <a href="{{ route('menus.user.edit', [
+                                            'menu' => $menuItem->id,
+                                            'event' => $event->id,
+                                        ]) }}"
+                                            class="btn btn-warning btn-sm text-nowrap">
+                                            Edytuj
+                                        </a>
+                                    @endif
 
+                                    @if (isset($event))
+                                        @php
+                                            $isAttached = $event->menus->contains('id', $menuItem->id);
+                                            $canManage =
+                                                Auth::id() === $event->user_id ||
+                                                Gate::allows('restaurant-owner', $event->restaurant);
+                                        @endphp
+
+                                        @if ($canManage)
+                                            @if (!$isAttached)
+                                                <form
+                                                    action="{{ route('events.menu.attach', ['event' => $event->id, 'menu' => $menuItem->id]) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="btn btn-success btn-sm text-nowrap ms-1">
+                                                        <i class="bi bi-plus-circle"></i> Dodaj
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <form
+                                                    action="{{ route('events.menu.detach', ['event' => $event->id, 'menu' => $menuItem->id]) }}"
+                                                    method="POST" class="d-inline"
+                                                    onsubmit="return confirm('Czy na pewno chcesz odpiąć to menu z wydarzenia?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="btn btn-danger btn-sm text-nowrap ms-1">Usuń
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @endif
+                                    @endif
+                                </div>
                             </div>
 
                             @foreach ($menuItem->dishesByType ?? [] as $type => $dishes)
@@ -70,7 +103,6 @@
 
                                             <div class="mb-1" style="font-size: 0.85rem;">
                                                 <span class="fw-bold">Diety:</span>
-
                                                 @if ($dish->diets->isEmpty())
                                                     <span class="text-muted">Brak</span>
                                                 @else
@@ -92,7 +124,6 @@
 
                                             <div style="font-size: 0.85rem;">
                                                 <span class="fw-bold">Alergeny:</span>
-
                                                 @if ($dish->allergies->isEmpty())
                                                     <span class="text-muted">Brak</span>
                                                 @else
@@ -115,11 +146,9 @@
                                     @endforeach
                                 </ul>
                             @endforeach
-
                         </div>
                     @endforeach
                 </div>
-
             </div>
         </div>
     </div>

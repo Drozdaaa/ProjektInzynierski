@@ -320,7 +320,7 @@ class MenuController extends Controller
         ])->with('success', $msg);
     }
 
-    public function updateAmounts(Request $request, $restaurantId, $firstEventId)
+    public function updateAmounts(Request $request, $restaurantId)
     {
         $request->validate([
             'amounts' => 'required|array',
@@ -338,8 +338,10 @@ class MenuController extends Controller
             if ($dailyTotal !== $event->number_of_people) {
                 return redirect()
                     ->back()
-                    ->withErrors(['amounts' => "Błąd w dniu {$event->date}: Suma porcji ($dailyTotal) musi być równa liczbie gości ({$event->number_of_people})."])
-                    ->withInput();
+                    ->withInput()
+                    ->withErrors([
+                        "sum_error_{$eventId}" => "Źle podano ilość porcji: wpisano $dailyTotal, a gości jest {$event->number_of_people}."
+                    ]);
             }
             foreach ($menusData as $menuId => $amount) {
                 $event->menus()->updateExistingPivot($menuId, ['amount' => $amount]);
@@ -372,5 +374,19 @@ class MenuController extends Controller
         $event->menus()->attach($newMenu->id);
 
         return $newMenu;
+    }
+
+    public function detachMenu(Event $event, Menu $menu)
+    {
+        $isEventOwner = $event->user_id === Auth::id();
+        $isRestaurantOwner = Gate::allows('restaurant-owner', $event->restaurant);
+
+        if (! $isEventOwner && ! $isRestaurantOwner) {
+            abort(403, 'Nie masz uprawnień do edycji tego wydarzenia.');
+        }
+
+        $event->menus()->detach($menu->id);
+
+        return back()->with('success', 'Menu zostało usunięte z wydarzenia.');
     }
 }
