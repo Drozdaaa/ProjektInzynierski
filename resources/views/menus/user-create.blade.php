@@ -36,7 +36,7 @@
                     </h2>
 
                     <div class="mb-3">
-                        <label class="fw-bold">Szacowana cena menu (Dzień {{ $loop->iteration }}):</label>
+                        <label class="fw-bold">Cena menu:</label>
                         <input type="number" step="0.01" min="0"
                                name="price_display_{{ $dayEvent->id }}"
                                class="form-control day-price-input"

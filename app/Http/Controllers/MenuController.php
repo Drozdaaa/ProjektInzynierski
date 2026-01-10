@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\DishType;
 use App\Models\Menu;
-use App\Models\User;
 use App\Models\Dish;
 use App\Models\Event;
 use App\Models\Restaurant;
@@ -204,7 +203,7 @@ class MenuController extends Controller
                 $firstEventId = $event->id;
             }
 
-            $dishes = \App\Models\Dish::whereIn('id', $data['dishes'])->get();
+            $dishes = Dish::whereIn('id', $data['dishes'])->get();
             $totalPrice = $dishes->sum('price');
 
             $menu = Menu::create([
@@ -225,10 +224,6 @@ class MenuController extends Controller
             }
 
             $createdCount++;
-        }
-
-        if ($createdCount === 0) {
-            return back()->withErrors(['msg' => 'Nie udało się utworzyć żadnego menu (brak dań lub brak uprawnień).']);
         }
 
         $redirectEventId = $firstEventId ?? array_key_first($validated['menus']);

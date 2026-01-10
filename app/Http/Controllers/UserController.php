@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\User;
 use App\Models\Event;
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Exception;
 
 class UserController extends Controller
 {
@@ -149,21 +150,43 @@ class UserController extends Controller
     public function destroy(Request $request)
     {
         $user = User::findOrFail(Auth::id());
+        $isDeactivated = false;
 
         try {
-            DB::transaction(function () use ($user) {
+            DB::transaction(function () use ($user, &$isDeactivated) {
+                if ($user->role_id === 1) {
+                    throw new Exception('Administrator nie może usunąć swojego konta.');
+                }
+
                 if ($user->role_id === 2) {
                     $hasActiveEvents = Event::where('user_id', $user->id)
                         ->whereIn('status_id', [1, 2])
                         ->exists();
 
                     if ($hasActiveEvents) {
-                        throw new Exception(
-                            'Nie możesz usunąć konta, ponieważ posiadasz aktywne rezerwacje.'
-                        );
+                        throw new Exception('Nie możesz usunąć konta, ponieważ posiadasz aktywne rezerwacje jako klient.');
                     }
 
                     Event::where('user_id', $user->id)->delete();
+                    $user->delete();
+                } elseif ($user->role_id === 3) {
+                    $hasActiveReservations = Event::where('manager_id', $user->id)
+                        ->whereIn('status_id', [1, 2])
+                        ->exists();
+
+                    if ($hasActiveReservations) {
+                        $user->update(['is_active' => false]);
+                        $isDeactivated = true;
+                    } else {
+                        $restaurant = Restaurant::where('user_id', $user->id)->first();
+
+                        if ($restaurant) {
+                            $restaurant->delete();
+                        }
+
+                        $user->delete();
+                    }
+                } else {
                     $user->delete();
                 }
             });
@@ -175,10 +198,8 @@ class UserController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        $userCheck = User::find($user->id);
-
-        if ($userCheck && $userCheck->is_active == 0) {
-            $message = 'Twoje konto zostało dezaktywowane (lokal posiada aktywne rezerwacje).';
+        if ($isDeactivated) {
+            $message = 'Twoje konto zostało dezaktywowane, ponieważ Twój lokal posiada jeszcze aktywne rezerwacje.';
         } else {
             $message = 'Twoje konto zostało trwale usunięte.';
         }

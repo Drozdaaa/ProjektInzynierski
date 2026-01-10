@@ -141,7 +141,7 @@
                                                 @foreach ($menu->dishes as $dish)
                                                     <li class="list-group-item px-0 py-1 border-0">
                                                         <strong>{{ $dish->name }}</strong> -
-                                                        {{ $dish->description }}
+                                                        {{ $dish->description }}, <strong>cena {{ $dish->price }}zł</strong>
                                                         <span
                                                             class="badge bg-secondary rounded-pill ms-1">{{ $dish->dishType->name ?? '' }}</span>
                                                         <div class="mt-1">
@@ -150,7 +150,7 @@
                                                                     style="font-size: 0.65rem;">{{ $diet->name }}</span>
                                                             @endforeach
                                                             @foreach ($dish->allergies as $allergen)
-                                                                <span class="badge bg-warning text-dark"
+                                                                <span class="badge bg-warning "
                                                                     style="font-size: 0.65rem;">{{ $allergen->name }}</span>
                                                             @endforeach
                                                         </div>

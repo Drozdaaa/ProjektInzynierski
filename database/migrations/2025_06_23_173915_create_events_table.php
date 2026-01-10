@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('date')->nullable();
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
-            $table->integer('number_of_people')->nullable();
+            $table->smallInteger('number_of_people')->nullable();
             $table->string('description')->nullable();
             $table->json('original_data')->nullable();
             $table->foreignId('status_id')->constrained('statuses')->onDelete('cascade');

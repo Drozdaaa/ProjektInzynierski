@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('diets', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description')->nullable();
+            $table->string('name', 16);
+            $table->string('description', 100)->nullable();
         });
     }
 

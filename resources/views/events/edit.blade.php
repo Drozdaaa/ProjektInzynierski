@@ -122,7 +122,7 @@
 
             <div class="mt-3 mb-5">
                 <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
-                <a href="{{ route('users.manager-dashboard') }}" class="btn btn-secondary">Anuluj</a>
+                <a href="{{ route('users.user-dashboard') }}" class="btn btn-secondary">Anuluj</a>
             </div>
         </form>
     </div>

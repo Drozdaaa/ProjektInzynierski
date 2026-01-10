@@ -24,13 +24,14 @@
                         <input type="hidden" name="redirect_to" value="{{ request()->get('redirect_to') }}">
                     @endif
 
+                    <input type="hidden" name="previous_url" value="{{ old('previous_url', $previousUrl ?? route('main.index')) }}">
+
                     <div class="form-group mb-2">
                         <label for="email" class="form-label">Email</label>
                         <input id="email" name="email" type="email"
                             class="form-control @if ($errors->has('email')) is-invalid @endif"
                             value="{{ old('email') }}" required>
                     </div>
-
 
                     <div class="form-group mb-2">
                         <label for="password" class="form-label">Hasło</label>
@@ -44,11 +45,15 @@
                         </a>
                     </div>
 
-                    <div class="text-center mt-4 mb-4">
+                    <div class="text-center mt-4 mb-4 d-grid gap-2 col-6 mx-auto">
                         <input class="btn btn-primary" type="submit" value="Zaloguj się">
+                        <a href="{{ old('previous_url', $previousUrl ?? route('main.index')) }}" class="btn btn-secondary">
+                            Wróć
+                        </a>
                     </div>
+
                     <div class="text-center mt-4 mb-4">
-                        <a href="{{ route('register.form') }}" class="btn btn-primary">Zarejstruj się </a>
+                        <a href="{{ route('register.form') }}" class="btn btn-link">Zarejestruj się</a>
                     </div>
                 </form>
             </div>

@@ -27,7 +27,7 @@ class LoginController extends Controller
         if (!Auth::attempt($credentials)) {
             return back()->withErrors([
                 'login' => 'Podany email lub hasło są nieprawidłowe.',
-            ])->onlyInput('email');
+            ])->onlyInput('email', 'previous_url');
         }
 
         $request->session()->regenerate();

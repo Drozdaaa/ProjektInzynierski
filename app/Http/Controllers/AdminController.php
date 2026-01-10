@@ -182,7 +182,7 @@ class AdminController extends Controller
 
         $userCheck = User::find($id);
         $message = ($userCheck && !$userCheck->is_active)
-            ? 'Konto managera zostało dezaktywowane (lokal posiada aktywne rezerwacje).'
+            ? 'Konto managera zostało dezaktywowane, a nie usunięte (lokal posiada aktywne rezerwacje).'
             : 'Użytkownik został trwale usunięty.';
 
         return redirect()->route('users.admin-dashboard')->with('success', $message);

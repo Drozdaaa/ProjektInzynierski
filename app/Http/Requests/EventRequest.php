@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Room;
 use App\Models\Event;
 use App\Models\Restaurant;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,15 +15,7 @@ class EventRequest extends FormRequest
     public function authorize(): bool
     {
         if ($this->isMethod('post')) {
-            $routeParam = $this->route('id');
-            $restaurantId = $routeParam instanceof Restaurant ? $routeParam->id : $routeParam;
-            $restaurant = Restaurant::find($restaurantId);
-
-            if (!$restaurant) {
-                return false;
-            }
-
-            return Gate::allows('restaurant-owner', $restaurant);
+            return Auth::check();
         }
 
         $routeParam = $this->route('id');
@@ -34,6 +28,7 @@ class EventRequest extends FormRequest
 
         return Gate::allows('manage-event', $event);
     }
+
 
     public function rules(): array
     {
@@ -52,8 +47,8 @@ class EventRequest extends FormRequest
         $userId = $this->user()?->id;
 
         $rules = [
-             'description' => 'required|string|max:255',
-             'event_type_id' => 'required|exists:event_types,id',
+            'description' => 'required|string|max:255',
+            'event_type_id' => 'required|exists:event_types,id',
         ];
 
         if ($this->isMethod('put') || $this->isMethod('patch')) {
@@ -61,7 +56,23 @@ class EventRequest extends FormRequest
                 'date' => 'required|date',
                 'start_time' => 'required|date_format:H:i',
                 'end_time' => 'required|date_format:H:i|after:start_time',
-                'number_of_people' => 'required|integer|min:1',
+                'number_of_people' => [
+                    'required',
+                    'integer',
+                    'min:1',
+                    function ($value, $fail) {
+                        $roomIds = $this->input('rooms', []);
+
+                        if (empty($roomIds)) {
+                            return;
+                        }
+                        $totalCapacity = Room::whereIn('id', $roomIds)->sum('capacity');
+
+                        if ($value > $totalCapacity) {
+                            $fail("Liczba osób ($value) przekracza całkowitą pojemność wybranych sal ($totalCapacity).");
+                        }
+                    },
+                ],
                 'rooms' => 'required|array',
                 'rooms.*' => [
                     'integer',
@@ -72,8 +83,12 @@ class EventRequest extends FormRequest
                 'menus_id' => 'nullable|array',
                 'menus_id.*' => [
                     'integer',
-                    Rule::exists('menus', 'id')->where(function ($query) use ($userId) {
-                        return $query->where('user_id', $userId);
+                    Rule::exists('menus', 'id')->where(function ($query) {
+                        $user = Auth::user();
+                        if ($user->role_id !== 1) {
+                            return $query->where('user_id', $user->id);
+                        }
+                        return $query;
                     }),
                 ],
             ]);
@@ -94,7 +109,24 @@ class EventRequest extends FormRequest
                 }),
             ],
             'people' => 'required|array',
-            'people.*' => 'required|integer|min:1',
+            'people.*' => [
+                'required',
+                'integer',
+                'min:1',
+                function ($attribute, $value, $fail) {
+                    $date = str_replace('people.', '', $attribute);
+                    $roomIds = $this->input("rooms.$date", []);
+
+                    if (empty($roomIds)) {
+                        return;
+                    }
+                    $totalCapacity = Room::whereIn('id', $roomIds)->sum('capacity');
+
+                    if ($value > $totalCapacity) {
+                        $fail("W dniu $date liczba osób ($value) przekracza pojemność wybranych sal ($totalCapacity).");
+                    }
+                },
+            ],
             'menus' => 'nullable|array',
             'terms' => 'accepted',
         ]);

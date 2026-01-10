@@ -1,53 +1,59 @@
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const daySections = document.querySelectorAll('.day-section');
-
-    daySections.forEach(section => {
-        const cards = section.querySelectorAll('.dish-card');
-        const priceInput = section.querySelector('.day-price-input');
-
-        function updateTotalPrice() {
+    document.addEventListener('DOMContentLoaded', function() {
+        function updateSection(container) {
             let total = 0;
-            section.querySelectorAll('.dish-checkbox:checked').forEach(checkbox => {
+            let count = 0;
+
+            const checkboxes = container.querySelectorAll('.dish-checkbox:checked');
+            const priceInput = container.querySelector('.day-price-input') || document.getElementById('price');
+            const countBadge = document.getElementById('selected-count');
+
+            checkboxes.forEach(checkbox => {
                 const card = checkbox.closest('.dish-card');
                 if (card && card.dataset.price) {
                     total += parseFloat(card.dataset.price);
+                    count++;
                 }
             });
 
             if (priceInput) {
                 priceInput.value = total.toFixed(2);
             }
+
+            if (countBadge && !container.classList.contains('day-section')) {
+                countBadge.textContent = count;
+            }
         }
 
-        updateTotalPrice();
-
-        cards.forEach(card => {
+        const dishCards = document.querySelectorAll('.dish-card');
+        dishCards.forEach(card => {
             card.addEventListener('click', function(e) {
-                const checkbox = card.querySelector('.dish-checkbox');
+                const checkbox = this.querySelector('.dish-checkbox');
+                const target = e.target;
 
-                if (e.target.type === 'checkbox') {
-                    if (checkbox.checked) {
-                        card.classList.add('selected');
-                    } else {
-                        card.classList.remove('selected');
-                    }
-                    updateTotalPrice();
-                    return;
+                if (target !== checkbox && !target.closest('.form-check-label')) {
+                    checkbox.checked = !checkbox.checked;
                 }
 
-                if (e.target.tagName !== 'LABEL') {
-                    checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    this.classList.add('selected');
+                } else {
+                    this.classList.remove('selected');
+                }
 
-                    if (checkbox.checked) {
-                        card.classList.add('selected');
-                    } else {
-                        card.classList.remove('selected');
-                    }
-                    updateTotalPrice();
+                const container = this.closest('.day-section') || this.closest('#menu-form');
+                if (container) {
+                    updateSection(container);
                 }
             });
         });
+
+        const sections = document.querySelectorAll('.day-section');
+        if (sections.length > 0) {
+            sections.forEach(s => updateSection(s));
+        } else {
+            const form = document.getElementById('menu-form');
+            if (form) updateSection(form);
+        }
     });
-});
 </script>

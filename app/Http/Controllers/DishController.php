@@ -19,10 +19,14 @@ class DishController extends Controller
     public function index(Restaurant $restaurant)
     {
         $dishes = Dish::where('restaurant_id', $restaurant->id)
-        ->with('dishType')
-        ->get();
+            ->with(['dishType', 'diets', 'allergies'])
+            ->get();
 
-        return view('dishes.index', compact('dishes', 'restaurant'));
+        $dishTypes = DishType::all();
+        $allergies = Allergy::all();
+        $diets = Diet::all();
+
+        return view('dishes.index', compact('dishes', 'restaurant', 'dishTypes', 'allergies', 'diets'));
     }
 
     /**
@@ -41,25 +45,25 @@ class DishController extends Controller
 
         return view('dishes.create', compact('restaurant', 'dishTypes', 'allergies', 'diets'));
     }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request, $id)
     {
-
-
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:50|min:2',
             'price' => 'required|numeric|min:0',
             'description' => 'required|string|max:255',
-            'dish_type_id' => 'required|exists:event_types,id',
+            'dish_type_id' => 'required|exists:dish_types,id',
             'diets' => 'sometimes|array',
             'diets.*' => 'exists:diets,id',
             'allergies' => 'sometimes|array',
             'allergies.*' => 'exists:allergies,id',
-
         ], [
             'name.required' => 'Nazwa dania jest wymagana.',
+            'name.max' => 'Nazwa dania może mieć mkasymalnie 50 znaków.',
+            'name.min' => 'Nazwa dania może mieć minimalnie 2 znaki.',
             'price.required' => 'Cena dania jest wymagana.',
             'price.numeric' => 'Cena musi być liczbą.',
             'price.min' => 'Cena nie może być ujemna.',
@@ -108,16 +112,56 @@ class DishController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Dish $dish)
     {
-        //
+        $restaurant = $dish->restaurant;
+        if (Gate::denies('restaurant-owner', $restaurant)) {
+            abort(403, 'Brak dostępu do edycji tego dania.');
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:30',
+            'price' => 'required|numeric|min:0',
+            'description' => 'required|string|max:255',
+            'dish_type_id' => 'required|exists:dish_types,id',
+            'diets' => 'sometimes|array',
+            'diets.*' => 'exists:diets,id',
+            'allergies' => 'sometimes|array',
+            'allergies.*' => 'exists:allergies,id',
+        ], [
+            'name.required' => 'Nazwa dania jest wymagana.',
+            'price.numeric' => 'Cena musi być liczbą.',
+            'price.min' => 'Cena nie może być ujemna.',
+            'description.max' => 'Opis może mieć maksymalnie 255 znaków',
+        ]);
+
+        $dish->update([
+            'name' => $request->name,
+            'price' => $request->price,
+            'description' => $request->description,
+            'dish_type_id' => $request->dish_type_id,
+        ]);
+
+        $dish->diets()->sync($request->input('diets', []));
+        $dish->allergies()->sync($request->input('allergies', []));
+
+        return redirect()->route('dishes.index', ['restaurant' => $restaurant->id])
+            ->with('success', 'Danie zostało zaktualizowane.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Dish $dish)
     {
-        //
+        $restaurant = $dish->restaurant;
+
+        if (Gate::denies('restaurant-owner', $restaurant)) {
+            abort(403, 'Brak dostępu do usunięcia tego dania.');
+        }
+
+        $dish->delete();
+
+        return back()->with('success', 'Danie zostało usunięte.');
     }
 }

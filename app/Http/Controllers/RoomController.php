@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Room;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
+use App\Http\Requests\RoomRequest;
 use Illuminate\Support\Facades\Gate;
 
 class RoomController extends Controller
@@ -31,7 +32,7 @@ class RoomController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Restaurant $restaurant)
+    public function store(RoomRequest $request, Restaurant $restaurant)
     {
         if (! Gate::allows('restaurant-owner', $restaurant)) {
             abort(403);
@@ -41,15 +42,6 @@ class RoomController extends Controller
             return redirect()->route('users.manager-dashboard')
                 ->with('success', 'Dodawanie sal zakończone.');
         }
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'capacity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'description' => 'nullable|string|max:255',
-            'cleaning_hours' => 'nullable|integer|min:0',
-            'cleaning_minutes' => 'nullable|integer|min:0|max:59',
-        ]);
 
         $hours = $request->input('cleaning_hours', 0);
         $minutes = $request->input('cleaning_minutes', 0);
@@ -63,7 +55,8 @@ class RoomController extends Controller
             'cleaning_duration' => $totalDuration,
         ]);
 
-        return redirect()->back();
+        return redirect()->back()
+            ->with('success', 'Sala została dodana.');
     }
 
 
@@ -86,7 +79,7 @@ class RoomController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Restaurant $restaurant, Room $room)
+    public function update(RoomRequest $request, Restaurant $restaurant, Room $room)
     {
         if (! Gate::allows('restaurant-owner', $restaurant)) {
             abort(403);
@@ -96,14 +89,6 @@ class RoomController extends Controller
             abort(404);
         }
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'capacity' => 'required|integer|min:1',
-            'description' => 'nullable|string|max:255',
-            'cleaning_hours' => 'nullable|integer|min:0',
-            'cleaning_minutes' => 'nullable|integer|min:0|max:59',
-        ]);
-
         $hours = $request->input('cleaning_hours', 0);
         $minutes = $request->input('cleaning_minutes', 0);
         $totalDuration = ($hours * 60) + $minutes;
@@ -111,6 +96,7 @@ class RoomController extends Controller
         $room->update([
             'name' => $request->name,
             'capacity' => $request->capacity,
+            'price' => $request->price,
             'description' => $request->description,
             'cleaning_duration' => $totalDuration,
         ]);
@@ -118,7 +104,6 @@ class RoomController extends Controller
         return redirect()->route('restaurants.index')
             ->with('success', 'Sala została zaktualizowana.');
     }
-
     /**
      * Remove the specified resource from storage.
      */

@@ -1,21 +1,12 @@
 <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ route('main.index') }}">Navbar</a>
+        <a class="navbar-brand" href="{{ route('main.index') }}">Strona główna</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01"
             aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarColor01">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('main.index') ? 'active' : '' }}"
-                        href="{{ route('main.index') }}">
-                        Strona główna
-                        @if (request()->routeIs('main.index'))
-                            <span class="visually-hidden">(current)</span>
-                        @endif
-                    </a>
-                </li>
                 @can('admin-or-manager')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"

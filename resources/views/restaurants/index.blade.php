@@ -23,8 +23,10 @@
                         <img src="{{ asset('storage/' . $restaurant->image) }}" class="img-fluid rounded shadow-sm"
                             alt="{{ $restaurant->name }}" style="object-fit: cover; width: 100%; max-height: 300px;">
                     @else
-                        <img src="https://via.placeholder.com/400x300?text=Brak+zdjęcia"
-                            class="img-fluid rounded shadow-sm" alt="Brak zdjęcia">
+                        <div class="rounded shadow-sm bg-light d-flex align-items-center justify-content-center"
+                            style="height: 300px; background-color: #f0f0f0; width: 100%;">
+                            <span class="text-muted">Brak zdjęcia</span>
+                        </div>
                     @endif
                 </div>
 
@@ -69,6 +71,7 @@
                         <tr>
                             <th>#</th>
                             <th>Nazwa sali</th>
+                            <th>Cena</th>
                             <th>Pojemność</th>
                             <th>Opis</th>
                             <th>Czas sprzątania</th>
@@ -80,6 +83,7 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $room->name }}</td>
+                                <td>{{ $room->price }} zł</td>
                                 <td>{{ $room->capacity }}</td>
                                 <td>{{ $room->description ?? '-' }}</td>
                                 <td>
@@ -93,10 +97,10 @@
                                         -
                                     @else
                                         @if ($hours > 0)
-                                            {{ $hours }}h
+                                            {{ $hours }} godz.
                                         @endif
                                         @if ($minutes > 0)
-                                            {{ $minutes }}min
+                                            {{ $minutes }}min.
                                         @endif
                                     @endif
                                 </td>
@@ -133,12 +137,10 @@
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="form_type" value="restaurant_edit">
-
                 <div class="modal-header">
                     <h5 class="modal-title">Edytuj dane restauracji i adres</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body">
                     <div class="mb-4">
                         <h6>Dane restauracji</h6>
@@ -151,7 +153,6 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-
                         <div class="mb-3">
                             <label for="restaurant_name" class="form-label">Nazwa restauracji</label>
                             <input type="text" name="name" id="restaurant_name"
@@ -161,7 +162,6 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-
                         <div class="mb-3">
                             <label for="restaurant_description" class="form-label">Opis</label>
                             <textarea name="description" id="restaurant_description" class="form-control @error('description') is-invalid @enderror"
@@ -273,7 +273,6 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">Czas potrzebny na sprzątanie (po wydarzeniu)</label>
                         <div class="row">
@@ -294,9 +293,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-text">Ten czas zostanie doliczony do rezerwacji jako bufor techniczny.</div>
                     </div>
-
                     <div class="mb-3">
                         <label for="room_description" class="form-label">Opis</label>
                         <textarea name="description" id="room_description" class="form-control @error('description') is-invalid @enderror"
@@ -316,7 +313,6 @@
 </div>
 
 <script src="{{ asset('js/postal_code.js') }}"></script>
-
 <script>
     window.restaurantConfig = {
         routes: {
@@ -337,5 +333,4 @@
         }
     };
 </script>
-
 <script src="{{ asset('js/restaurant.js') }}"></script>

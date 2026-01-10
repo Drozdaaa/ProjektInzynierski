@@ -87,7 +87,9 @@
                             <td>{{ $event->eventType->name }}</td>
                             <td>
                                 {{ $event->date }}<br>
-                                <small class="text-muted">{{ $event->start_time }} - {{ $event->end_time }}</small>
+                                <small
+                                    class="text-muted">{{ \Carbon\Carbon::parse($event->start_time)->format('H:i') }} -
+                                    {{ \Carbon\Carbon::parse($event->end_time)->format('H:i') }}</small>
                             </td>
                             <td>
                                 {{ $event->rooms->pluck('name')->join(', ') }}

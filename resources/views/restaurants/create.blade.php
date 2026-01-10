@@ -21,7 +21,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('restaurants.store') }}">
+        <form method="POST" action="{{ route('restaurants.store') }}" enctype="multipart/form-data">
             @csrf
 
             <div class="mb-3">
@@ -53,7 +53,7 @@
 
             <div class="mb-3">
                 <label for="building_number" class="form-label">Numer budynku</label>
-                <input type="number" name="building_number" id="building_number" class="form-control"
+                <input type="text" name="building_number" id="building_number" class="form-control"
                     value="{{ old('building_number') }}" required>
             </div>
 

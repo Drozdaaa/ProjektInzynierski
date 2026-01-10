@@ -124,9 +124,15 @@
                                                             $hours = floor($duration / 60);
                                                             $minutes = $duration % 60;
                                                         @endphp
-                                                        @if($duration == 0) - @else
-                                                            @if($hours > 0) {{ $hours }} godz. @endif
-                                                            @if($minutes > 0) {{ $minutes }} min. @endif
+                                                        @if ($duration == 0)
+                                                            -
+                                                        @else
+                                                            @if ($hours > 0)
+                                                                {{ $hours }} godz.
+                                                            @endif
+                                                            @if ($minutes > 0)
+                                                                {{ $minutes }} min.
+                                                            @endif
                                                         @endif
                                                     </li>
                                                 </ul>
@@ -192,25 +198,26 @@
         </form>
     </div>
 
-    @if ($restaurant->booking_regulations)
-        <div class="modal fade" id="bookingRegulationsModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Regulamin rezerwacji - {{ $restaurant->name }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        {!! nl2br(e($restaurant->booking_regulations)) !!}
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
-                        <button type="button" class="btn btn-success" id="acceptRegulationsBtn">Akceptuję regulamin</button>
-                    </div>
+    <div class="modal fade" id="bookingRegulationsModal" tabindex="-1" aria-hidden="true"
+        data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Regulamin rezerwacji - {{ $restaurant->name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {!! nl2br(e($restaurant->booking_regulations)) !!}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                    <button type="button" class="btn btn-success" id="acceptRegulationsBtn">Akceptuję
+                        regulamin</button>
                 </div>
             </div>
         </div>
-    @endif
+    </div>
+
 
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
