@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('allergies', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 15);
-            $table->string('description', 100)->nullable();
+            $table->string('name', 30);
+            $table->string('description', 250)->nullable();
         });
     }
 

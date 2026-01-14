@@ -6,6 +6,18 @@
     <div class="container-fluid mt-5 px-5">
         <h1>Sale w restauracji: {{ $restaurant->name }}</h1>
 
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         @if ($restaurant->rooms->count())
             <ul class="list-group mb-4">
                 @foreach ($restaurant->rooms as $room)
@@ -64,7 +76,9 @@
             </div>
 
             <button type="submit" name="action" value="add" class="btn btn-primary">Dodaj salę</button>
-            <button type="submit" name="action" value="finish" class="btn btn-success">Zakończ dodawanie</button>
+            <a href="{{ route('users.manager-dashboard') }}" class="btn btn-success">
+                Zakończ dodawanie
+            </a>
         </form>
 
     </div>

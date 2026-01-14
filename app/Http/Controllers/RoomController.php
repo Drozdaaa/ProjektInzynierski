@@ -38,10 +38,6 @@ class RoomController extends Controller
             abort(403);
         }
 
-        if ($request->input('action') === 'finish') {
-            return redirect()->route('users.manager-dashboard')
-                ->with('success', 'Dodawanie sal zakończone.');
-        }
 
         $hours = $request->input('cleaning_hours', 0);
         $minutes = $request->input('cleaning_minutes', 0);
@@ -54,6 +50,10 @@ class RoomController extends Controller
             'description' => $request->description,
             'cleaning_duration' => $totalDuration,
         ]);
+        if ($request->input('action') === 'finish') {
+            return redirect()->route('users.manager-dashboard')
+                ->with('success', 'Dodawanie sal zakończone.');
+        }
 
         return redirect()->back()
             ->with('success', 'Sala została dodana.');

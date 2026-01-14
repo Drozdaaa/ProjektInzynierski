@@ -6,7 +6,11 @@
 
     <div class="container-fluid mt-5 px-5">
         <h1 class="mb-4">Panel Menadżera</h1>
-
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
             <div class="text-center text-md-start">
                 @if ($restaurant)
