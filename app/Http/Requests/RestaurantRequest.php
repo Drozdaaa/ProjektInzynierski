@@ -80,6 +80,7 @@ class RestaurantRequest extends FormRequest
             'image.image' => 'Plik musi być poprawnym obrazem.',
             'image.mimes' => 'Dozwolone formaty zdjęcia to: jpeg, png, jpg.',
             'image.max' => 'Zdjęcie nie może być większe niż 2 MB. Zalecane wymiary: 1200x800 px (format poziomy).',
+            'image.uploaded' => 'Przesyłanie nie powiodło się. Plik przekracza limit 2MB.',
 
             'booking_regulations.max' => 'Regulamin rezerwacji nie może przekraczać 5000 znaków.',
 

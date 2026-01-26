@@ -23,12 +23,10 @@
             </div>
         @endif
 
-        <form action="{{ route('menus.user-store', ['restaurant' => $restaurant->id]) }}"
-            method="POST" id="menu-form">
+        <form action="{{ route('menus.user-store', ['restaurant' => $restaurant->id]) }}" method="POST" id="menu-form">
             @csrf
 
-            @foreach($events as $dayEvent)
-
+            @foreach ($events as $dayEvent)
                 <div class="day-section border-bottom mb-5 pb-4" data-event-id="{{ $dayEvent->id }}">
 
                     <h2 class="text-primary mt-4">
@@ -37,10 +35,9 @@
 
                     <div class="mb-3">
                         <label class="fw-bold">Cena menu:</label>
-                        <input type="number" step="0.01" min="0"
-                               name="price_display_{{ $dayEvent->id }}"
-                               class="form-control day-price-input"
-                               value="0.00" style="max-width: 200px;" required readonly>
+                        <input type="number" step="0.01" min="0" name="price_display_{{ $dayEvent->id }}"
+                            class="form-control day-price-input" value="0.00" style="max-width: 200px;" required
+                            readonly>
                     </div>
 
                     <h3>Wybierz dania:</h3>
@@ -54,7 +51,7 @@
                                         @include('shared.dish-card', [
                                             'dish' => $dish,
                                             'inputName' => "menus[{$dayEvent->id}][dishes][]",
-                                            'uniqueSuffix' => "_{$dayEvent->id}"
+                                            'uniqueSuffix' => "_{$dayEvent->id}",
                                         ])
                                     @endforeach
                                 </div>
@@ -69,7 +66,7 @@
                                         @include('shared.dish-card', [
                                             'dish' => $dish,
                                             'inputName' => "menus[{$dayEvent->id}][dishes][]",
-                                            'uniqueSuffix' => "_{$dayEvent->id}"
+                                            'uniqueSuffix' => "_{$dayEvent->id}",
                                         ])
                                     @endforeach
                                 </div>
@@ -84,7 +81,7 @@
                                         @include('shared.dish-card', [
                                             'dish' => $dish,
                                             'inputName' => "menus[{$dayEvent->id}][dishes][]",
-                                            'uniqueSuffix' => "_{$dayEvent->id}"
+                                            'uniqueSuffix' => "_{$dayEvent->id}",
                                         ])
                                     @endforeach
                                 </div>
@@ -99,7 +96,7 @@
                                         @include('shared.dish-card', [
                                             'dish' => $dish,
                                             'inputName' => "menus[{$dayEvent->id}][dishes][]",
-                                            'uniqueSuffix' => "_{$dayEvent->id}"
+                                            'uniqueSuffix' => "_{$dayEvent->id}",
                                         ])
                                     @endforeach
                                 </div>
@@ -118,7 +115,7 @@
                     Utwórz i dodaj kolejne menu
                 </button>
 
-                <a href="{{ route('events.show', ['restaurant' => $restaurant->id, 'event' => $event->id]) }}" class="btn btn-secondary btn-md">
+                <a href="{{ url()->previous() }}" class="btn btn-secondary btn-md">
                     Anuluj
                 </a>
             </div>

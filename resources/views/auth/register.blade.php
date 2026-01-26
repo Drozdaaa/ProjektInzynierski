@@ -34,31 +34,30 @@
                     <div class="form-group mb-2">
                         <label for="last_name" class="form-label">Nazwisko</label>
                         <input id="last_name" name="last_name" type="text"
-                            class="form-control @error('last_name') is-invalid @enderror"
-                            value="{{ old('last_name') }}" required>
+                            class="form-control @error('last_name') is-invalid @enderror" value="{{ old('last_name') }}"
+                            required>
                     </div>
 
                     <div class="form-group mb-2">
                         <label for="phone" class="form-label">Telefon</label>
                         <input id="phone" name="phone" type="text"
-                            class="form-control @error('phone') is-invalid @enderror"
-                            value="{{ old('phone') }}" required>
+                            class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}"
+                            required>
                     </div>
 
                     <div class="form-group mb-2">
                         <label for="email" class="form-label">Email</label>
                         <input id="email" name="email" type="email"
-                            class="form-control @error('email') is-invalid @enderror"
-                            value="{{ old('email') }}" required>
+                            class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}"
+                            required>
                     </div>
 
                     <div class="form-group mb-2">
                         <label for="password" class="form-label">Hasło</label>
                         <input id="password" name="password" type="password"
-                            class="form-control @error('password') is-invalid @enderror"
-                            required>
+                            class="form-control @error('password') is-invalid @enderror" required>
                     </div>
-                    
+
                     <div class="form-group mb-2">
                         <label for="password_confirmation" class="form-label">Powtórz hasło</label>
                         <input id="password_confirmation" name="password_confirmation" type="password"
@@ -75,9 +74,15 @@
                         </select>
                     </div>
 
-                    <div class="text-center mb-4">
+                    <div class="text-center mt-4 mb-4 d-grid gap-2 col-6 mx-auto">
                         <input class="btn btn-success" type="submit" value="Zarejestruj się">
+
+                        <a href="{{ old('previous_url', $previousUrl ?? route('main.index')) }}"
+                            class="btn btn-secondary">
+                            Wróć
+                        </a>
                     </div>
+
                 </form>
             </div>
         </div>

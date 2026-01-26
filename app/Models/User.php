@@ -38,11 +38,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Event::class);
     }
 
-    public function allergies()
-    {
-        return $this->belongsToMany(Allergy::class, 'user_allergy');
-    }
-
     public function restaurants()
     {
         return $this->hasOne(Restaurant::class);

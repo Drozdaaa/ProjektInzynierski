@@ -100,7 +100,10 @@ class EventController extends Controller
 
         $hours = $request->input('hours', []);
         $roomsPerDay = $request->input('rooms', []);
-        $menusPerDay = $request->input('menus', []);
+
+        $action = $request->input('action');
+        $menusPerDay = ($action === 'custom') ? [] : $request->input('menus', []);
+
         $peoplePerDay = $request->input('people', []);
 
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
@@ -118,7 +121,6 @@ class EventController extends Controller
             }
         }
 
-        $action = $request->input('action');
         $reservationId = (string) Str::uuid();
         $createdEvents = [];
         $dayCounter = 1;
@@ -134,7 +136,16 @@ class EventController extends Controller
                 $description .= " (Dzień {$dayCounter})";
             }
             $selectedRoomIds = $roomsPerDay[$dateString] ?? [];
+
             $selectedMenuIds = $menusPerDay[$dateString] ?? [];
+
+            $menusCount = count($selectedMenuIds);
+            $initialAmount = ($menusCount === 1) ? $dailyPeopleCount : 0;
+
+            $menusHistory = [];
+            foreach ($selectedMenuIds as $menuId) {
+                $menusHistory[$menuId] = $initialAmount;
+            }
 
             $event = Event::create([
                 'reservation_id' => $reservationId,
@@ -154,7 +165,7 @@ class EventController extends Controller
                     'number_of_people' => $dailyPeopleCount,
                     'description' => $description,
                     'rooms' => $selectedRoomIds,
-                    'menus' => $selectedMenuIds
+                    'menus' => $menusHistory
                 ],
             ]);
 
@@ -165,7 +176,7 @@ class EventController extends Controller
             if (!empty($selectedMenuIds)) {
                 $menusWithPivot = [];
                 foreach ($selectedMenuIds as $menuId) {
-                    $menusWithPivot[$menuId] = ['amount' => $dailyPeopleCount];
+                    $menusWithPivot[$menuId] = ['amount' => $initialAmount];
                 }
                 $event->menus()->sync($menusWithPivot);
             }
@@ -178,7 +189,7 @@ class EventController extends Controller
             return redirect()->route('menus.user-create', [
                 'restaurant' => $restaurant->id,
                 'event' => $createdEvents[0]->id,
-            ])->with('info', 'Wydarzenia utworzone. Możesz teraz skomponować własne menu.');
+            ])->with('info', 'Wydarzenie utworzone. Możesz teraz skomponować własne menu.');
         }
 
         return redirect()->route('events.show', [
@@ -262,10 +273,9 @@ class EventController extends Controller
         $event->update($request->validated());
         $event->rooms()->sync($selectedRoomIds);
 
-        $menus = $request->input('menus_id', []);
-        $event->menus()->sync($menus);
-
         if ($user->id === $event->user_id) {
+            $existingOriginal = $event->original_data;
+
             $event->update([
                 'original_data' => [
                     'start_time' => $request->input('start_time'),
@@ -273,20 +283,15 @@ class EventController extends Controller
                     'number_of_people' => $request->input('number_of_people'),
                     'description' => $request->input('description'),
                     'rooms' => $selectedRoomIds,
-                    'menus' => $menus
+                    'menus' => $existingOriginal['menus'] ?? []
                 ]
             ]);
         }
 
-        if ($user->id === $event->manager_id) {
-            return redirect()->route('users.manager-dashboard')->with('success', 'Wydarzenie zostało zaktualizowane.');
-        }
-
-        if ($user->id === $event->user_id) {
-            return redirect()->route('users.user-dashboard')->with('success', 'Wydarzenie zostało zaktualizowane (zapisano jako nową wersję).');
-        }
-
-        return redirect()->route('users.admin-dashboard')->with('success', 'Wydarzenie zostało zaktualizowane.');
+        return redirect()->route('events.show', [
+            'restaurant' => $event->restaurant_id,
+            'event' => $event->id
+        ])->with('success', 'Wydarzenie zostało zaktualizowane. Sprawdź poprawność menu i liczby porcji.');
     }
 
     /**
@@ -388,8 +393,21 @@ class EventController extends Controller
 
         $originalRoomNames = Room::whereIn('id', $original['rooms'] ?? [])->pluck('name');
 
+        $originalMenusData = $original['menus'] ?? [];
+        $menuIds = [];
+
+        if (is_array($originalMenusData)) {
+            $isAssociative = array_keys($originalMenusData) !== range(0, count($originalMenusData) - 1);
+
+            if ($isAssociative && !empty($originalMenusData)) {
+                $menuIds = array_keys($originalMenusData);
+            } else {
+                $menuIds = array_values($originalMenusData);
+            }
+        }
+
         $originalMenus = Menu::with(['dishes.dishType', 'dishes.diets', 'dishes.allergies'])
-            ->whereIn('id', $original['menus'] ?? [])
+            ->whereIn('id', $menuIds)
             ->get()
             ->transform(function ($menu) {
                 $menu->dishesByType = $menu->dishes->groupBy(fn($dish) => $dish->dishType?->name);

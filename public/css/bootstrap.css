@@ -196,6 +196,45 @@
     box-sizing: border-box;
 }
 
+@media (max-width: 768px) {
+    .fc .fc-header-toolbar {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 10px !important;
+        margin-bottom: 1.5em !important;
+    }
+
+    .fc-toolbar-chunk {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+    }
+
+    .fc-button-group {
+        display: flex !important;
+        width: auto !important;
+    }
+
+    .fc .fc-button {
+        padding: 0.3rem 0.6rem !important;
+        font-size: 0.85rem !important;
+        line-height: 1.2 !important;
+        height: auto !important;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.3rem !important;
+        text-align: center !important;
+        margin: 0 !important;
+    }
+
+    .fc button.fc-custom-button {
+        width: 100%;
+        margin-top: 5px;
+    }
+}
+
 @media (prefers-reduced-motion: no-preference) {
     :root {
         scroll-behavior: smooth;

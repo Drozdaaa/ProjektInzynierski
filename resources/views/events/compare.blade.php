@@ -101,18 +101,29 @@
                             <tr>
                                 <td class="p-0 bg-light align-top">
                                     <div class="p-3">
-                                        <small class="text-muted d-block mb-2">Szczegóły Menu:</small>
+                                        <small class="text-muted d-block mb-2">Szczegóły Menu (Oryginał):</small>
                                         @if ($originalMenus->isNotEmpty())
                                             <div class="d-flex flex-column gap-3">
                                                 @foreach ($originalMenus as $menu)
+                                                    @php
+                                                        $origAmount = '-';
+                                                        if (
+                                                            isset($original['menus']) &&
+                                                            is_array($original['menus']) &&
+                                                            array_key_exists($menu->id, $original['menus'])
+                                                        ) {
+                                                            $origAmount = $original['menus'][$menu->id];
+                                                        }
+                                                    @endphp
                                                     <div class="card border bg-white">
-                                                        <div class="card-header py-1 px-2 bg-secondary text-white small d-flex justify-content-between align-items-center">
+                                                        <div
+                                                            class="card-header py-1 px-2 bg-secondary text-white small d-flex justify-content-between align-items-center">
                                                             <span>
                                                                 <strong>{{ $menu->name }}</strong>
                                                                 ({{ number_format($menu->price, 2) }} zł)
                                                             </span>
                                                             <span class="badge bg-light text-dark rounded-pill">
-                                                                {{ $original['number_of_people'] ?? '-' }} porcji
+                                                                {{ $origAmount }} porcji
                                                             </span>
                                                         </div>
                                                         <div class="card-body p-2">
@@ -149,12 +160,13 @@
 
                                 <td class="p-0 bg-light align-top">
                                     <div class="p-3">
-                                        <small class="text-muted d-block mb-2">Szczegóły Menu:</small>
+                                        <small class="text-muted d-block mb-2">Szczegóły Menu (Aktualne):</small>
                                         @if ($event->menus->isNotEmpty())
                                             <div class="d-flex flex-column gap-3">
                                                 @foreach ($event->menus as $menu)
                                                     @php
                                                         $isNewMenu = !$originalMenus->contains('id', $menu->id);
+                                                        $amount = $menu->pivot->amount ?? 0;
                                                     @endphp
                                                     <div
                                                         class="card border {{ $isNewMenu ? 'border-success' : 'bg-white' }}">
@@ -168,9 +180,9 @@
                                                                         class="badge bg-white text-success ms-1">NOWE</span>
                                                                 @endif
                                                             </span>
-                                                            <span
-                                                                class="badge bg-light text-dark rounded-pill">{{ $menu->pivot->amount }}
-                                                                porcji</span>
+                                                            <span class="badge bg-light text-dark rounded-pill">
+                                                                {{ $amount }} porcji
+                                                            </span>
                                                         </div>
                                                         <div class="card-body p-2 bg-white">
                                                             @foreach ($menu->dishesByType ?? [] as $type => $dishes)
@@ -211,7 +223,8 @@
                             <tr>
                                 <td class="p-3 align-middle">
                                     <small class="text-muted">Opis oryginalny:</small>
-                                    <div class="fst-italic text-muted mt-1">{{ $original['description'] ?? '-' }}</div>
+                                    <div class="fst-italic text-muted mt-1">{{ $original['description'] ?? '-' }}
+                                    </div>
                                 </td>
                                 <td class="p-3 align-middle {{ $descDiff ? 'bg-warning bg-opacity-10' : '' }}">
                                     <small class="text-muted">Zmieniony opis:</small>

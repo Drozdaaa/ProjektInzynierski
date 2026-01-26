@@ -219,7 +219,9 @@ class MenuController extends Controller
 
             if ($isClient && !$isManager) {
                 $originalData = $event->original_data;
-                $originalData['menus'] = $event->menus()->pluck('menus.id')->toArray();
+                $originalData['menus'] = $event->menus->mapWithKeys(function ($menu) {
+                    return [$menu->id => $menu->pivot->amount];
+                })->toArray();
                 $event->update(['original_data' => $originalData]);
             }
 
@@ -228,7 +230,7 @@ class MenuController extends Controller
 
         $redirectEventId = $firstEventId ?? array_key_first($validated['menus']);
 
-        $msg = "Pomyślnie utworzono i przypisano menu dla $createdCount dni.";
+        $msg = "Pomyślnie utworzono i przypisano menu.";
 
         if ($request->has('create_another')) {
             return redirect()
@@ -251,16 +253,17 @@ class MenuController extends Controller
     {
         $user = Auth::user();
         $isClient = $event->user_id === $user->id;
-        $isManagerOrAdmin = Gate::allows('restaurant-owner', $event->restaurant);
+        $isManager = Gate::allows('restaurant-owner', $event->restaurant);
 
-        if (!$isClient && !$isManagerOrAdmin) {
+        if (!$isClient && !$isManager) {
             abort(403, 'Brak uprawnień do edycji tego wydarzenia.');
         }
 
-        if ($isClient && !$isManagerOrAdmin && $event->status->name !== 'Oczekujące') {
+        if ($isClient && !$isManager && $event->status->name !== 'Oczekujące') {
             return redirect()->back()
                 ->with('error', 'Jako klient możesz edytować menu tylko dla wydarzeń oczekujących.');
         }
+
         $cancelUrl = ($user->role_id === 2)
             ? route('users.user-dashboard')
             : route('users.manager-dashboard');
@@ -286,51 +289,49 @@ class MenuController extends Controller
             'cancelUrl'
         ));
     }
-    public function updateForUser(Request $request, Event $event, Menu $menu)
+
+    public function updateForUser(Request $request, Event $event)
     {
         $user = Auth::user();
+        $isManager = Gate::allows('restaurant-owner', $event->restaurant);
 
-        $isClient = $event->user_id === $user->id;
-        $isManagerOrAdmin = Gate::allows('restaurant-owner', $event->restaurant);
-
-        if (!$isClient && !$isManagerOrAdmin) {
+        if ($event->user_id !== $user->id && !$isManager) {
             abort(403);
         }
 
-        if ($isClient && !$isManagerOrAdmin && $event->status->name !== 'Oczekujące') {
-            return redirect()->back()
-                ->with('error', 'Nie można edytować menu, ponieważ status wydarzenia uległ zmianie.');
-        }
-
-        if (!$event->menus->contains($menu->id)) {
-            abort(403, 'To menu nie jest przypisane do tego wydarzenia.');
-        }
-
-        if ($menu->events()->count() > 1 || $menu->event_id === null) {
-            $menu = $this->cloneMenuForEvent($menu, $event);
-        }
-
         $validated = $request->validate([
-            'price' => 'required|numeric|min:0',
-            'dishes' => 'required|array|min:1',
-            'dishes.*' => 'exists:dishes,id',
+            'menus' => 'required|array',
+            'menus.*.price' => 'required|numeric|min:0',
+            'menus.*.dishes' => 'array',
+            'menus.*.dishes.*' => 'exists:dishes,id',
         ]);
 
-        $menu->update([
-            'price' => $validated['price']
-        ]);
+        foreach ($validated['menus'] as $menuId => $data) {
+            $menu = $event->menus()->find($menuId);
 
-        $menu->dishes()->sync($validated['dishes']);
+            if (!$menu) continue;
 
-        if ($isClient && !$isManagerOrAdmin) {
+            if ($menu->events()->count() > 1 || $menu->event_id === null) {
+
+                $menu = $this->cloneMenuForEvent($menu, $event);
+            }
+
+            $menu->update(['price' => $data['price']]);
+            $menu->dishes()->sync($data['dishes'] ?? []);
+        }
+
+        $event->load('menus');
+
+        if (!$isManager) {
             $originalData = $event->original_data;
-            $originalData['menus'] = $event->menus()->pluck('menus.id')->toArray();
+            $originalData['menus'] = $event->menus->mapWithKeys(function ($m) {
+                return [$m->id => $m->pivot->amount];
+            })->toArray();
+
             $event->update(['original_data' => $originalData]);
         }
 
-        $msg = $isManagerOrAdmin
-            ? 'Menu zostało zaktualizowane przez Managera.'
-            : 'Twoje menu zostało zaktualizowane.';
+        $msg = $isManager ? 'Menu zostało zaktualizowane przez Managera.' : 'Twoje menu zostało zaktualizowane.';
 
         return redirect()->route('events.show', [
             'restaurant' => $event->restaurant_id,
@@ -345,12 +346,17 @@ class MenuController extends Controller
             'amounts.*' => 'array',
             'amounts.*.*' => 'required|integer|min:0',
         ]);
+
+        $restaurant = Restaurant::findOrFail($restaurantId);
+        $user = Auth::user();
+
         foreach ($request->amounts as $eventId => $menusData) {
             $event = Event::find($eventId);
 
             if (!$event || $event->restaurant_id != $restaurantId) {
                 continue;
             }
+
             $dailyTotal = array_sum($menusData);
 
             if ($dailyTotal !== $event->number_of_people) {
@@ -361,22 +367,32 @@ class MenuController extends Controller
                         "sum_error_{$eventId}" => "Źle podano ilość porcji: wpisano $dailyTotal, a gości jest {$event->number_of_people}."
                     ]);
             }
+
             foreach ($menusData as $menuId => $amount) {
                 $event->menus()->updateExistingPivot($menuId, ['amount' => $amount]);
             }
-        }
-        $user = Auth::user();
-        if ((int)$user->role_id === 2) {
-            return redirect()->route('users.user-dashboard')
-                ->with('success', 'Liczba porcji została zaktualizowana.');
+
+            if ($user->id === $event->user_id) {
+                $originalData = $event->original_data;
+                $originalData['menus'] = $menusData;
+                $event->update(['original_data' => $originalData]);
+            }
         }
 
-        return redirect()->route('users.manager-dashboard')
-            ->with('success', 'Liczba porcji została zaktualizowana przez managera.');
+        if (Gate::allows('restaurant-owner', $restaurant)) {
+            return redirect()->route('users.manager-dashboard')
+                ->with('success', 'Liczba porcji została zaktualizowana przez managera.');
+        }
+
+        return redirect()->route('users.user-dashboard')
+            ->with('success', 'Liczba porcji została zaktualizowana.');
     }
 
     private function cloneMenuForEvent(Menu $menu, Event $event): Menu
     {
+        $pivotInfo = $event->menus->find($menu->id);
+        $currentAmount = $pivotInfo ? $pivotInfo->pivot->amount : 0;
+
         $newMenu = Menu::create([
             'price' => $menu->price,
             'user_id' => Auth::id(),
@@ -384,12 +400,10 @@ class MenuController extends Controller
             'event_id' => $event->id,
         ]);
 
-        $newMenu->dishes()->sync(
-            $menu->dishes->pluck('id')->toArray()
-        );
+        $newMenu->dishes()->sync($menu->dishes->pluck('id')->toArray());
 
         $event->menus()->detach($menu->id);
-        $event->menus()->attach($newMenu->id);
+        $event->menus()->attach($newMenu->id, ['amount' => $currentAmount]);
 
         return $newMenu;
     }

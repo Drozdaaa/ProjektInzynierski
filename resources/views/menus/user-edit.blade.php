@@ -5,46 +5,45 @@
 <body>
     @include('shared.navbar')
     <div class="container-fluid mt-5 px-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Edytuj menu dla wydarzenia</h1>
-        </div>
 
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+        <form class="menu-editor-form" action="{{ route('menus.user.update', ['event' => $event->id]) }}" method="POST"
+            id="main-menu-form">
 
-        @if (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
+            @csrf
+            @method('PUT')
 
-        @if ($errors->any())
-            <div class="alert alert-danger mb-4">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $err)
-                        <li>{{ $err }}</li>
-                    @endforeach
-                </ul>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Edytuj menu dla wydarzenia</h1>
             </div>
-        @endif
 
-        @foreach ($menusToEdit as $menu)
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Edycja: {{ $menu->name }}</h4>
+            @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+            @if ($errors->any())
+                <div class="alert alert-danger mb-4">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
                 </div>
+            @endif
 
-                <div class="card-body">
-                    <form class="menu-editor-form day-section"
-                        action="{{ route('menus.user.update', ['event' => $event->id, 'menu' => $menu->id]) }}"
-                        method="POST">
-                        @csrf
-                        @method('PUT')
+            @foreach ($menusToEdit as $menu)
+                <div class="card mb-4 shadow-sm day-section">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Edycja: {{ $menu->name }}</h4>
+                    </div>
 
+                    <div class="card-body">
                         <div class="mb-3">
-                            <label for="price_{{ $menu->id }}" class="form-label fw-bold">Cena menu (zł)</label>
-                            <input type="number" step="0.01" min="0" name="price"
-                                id="price_{{ $menu->id }}" class="form-control form-control-lg day-price-input"
-                                value="{{ old('price', $menu->price) }}" required>
+                            <label class="form-label fw-bold">Cena menu (zł)</label>
+                            <input type="number" step="0.01" min="0" name="menus[{{ $menu->id }}][price]"
+                                class="form-control form-control-lg day-price-input"
+                                value="{{ old('menus.' . $menu->id . '.price', $menu->price) }}" required>
                         </div>
 
                         <h5 class="mb-3 border-bottom pb-2">Wybierz dania do tego menu:</h5>
@@ -66,7 +65,7 @@
                                                         'dish' => $dish,
                                                         'selected' => $selected,
                                                         'uniqueSuffix' => '_menu_' . $menu->id,
-                                                        'inputName' => 'dishes[]',
+                                                        'inputName' => "menus[{$menu->id}][dishes][]",
                                                     ])
                                                 @empty
                                                     <div class="col-12 text-muted fst-italic small">
@@ -79,17 +78,17 @@
                                 @endforeach
                             </table>
                         </div>
-
-                        <div class="mt-4 d-flex justify-content-left gap-2">
-                            <a href="{{ $cancelUrl }}" class="btn btn-secondary">Anuluj</a>
-                            <button type="submit" class="btn btn-success">
-                                Zapisz zmiany
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
-        @endforeach
+            @endforeach
 
+            <div class="fixed-bottom bg-white border-top p-3 px-5 shadow-md d-flex gap-2">
+                <button type="submit" class="btn btn-success btn-md">
+                    Zapisz zmiany
+                </button>
+                <a href="{{ $cancelUrl }}" class="btn btn-secondary btn-md">Anuluj</a>
+            </div>
+
+        </form>
     </div>
 </body>

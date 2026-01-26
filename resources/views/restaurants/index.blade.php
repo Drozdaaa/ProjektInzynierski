@@ -14,7 +14,7 @@
             {{ session('error') }}
         </div>
     @endif
-    
+
     <div class="card mt-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <span>Podstawowe informacje</span>
@@ -71,64 +71,66 @@
             @if ($restaurant->rooms->isEmpty())
                 <p>Brak dodanych sal.</p>
             @else
-                <table class="table table-striped align-middle text-center">
-                    <thead class="table-success">
-                        <tr>
-                            <th>#</th>
-                            <th>Nazwa sali</th>
-                            <th>Cena</th>
-                            <th>Pojemność</th>
-                            <th>Opis</th>
-                            <th>Czas sprzątania</th>
-                            <th>Akcje</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($restaurant->rooms as $room)
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle text-center mb-0">
+                        <thead class="table-success">
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $room->name }}</td>
-                                <td>{{ $room->price }} zł</td>
-                                <td>{{ $room->capacity }}</td>
-                                <td>{{ $room->description ?? '-' }}</td>
-                                <td>
-                                    @php
-                                        $duration = $room->cleaning_duration ?? 0;
-                                        $hours = floor($duration / 60);
-                                        $minutes = $duration % 60;
-                                    @endphp
-
-                                    @if ($duration == 0)
-                                        -
-                                    @else
-                                        @if ($hours > 0)
-                                            {{ $hours }} godz.
-                                        @endif
-                                        @if ($minutes > 0)
-                                            {{ $minutes }}min.
-                                        @endif
-                                    @endif
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm gap-1">
-                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#roomModal"
-                                            onclick="openRoomModal('edit', {{ $room->id }}, '{{ $room->name }}', {{ $room->capacity }}, {{ $room->price }}, '{{ $room->description }}', {{ $room->cleaning_duration ?? 0 }})">
-                                            Edytuj
-                                        </button>
-                                        <form action="{{ route('rooms.destroy', [$restaurant->id, $room->id]) }}"
-                                            method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-sm btn-danger"
-                                                onclick="return confirm('Na pewno usunąć salę?')">Usuń</button>
-                                        </form>
-                                    </div>
-                                </td>
+                                <th class="text-nowrap">#</th>
+                                <th class="text-nowrap">Nazwa sali</th>
+                                <th class="text-nowrap">Cena</th>
+                                <th class="text-nowrap">Pojemność</th>
+                                <th class="text-nowrap" style="min-width: 150px;">Opis</th>
+                                <th class="text-nowrap">Czas sprzątania</th>
+                                <th class="text-nowrap">Akcje</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($restaurant->rooms as $room)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $room->name }}</td>
+                                    <td>{{ $room->price }} zł</td>
+                                    <td>{{ $room->capacity }}</td>
+                                    <td>{{ $room->description ?? '-' }}</td>
+                                    <td>
+                                        @php
+                                            $duration = $room->cleaning_duration ?? 0;
+                                            $hours = floor($duration / 60);
+                                            $minutes = $duration % 60;
+                                        @endphp
+
+                                        @if ($duration == 0)
+                                            -
+                                        @else
+                                            @if ($hours > 0)
+                                                {{ $hours }} godz.
+                                            @endif
+                                            @if ($minutes > 0)
+                                                {{ $minutes }}min.
+                                            @endif
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm gap-1">
+                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#roomModal"
+                                                onclick="openRoomModal('edit', {{ $room->id }}, '{{ $room->name }}', {{ $room->capacity }}, {{ $room->price }}, '{{ $room->description }}', {{ $room->cleaning_duration ?? 0 }})">
+                                                Edytuj
+                                            </button>
+                                            <form action="{{ route('rooms.destroy', [$restaurant->id, $room->id]) }}"
+                                                method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Na pewno usunąć salę?')">Usuń</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             @endif
         </div>
     </div>

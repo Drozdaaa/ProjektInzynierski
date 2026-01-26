@@ -43,65 +43,65 @@
             </form>
         </div>
     </div>
-
-    <table class="table table-striped align-middle text-center">
-        <thead class="table-primary">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Imię</th>
-                <th scope="col">Nazwisko</th>
-                <th scope="col">Email</th>
-                <th scope="col">Numer telefonu</th>
-                <th scope="col">Rola</th>
-                <th scope="col">Status</th>
-                <th scope="col">Akcje</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($users as $user)
+    <div class="table-responsive-sm">
+        <table class="table table-striped align-middle text-center">
+            <thead class="table-primary">
                 <tr>
-                    <th scope="row">{{ $users->firstItem() + $loop->index }}</th>
-                    <td>{{ $user->first_name }}</td>
-                    <td>{{ $user->last_name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->phone }}</td>
-                    <td>{{ $user->role->name }}</td>
-                    <td>
-                        @if ($user->is_active)
-                            <span class="badge bg-success">Aktywny</span>
-                        @else
-                            <span class="badge bg-danger">Nieaktywny</span>
-                        @endif
-                    </td>
-                    <td class="d-flex justify-content-center gap-2">
-                        <button type="button" class="btn btn-info btn-sm"
-                            onclick="openUserModal({{ $user->id }}, '{{ $user->first_name }}', '{{ $user->last_name }}', '{{ $user->email }}', '{{ $user->phone }}', {{ $user->role_id }}, {{ $user->is_active }})">
-                            Edytuj
-                        </button>
-
-                        @if (!in_array($user->id, [1, 4]))
-                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?')">
-                                    Usuń
-                                </button>
-                            </form>
-                        @else
-                            <button class="btn btn-secondary btn-sm" disabled title="Konto chronione">Usuń</button>
-                        @endif
-                    </td>
+                    <th scope="col">#</th>
+                    <th scope="col">Imię</th>
+                    <th scope="col">Nazwisko</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Numer telefonu</th>
+                    <th scope="col">Rola</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Akcje</th>
                 </tr>
-            @empty
-                <tr>
-                    <th scope="row" colspan="8" class="text-center">Brak użytkowników spełniających kryteria.
-                    </th>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @forelse ($users as $user)
+                    <tr>
+                        <th scope="row">{{ $users->firstItem() + $loop->index }}</th>
+                        <td>{{ $user->first_name }}</td>
+                        <td>{{ $user->last_name }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->phone }}</td>
+                        <td>{{ $user->role->name }}</td>
+                        <td>
+                            @if ($user->is_active)
+                                <span class="badge bg-success">Aktywny</span>
+                            @else
+                                <span class="badge bg-danger">Nieaktywny</span>
+                            @endif
+                        </td>
+                        <td class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-info btn-sm"
+                                onclick="openUserModal({{ $user->id }}, '{{ $user->first_name }}', '{{ $user->last_name }}', '{{ $user->email }}', '{{ $user->phone }}', {{ $user->role_id }}, {{ $user->is_active }})">
+                                Edytuj
+                            </button>
 
+                            @if (!in_array($user->id, [1, 4]))
+                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?')">
+                                        Usuń
+                                    </button>
+                                </form>
+                            @else
+                                <button class="btn btn-secondary btn-sm" disabled title="Konto chronione">Usuń</button>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <th scope="row" colspan="8" class="text-center">Brak użytkowników spełniających kryteria.
+                        </th>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
     <div class="d-flex justify-content-center mt-4">
         {{ $users->links('pagination::bootstrap-5') }}
     </div>

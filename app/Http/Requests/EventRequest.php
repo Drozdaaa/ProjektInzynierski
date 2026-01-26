@@ -17,8 +17,7 @@ class EventRequest extends FormRequest
         if ($this->isMethod('post')) {
             return Auth::check();
         }
-
-        $routeParam = $this->route('id');
+        $routeParam = $this->route('id') ?? $this->route('event');
         $eventId = $routeParam instanceof Event ? $routeParam->id : $routeParam;
         $event = Event::find($eventId);
 
@@ -29,22 +28,19 @@ class EventRequest extends FormRequest
         return Gate::allows('manage-event', $event);
     }
 
-
     public function rules(): array
     {
         $restaurantId = null;
 
         if ($this->isMethod('post')) {
-            $routeParam = $this->route('id');
+            $routeParam = $this->route('id') ?? $this->route('restaurant');
             $restaurantId = $routeParam instanceof Restaurant ? $routeParam->id : $routeParam;
         } else {
-            $routeParam = $this->route('id');
+            $routeParam = $this->route('id') ?? $this->route('event');
             $eventId = $routeParam instanceof Event ? $routeParam->id : $routeParam;
             $event = Event::find($eventId);
             $restaurantId = $event?->restaurant_id;
         }
-
-        $userId = $this->user()?->id;
 
         $rules = [
             'description' => 'required|string|max:255',
@@ -60,7 +56,7 @@ class EventRequest extends FormRequest
                     'required',
                     'integer',
                     'min:1',
-                    function ($value, $fail) {
+                    function ($attribute, $value, $fail) {
                         $roomIds = $this->input('rooms', []);
 
                         if (empty($roomIds)) {
@@ -83,12 +79,11 @@ class EventRequest extends FormRequest
                 'menus_id' => 'nullable|array',
                 'menus_id.*' => [
                     'integer',
-                    Rule::exists('menus', 'id')->where(function ($query) {
-                        $user = Auth::user();
-                        if ($user->role_id !== 1) {
-                            return $query->where('user_id', $user->id);
-                        }
-                        return $query;
+                    Rule::exists('menus', 'id')->where(function ($query) use ($restaurantId) {
+                        return $query->where(function ($q) use ($restaurantId) {
+                            $q->where('user_id', Auth::id())
+                              ->orWhere('restaurant_id', $restaurantId);
+                        });
                     }),
                 ],
             ]);

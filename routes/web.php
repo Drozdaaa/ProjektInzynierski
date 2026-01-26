@@ -109,7 +109,7 @@ Route::controller(MenuController::class)->group(function () {
         Route::get('/restaurants/{restaurant}/events/{event}/menus/create', 'createForUser')->name('menus.user-create');
         Route::post('/restaurants/{restaurant}/menus/user-store', 'storeForUser')->name('menus.user-store');
         Route::get('/events/{event}/menus/edit', 'editForUser')->name('menus.user.edit');
-        Route::put('/events/{event}/menus/{menu}', 'updateForUser')->name('menus.user.update');
+        Route::put('/events/{event}/menus/update', 'updateForUser')->name('menus.user.update');
         Route::post('/restaurants/{restaurant}/events/{event}/menus/amounts', 'updateAmounts')->name('menus.update-amounts');
         Route::delete('/events/{event}/menus/{menu}/detach', 'detachMenu')->name('events.menu.detach');
     });
