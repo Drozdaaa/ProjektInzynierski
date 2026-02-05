@@ -136,12 +136,20 @@
                                                                         @foreach ($dishes as $dish)
                                                                             <li class="mb-1"
                                                                                 style="font-size: 0.85rem;">
-                                                                                <span
-                                                                                    class="fw-semibold">{{ $dish->name }}</span>
+                                                                                <span class="fw-semibold">{{ $dish->name }}</span>
                                                                                 @if ($dish->description)
-                                                                                    <br><span
-                                                                                        class="text-muted fst-italic"
-                                                                                        style="font-size: 0.75rem;">{{ $dish->description }}</span>
+                                                                                    <br><span class="text-muted fst-italic" style="font-size: 0.75rem;">{{ $dish->description }}</span>
+                                                                                @endif
+
+                                                                                @if($dish->diets->isNotEmpty() || $dish->allergies->isNotEmpty())
+                                                                                    <div class="mt-1">
+                                                                                        @foreach($dish->diets as $diet)
+                                                                                            <span class="badge bg-success bg-opacity-75" style="font-size: 0.6rem;">{{ $diet->name }}</span>
+                                                                                        @endforeach
+                                                                                        @foreach($dish->allergies as $allergy)
+                                                                                            <span class="badge bg-danger bg-opacity-75" style="font-size: 0.6rem;">{{ $allergy->name }}</span>
+                                                                                        @endforeach
+                                                                                    </div>
                                                                                 @endif
                                                                             </li>
                                                                         @endforeach
@@ -194,12 +202,20 @@
                                                                         @foreach ($dishes as $dish)
                                                                             <li class="mb-1"
                                                                                 style="font-size: 0.85rem;">
-                                                                                <span
-                                                                                    class="fw-semibold">{{ $dish->name }}</span>
+                                                                                <span class="fw-semibold">{{ $dish->name }}</span>
                                                                                 @if ($dish->description)
-                                                                                    <br><span
-                                                                                        class="text-muted fst-italic"
-                                                                                        style="font-size: 0.75rem;">{{ $dish->description }}</span>
+                                                                                    <br><span class="text-muted fst-italic" style="font-size: 0.75rem;">{{ $dish->description }}</span>
+                                                                                @endif
+
+                                                                                @if($dish->diets->isNotEmpty() || $dish->allergies->isNotEmpty())
+                                                                                    <div class="mt-1">
+                                                                                        @foreach($dish->diets as $diet)
+                                                                                            <span class="badge bg-success bg-opacity-75" style="font-size: 0.6rem;">{{ $diet->name }}</span>
+                                                                                        @endforeach
+                                                                                        @foreach($dish->allergies as $allergy)
+                                                                                            <span class="badge bg-danger bg-opacity-75" style="font-size: 0.6rem;">{{ $allergy->name }}</span>
+                                                                                        @endforeach
+                                                                                    </div>
                                                                                 @endif
                                                                             </li>
                                                                         @endforeach

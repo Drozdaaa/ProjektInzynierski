@@ -15,8 +15,8 @@ class RoomRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:50',
-            'capacity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
+            'capacity' => 'required|integer|min:1|max:10000',
+            'price' => 'required|numeric|min:0|max:50000',
             'description' => 'nullable|string|max:255',
             'cleaning_hours' => 'nullable|integer|min:0|max:24',
             'cleaning_minutes' => 'nullable|integer|min:0|max:59',
@@ -33,10 +33,12 @@ class RoomRequest extends FormRequest
             'capacity.required' => 'Pojemność sali jest wymagana.',
             'capacity.integer' => 'Pojemność sali musi być liczbą całkowitą.',
             'capacity.min' => 'Pojemność sali musi wynosić co najmniej 1 osobę.',
+            'capacity.max' => 'Pojemność sali nie może być większa od 10000.',
 
             'price.required' => 'Cena sali jest wymagana.',
             'price.numeric' => 'Cena sali musi być liczbą.',
             'price.min' => 'Cena sali nie może być ujemna.',
+            'price.max' => 'Cena sali nie może przekraczać 50000 zł.',
 
             'description.string' => 'Opis sali musi być tekstem.',
             'description.max' => 'Opis sali nie może przekraczać 255 znaków.',

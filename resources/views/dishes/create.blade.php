@@ -20,29 +20,47 @@
             </div>
         @endif
 
-        <form action="{{ route('dishes.store', ['restaurant' => $restaurant->id]) }}" method="POST">
+        <form action="{{ route('dishes.store', ['restaurant' => $restaurant->id]) }}" method="POST" novalidate>
             @csrf
 
             <div class="mb-3">
                 <label for="name" class="form-label">Nazwa dania</label>
-                <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}"
-                    required>
+                <input type="text" name="name" id="name"
+                    class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
+                @error('name')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
             </div>
 
             <div class="mb-3">
                 <label for="description" class="form-label">Opis</label>
-                <textarea name="description" id="description" class="form-control" rows="3">{{ old('description') }}</textarea>
+                <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror"
+                    rows="3">{{ old('description') }}</textarea>
+                @error('description')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
             </div>
 
             <div class="mb-3">
                 <label for="price" class="form-label">Cena (zł)</label>
-                <input type="number" name="price" id="price" class="form-control" value="{{ old('price') }}"
-                    step="0.01" min="0" required>
+                <input type="number" name="price" id="price"
+                    class="form-control @error('price') is-invalid @enderror" value="{{ old('price') }}" step="0.01"
+                    min="0" required>
+                @error('price')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
             </div>
 
             <div class="mb-3">
                 <label for="dish_type_id" class="form-label">Typ dania</label>
-                <select name="dish_type_id" id="dish_type_id" class="form-select" required>
+                <select name="dish_type_id" id="dish_type_id"
+                    class="form-select @error('dish_type_id') is-invalid @enderror" required>
                     @foreach ($dishTypes as $dishType)
                         <option value="{{ $dishType->id }}"
                             {{ old('dish_type_id') == $dishType->id ? 'selected' : '' }}>
@@ -50,7 +68,13 @@
                         </option>
                     @endforeach
                 </select>
+                @error('dish_type_id')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
             </div>
+
             <div class="card mb-4">
                 <div class="card-header bg-light">
                     <h6 class="mb-0">Rodzaje diet (Opcjonalne)</h6>
@@ -75,6 +99,11 @@
                             </div>
                         @endforeach
                     </div>
+                    @error('diets')
+                        <div class="text-danger mt-2 small">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -105,8 +134,14 @@
                             </div>
                         @endforeach
                     </div>
+                    @error('allergies')
+                        <div class="text-danger mt-2 small">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
+
             <button type="submit" class="btn btn-primary">Dodaj danie</button>
             <a href="{{ route('menus.index') }}" class="btn btn-secondary">Wróć do zarządzania menu</a>
         </form>

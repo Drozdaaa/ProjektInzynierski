@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\Restaurant;
-use Illuminate\Http\Request;
 use App\Http\Requests\RoomRequest;
 use Illuminate\Support\Facades\Gate;
 
@@ -115,6 +115,14 @@ class RoomController extends Controller
 
         if ($room->restaurant_id !== $restaurant->id) {
             abort(404);
+        }
+
+        $hasActiveEvents = $room->events()
+            ->where('end_time', '>=', Carbon::now())
+            ->exists();
+
+        if ($hasActiveEvents) {
+            return back()->with('error', 'Nie można usunąć sali, ponieważ są na nią zaplanowane przyszłe wydarzenia.');
         }
 
         $room->delete();

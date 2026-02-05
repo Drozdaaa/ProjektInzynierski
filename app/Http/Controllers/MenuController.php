@@ -57,7 +57,7 @@ class MenuController extends Controller
     public function store(Request $request, Restaurant $restaurant)
     {
         $request->validate([
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0|max:10000',
             'dishes' => 'required|array|min:1',
             'dishes.*' => 'exists:dishes,id',
         ]);
@@ -120,7 +120,7 @@ class MenuController extends Controller
         }
 
         $validated = $request->validate([
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0|max:1000',
             'dishes' => 'array',
             'dishes.*' => 'exists:dishes,id',
         ]);
@@ -380,8 +380,7 @@ class MenuController extends Controller
         }
 
         if (Gate::allows('restaurant-owner', $restaurant)) {
-            return redirect()->route('users.manager-dashboard')
-                ->with('success', 'Liczba porcji została zaktualizowana przez managera.');
+            return redirect()->route('users.manager-dashboard');
         }
 
         return redirect()->route('users.user-dashboard')

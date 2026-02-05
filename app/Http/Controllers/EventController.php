@@ -299,8 +299,10 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
+        Gate::authorize('delete-event', $event);
+
         $event->delete();
-        return redirect()->route('users.manager-dashboard')->with('success', 'Wydarzenie usunięte.');
+        return back()->with('success', 'Wydarzenie usunięte.');
     }
 
     /**

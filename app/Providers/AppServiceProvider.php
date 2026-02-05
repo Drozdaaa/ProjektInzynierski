@@ -66,5 +66,13 @@ class AppServiceProvider extends ServiceProvider
 
             return false;
         });
+
+        Gate::define('delete-event', function (User $user, Event $event) {
+            if (Gate::allows('restaurant-owner', $event->restaurant)) {
+                return true;
+            }
+
+            return $user->id === $event->user_id;
+        });
     }
 }

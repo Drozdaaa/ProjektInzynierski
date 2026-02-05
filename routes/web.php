@@ -172,6 +172,6 @@ Route::controller(EventController::class)->group(function () {
         Route::get('/events/{id}/edit', 'edit')->name('events.edit');
         Route::put('/events/{id}', 'update')->name('events.update');
         Route::patch('/events/{event}/status', 'updateStatus')->name('events.update-status');
-        Route::delete('/manager/{event}', 'destroy')->name('events.destroy');
+        Route::delete('/events/{event}', 'destroy')->name('events.destroy');
     });
 });

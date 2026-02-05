@@ -53,7 +53,7 @@ class DishController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:50|min:2',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0|max:50000',
             'description' => 'required|string|max:255',
             'dish_type_id' => 'required|exists:dish_types,id',
             'diets' => 'sometimes|array',
@@ -67,6 +67,7 @@ class DishController extends Controller
             'price.required' => 'Cena dania jest wymagana.',
             'price.numeric' => 'Cena musi być liczbą.',
             'price.min' => 'Cena nie może być ujemna.',
+            'price.max' => 'Cena dania nie może przekraczać 50000 zł.',
             'description.max' => 'Opis może mieć maksymalnie 255 znaków',
             'dish_type_id.required' => 'Typ dania jest wymagany.',
         ]);
@@ -121,7 +122,7 @@ class DishController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:30',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0|max:50000',
             'description' => 'required|string|max:255',
             'dish_type_id' => 'required|exists:dish_types,id',
             'diets' => 'sometimes|array',
@@ -132,6 +133,7 @@ class DishController extends Controller
             'name.required' => 'Nazwa dania jest wymagana.',
             'price.numeric' => 'Cena musi być liczbą.',
             'price.min' => 'Cena nie może być ujemna.',
+            'price.max' => 'Cena dania nie może przekraczać 50000 zł.',
             'description.max' => 'Opis może mieć maksymalnie 255 znaków',
         ]);
 

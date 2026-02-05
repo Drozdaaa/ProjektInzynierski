@@ -6,26 +6,57 @@ document.addEventListener('DOMContentLoaded', function () {
     const selectionTemplate = document.getElementById('daily-selection-template');
     const mainPeopleInput = document.getElementById('number_of_people');
 
+    const MAX_DAYS = 7;
+
     if (!startDateInput || !endDateInput) return;
 
-    if (startDateInput.value && endDateInput.value) {
-        buildReservationDays();
-    } else {
-        renderPreviewMode();
-    }
+    const todayStr = new Date().toISOString().split('T')[0];
+    startDateInput.setAttribute('min', todayStr);
+    endDateInput.setAttribute('min', todayStr);
 
-    startDateInput.addEventListener('change', syncDates);
-    endDateInput.addEventListener('change', syncDates);
+    validateAndBuild();
+
+    startDateInput.addEventListener('change', validateAndBuild);
+    endDateInput.addEventListener('change', validateAndBuild);
 
     if (mainPeopleInput) {
         mainPeopleInput.addEventListener('input', syncPeopleCount);
     }
 
-    function syncDates() {
+    function validateAndBuild() {
         if (!startDateInput.value || !endDateInput.value) {
             renderPreviewMode();
             return;
         }
+
+        const start = new Date(startDateInput.value);
+        const end = new Date(endDateInput.value);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        start.setHours(0,0,0,0);
+        end.setHours(0,0,0,0);
+
+        if (start < today) {
+            startDateInput.value = '';
+            renderPreviewMode();
+            return;
+        }
+
+        if (end < start) {
+            renderPreviewMode();
+            return;
+        }
+
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+        if (diffDays > MAX_DAYS) {
+            alert(`Maksymalny czas rezerwacji to ${MAX_DAYS} dni.`);
+            endDateInput.value = '';
+            renderPreviewMode();
+            return;
+        }
+
         buildReservationDays();
     }
 
@@ -40,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         dailySelectionsContainer.innerHTML = '';
         dailyHoursContainer.innerHTML =
-            '<div class="text-center text-muted fst-italic p-3">Wybierz daty, aby skonfigurować rezerwację.</div>';
+            '<div class="text-center text-muted fst-italic p-3">Wybierz poprawne daty, aby skonfigurować rezerwację.</div>';
 
         const clone = selectionTemplate.content.cloneNode(true);
         const header = clone.querySelector('.card-header');
@@ -48,8 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (header) {
             header.classList.remove('bg-light');
             header.classList.add('bg-secondary', 'text-white');
-            header.innerHTML =
-                '<h5 class="mb-0">Podgląd oferty</h5>';
+            header.innerHTML = '<h5 class="mb-0">Podgląd oferty</h5>';
         }
 
         clone.querySelectorAll('input, select, button').forEach(el => {
@@ -138,10 +168,13 @@ document.addEventListener('DOMContentLoaded', function () {
         let current = new Date(startDateInput.value);
         const end = new Date(endDateInput.value);
 
+        let safeguard = 0;
         while (current <= end) {
+            if (safeguard > MAX_DAYS + 1) break;
             const dateStr = current.toISOString().split('T')[0];
             callback(dateStr, new Date(current));
             current.setDate(current.getDate() + 1);
+            safeguard++;
         }
     }
 
@@ -150,10 +183,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!timeInputs.length) return;
         document.querySelectorAll('.daily-block .room-checkbox').forEach(cb => {
             cb.disabled = false;
-
             const card = cb.closest('.card');
             if (card) card.classList.remove('opacity-50', 'border-danger');
-
             const label = cb.closest('.daily-block').querySelector(`label[for="${cb.id}"]`);
             if (label && label.innerText === 'Zajęta') label.innerText = 'Wybierz';
         });
@@ -168,7 +199,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const requests = Object.entries(days).map(([date, times]) => {
             if (!times.start || !times.end) return;
-
             const url =
                 `${window.busyRoomsUrl}?date=${date}` +
                 `&start_time=${times.start}` +
@@ -185,17 +215,13 @@ document.addEventListener('DOMContentLoaded', function () {
     function disableBusyRooms(date, busyIds) {
         const block = document.querySelector(`.daily-block[data-date="${date}"]`);
         if (!block) return;
-
         busyIds.forEach(id => {
             const checkbox = block.querySelector(`.room-checkbox[value="${id}"]`);
             if (!checkbox) return;
-
             checkbox.checked = false;
             checkbox.disabled = true;
-
             const card = checkbox.closest('.card');
             if (card) card.classList.add('opacity-50', 'border-danger');
-
             const label = block.querySelector(`label[for="${checkbox.id}"]`);
             if (label) label.innerText = 'Zajęta';
         });

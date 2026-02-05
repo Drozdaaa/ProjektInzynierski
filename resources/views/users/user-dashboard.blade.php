@@ -43,8 +43,9 @@
                                 <small class="text-muted">
                                     {{ $event->restaurant->address->city }},
                                     {{ $event->restaurant->address->street }}
-                                    {{ $event->restaurant->address->building_number }},
-                                    {{ $event->restaurant->address->postal_code }}
+                                    {{ $event->restaurant->address->building_number }}<br>
+                                    {{ $event->manager->email }}<br>
+                                    nr telefonu: {{ $event->manager->phone }}
                                 </small>
                             </td>
                             <td>{{ $event->eventType->name }}</td>
@@ -99,6 +100,17 @@
                                             class="btn btn-sm btn-warning w-100 text-nowrap">
                                             Edytuj
                                         </a>
+                                    @endif
+                                    @if (Gate::allows('manage-event', $event))
+                                        <form action="{{ route('events.destroy', $event->id) }}" method="POST"
+                                            onsubmit="return confirm('Czy na pewno chcesz usunąć to wydarzenie?');"
+                                            class="w-100">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger w-100 text-nowrap">
+                                                Usuń
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             </td>
